@@ -1,0 +1,107 @@
+{
+  "manifest_version": "1.0",
+  "manifest_id": "approved-lpmandate-poba-2020-domestic-office-blind",
+  "status": "APPROVED",
+  "review": {
+    "reviewed_by": "hermes-research-consolidation",
+    "reviewed_at": "2026-08-16T00:40:00Z",
+    "approved_by": "hermes-parent-official-url-review",
+    "approved_at": "2026-08-16T00:41:00Z"
+  },
+  "sources": [
+    {
+      "id": "src-poba-73498",
+      "url": "https://www.poba.or.kr/bbs/selectNttDetail?sechBbsSeq=10&sechBbstSeq=73498",
+      "title": "국내 오피스 블라인드 펀드 위탁운용사 선정 공고",
+      "publisher": "대한지방행정공제회",
+      "document_type": "BID_NOTICE",
+      "published_at": "2020-11-26",
+      "accessed_at": "2026-08-16",
+      "rights_status": "EXCERPT_ALLOWED",
+      "exact_text": "1. 선정개요\n〇 선정기관 : 1개 기관(공동운용사 제안 금지)\n〇 위탁금액 : 3천억원 이내\n2. 운용사 선정방식\n〇 공개모집에 의한 제안서 평가 방식\n3. 제안서 제출\n〇 제출기한 : 2020.12.11.(금) 15:00\n4. 선정절차 및 일정\n〇 제안서 평가 : 2020.12월 중순\n- 1차 정량평가 : 국내부동산팀에서 실시, 3배수 이내 선정(선정 운용사 개별 통보)\n- 2차 정성평가 : 운용사별 PT 진행, 평가단 평가"
+    }
+  ],
+  "organizations": [
+    {
+      "id": "org-poba",
+      "organization_type": "ASSOCIATION",
+      "canonical_name": "대한지방행정공제회"
+    }
+  ],
+  "event": {
+    "id": "evt-poba-2020-domestic-office-blind",
+    "canonical_title": "대한지방행정공제회 국내 오피스 블라인드 펀드 위탁운용사 선정 공고",
+    "current_stage_code": "MANAGER_RFP_OPEN",
+    "event_date_start": "2020-11-26",
+    "event_date_end": "2020-11-26",
+    "date_precision": "DAY",
+    "lifecycle_status": "ACTIVE",
+    "verification_level": "V2",
+    "evidence": {
+      "source_ids": [
+        "src-poba-73498"
+      ]
+    }
+  },
+  "mandate": {
+    "id": "mandate-poba-2020-domestic-office-blind",
+    "lp_organization_id": "org-poba",
+    "mandate_code": "POBA-2020-DOMESTIC-OFFICE-BLIND",
+    "mandate_name": "국내 오피스 블라인드 펀드 위탁운용사 선정 공고",
+    "vintage_year": 2020,
+    "announced_at": "2020-11-26",
+    "application_deadline": "2020-12-11T15:00:00+09:00",
+    "mandate_status": "UNKNOWN",
+    "mandate_scope": "DOMESTIC",
+    "metadata": {
+      "selection_result_status": "NO_OFFICIAL_RESULT_FOUND",
+      "manager": "UNKNOWN",
+      "import_eligibility": "APPROVED_NOTICE_ONLY_NO_MANAGER_INFERENCE"
+    },
+    "evidence": {
+      "source_ids": [
+        "src-poba-73498"
+      ]
+    }
+  },
+  "tracks": [
+    {
+      "id": "track-poba-2020-domestic-office-blind",
+      "track_code": "POBA-2020-DOMESTIC-OFFICE-BLIND",
+      "track_name": "국내 오피스 블라인드 펀드",
+      "strategy_code": "REAL_ESTATE",
+      "geography_code": "DOMESTIC",
+      "target_manager_count": null,
+      "evidence": {
+        "source_ids": [
+          "src-poba-73498"
+        ]
+      }
+    }
+  ],
+  "guidelines": [],
+  "selections": [],
+  "selection_members": [],
+  "selection_vehicles": [],
+  "amounts": [
+    {
+      "id": "amount-poba-2020-domestic-office-blind-1",
+      "scope_type": "MANDATE",
+      "scope_id": "mandate-poba-2020-domestic-office-blind",
+      "amount_basis": "PROGRAM_TOTAL",
+      "amount": {
+        "kind": "AT_MOST",
+        "decimal": "300000000000",
+        "currency": "KRW",
+        "raw_value": "위탁금액 : 3천억원 이내"
+      },
+      "amount_status": "ANNOUNCED",
+      "evidence": {
+        "source_ids": [
+          "src-poba-73498"
+        ]
+      }
+    }
+  ],
+  "deployments": []
+}

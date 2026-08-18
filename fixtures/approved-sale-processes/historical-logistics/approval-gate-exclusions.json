@@ -1,0 +1,133 @@
+{
+  "schema_version": "approved_sale_process_exclusions.v1",
+  "reviewed_at": "2026-08-16T00:00:00Z",
+  "gate": {
+    "name": "STRICT_COMPETITION_AND_MILESTONE_FULL_TEXT_GATE",
+    "rule": "승인 manifest에는 직접 저장된 source extract/full text가 경쟁 라운드와 기록하려는 각 milestone을 함께 입증하는 process만 포함한다.",
+    "approved_process_ids": ["LOG-2020-DANCHON-01"],
+    "excluded_process_count": 14
+  },
+  "exclusions": [
+    {
+      "process_id": "LOG-2020-CHEONAN-LG-01",
+      "process_scope": "COMPETITIVE_AND_CLOSING_CLAIMS_NOT_FULL_TEXT_VERIFIED",
+      "reason_code": "SOURCE_CONTEXT_ONLY",
+      "reason": "11곳 참여·우협·7월 잔금 근거 S05~S07의 local extract 본문이 비어 있어 엄격 gate에서 직접 검증할 수 없음.",
+      "source_refs": ["S05", "S06", "S07"]
+    },
+    {
+      "process_id": "LOG-2020-ICHEON-INTERNATIONAL-01",
+      "process_scope": "PREFERRED_BIDDER_ONLY_COMPETITIVE_ROUND_UNPROVEN",
+      "reason_code": "COMPETITIVE_ROUND_AND_TERMINAL_UNCONFIRMED",
+      "reason": "S08 full text는 ADF 우협과 예정 closing만 입증한다. 복수 bidder/정식 라운드와 terminal은 확인되지 않음.",
+      "source_refs": ["S08"]
+    },
+    {
+      "process_id": "LOG-2020-ANSEONG-SAMSUNG-ATTEMPT1",
+      "process_scope": "FAILED_ATTEMPT_FOLLOWUP_ONLY",
+      "reason_code": "FULL_TEXT_UNAVAILABLE_AND_COMPETITION_UNCONFIRMED",
+      "reason": "S09 local extract 본문이 비어 있고 bidder set/round가 공개 검증되지 않음.",
+      "source_refs": ["S09"],
+      "related_processes": [
+        {"process_id": "LOG-2021-ANSEONG-SAMSUNG-ATTEMPT2", "relation": "RELAUNCH_SAME_ASSET"}
+      ]
+    },
+    {
+      "process_id": "LOG-2021-ANSEONG-SAMSUNG-ATTEMPT2",
+      "process_scope": "RELAUNCH_CLOSING_REPORTED_COMPETITION_UNPROVEN",
+      "reason_code": "FULL_TEXT_UNAVAILABLE_AND_COMPETITION_UNCONFIRMED",
+      "reason": "재매입 후속 보도만 있고 local extract 본문, 경쟁 라운드 및 정확한 terminal 근거가 없음.",
+      "source_refs": ["S09"],
+      "related_processes": [
+        {"process_id": "LOG-2020-ANSEONG-SAMSUNG-ATTEMPT1", "relation": "PREVIOUS_FAILED_ATTEMPT"}
+      ]
+    },
+    {
+      "process_id": "LOG-2021-FOODIST-PORTFOLIO-01",
+      "process_scope": "BILATERAL_OR_UNDISCLOSED_SALE_LEASEBACK_COMPARABLE",
+      "reason_code": "COMPETITIVE_ROUND_UNCONFIRMED",
+      "reason": "매각·재임차 closing 비교군이나 복수 bidder/입찰 라운드가 확인되지 않아 경쟁매각 manifest에서 제외.",
+      "source_refs": ["S10"]
+    },
+    {
+      "process_id": "LOG-2022-SEOKNAM-01",
+      "process_scope": "MARKETING_PREFERRED_AND_CLOSING_CHAIN_COMPETITION_UNPROVEN",
+      "reason_code": "COMPETITIVE_ROUND_NOT_DIRECTLY_EVIDENCED",
+      "reason": "S13 full text는 매각 착수·이지스 협상·종결을 확인하지만 공개 bidder set이나 경쟁 라운드를 입증하지 않는다. seller PF 대주단도 buyer funding이 아님.",
+      "source_refs": ["S11", "S12", "S13", "S14"]
+    },
+    {
+      "process_id": "LOG-2022-CHEONAN-KREIT-01",
+      "process_scope": "PREFERRED_BIDDER_AND_MOU_ONLY",
+      "reason_code": "COMPETITIVE_ROUND_AND_TERMINAL_UNCONFIRMED",
+      "reason": "S15 full text는 퍼시픽 우협·MOU·900억원 초과만 확인한다. 다른 bidder/round와 SPA·잔금은 미확인.",
+      "source_refs": ["S15"]
+    },
+    {
+      "process_id": "LOG-2022-ANSEONG-ILJUK-01",
+      "process_scope": "PREFERRED_BIDDER_ONLY_PLANNED_CLOSING",
+      "reason_code": "COMPETITIVE_ROUND_AND_TERMINAL_UNCONFIRMED",
+      "reason": "S16 full text는 우협·2820억원 및 예정 closing만 확인한다. 예정일을 CLOSED로 승격하지 않으며 bidder set/round도 미확인.",
+      "source_refs": ["S16"]
+    },
+    {
+      "process_id": "LOG-2023-ICHEON1-01",
+      "process_scope": "CLOSED_BILATERAL_OR_UNDISCLOSED_COMPARABLE",
+      "reason_code": "COMPETITIVE_ROUND_UNCONFIRMED",
+      "reason": "810억원 처분과 buyer fund는 보도됐으나 복수 bidder/입찰 라운드가 공개 검증되지 않음.",
+      "source_refs": ["S17", "S18"]
+    },
+    {
+      "process_id": "LOG-2023-GYEONGSAN-CJ-01",
+      "process_scope": "FAILED_MARKETING_FOLLOWUP_ONLY",
+      "reason_code": "FULL_TEXT_UNAVAILABLE_AND_COMPETITION_UNCONFIRMED",
+      "reason": "S19 local extract 본문이 비어 있고 경쟁 라운드가 확인되지 않는다. seller refinancing은 buyer funding으로 취급하지 않음.",
+      "source_refs": ["S19"]
+    },
+    {
+      "process_id": "LOG-2023-NAMCHEONGNA-01",
+      "process_scope": "DISTRESSED_CLOSING_COMPARABLE",
+      "reason_code": "COMPETITIVE_ROUND_UNCONFIRMED",
+      "reason": "S20 full text는 PF 만기일 종결·가격·vehicle/equity를 확인하지만 복수 bidder/정식 라운드는 확인하지 못함.",
+      "source_refs": ["S20"]
+    },
+    {
+      "process_id": "LOG-2023-ICHEON-YM-01",
+      "process_scope": "MANDATE_AND_DELAY_ONLY",
+      "reason_code": "NO_COMPETITIVE_ROUND_NO_TERMINAL",
+      "reason": "S21 full text는 자문사 선정·지연·리파이낸싱만 확인한다. 기존 담보대출 360억원은 buyer funding이 아니며 terminal도 없음.",
+      "source_refs": ["S21"]
+    },
+    {
+      "process_id": "LOG-2024-GONJIAM-01",
+      "process_scope": "MANDATE_FULL_TEXT_FOLLOWUP_COMPETITION_METADATA_ONLY",
+      "reason_code": "COMPETITIVE_AND_TERMINAL_FULL_TEXT_GATE_FAIL",
+      "reason": "S22 full text는 2024 자문사 선정과 예정 입찰만 확인한다. 2025 입찰·숏리스트·우협·종결 S23~S24는 local full text extract로 보존되지 않아 엄격 gate에서 제외. seller fund LP는 buyer funding으로 넣지 않음.",
+      "source_refs": ["S22", "S23", "S24"]
+    },
+    {
+      "process_id": "LOG-2024-YEOJU-01",
+      "process_scope": "MANDATE_FULL_TEXT_AND_LATER_CLOSING_COMPETITION_UNPROVEN",
+      "reason_code": "COMPETITIVE_ROUND_UNCONFIRMED",
+      "reason": "S25 full text는 2024 자문사 선정과 예정 입찰만 확인하고, 후속 closing에도 공개 bidder set/round가 없다. 단순 mandate/closing chain을 경쟁입찰로 승인하지 않음.",
+      "source_refs": ["S25", "S26", "S27"]
+    }
+  ],
+  "research_level_exclusions_preserved": [
+    {
+      "name": "창원 두동 물류센터 2022",
+      "code": "RELATED_VEHICLE_REPURCHASE_COMPETITION_UNCONFIRMED",
+      "source_refs": ["S28"]
+    },
+    {
+      "name": "BGF리테일 물류센터 4곳 2024 추진",
+      "code": "CORPORATE_SALE_PLAN_TERMINAL_UNCONFIRMED",
+      "source_refs": ["S29"]
+    },
+    {
+      "name": "개발부지·산업단지 사업자 공모 일반",
+      "code": "DEVELOPMENT_SITE_NOT_OPERATING_ASSET",
+      "source_refs": []
+    }
+  ]
+}

@@ -1,0 +1,85 @@
+{
+  "candidate_version": "1.0",
+  "candidate_id": "review-ready-cw-2024-domestic-senior-re-debt",
+  "status": "REVIEW_READY",
+  "target_manifest_version": "1.0",
+  "approval_blockers": ["공식 선정결과 원문 확보 및 reviewer/approver 서명 필요"],
+  "sources": [
+    {
+      "id": "src_cw_2024_re_debt_official_hwp",
+      "url": "https://www.cw.or.kr/upload/boardAdmin/2024/02/688D70C7-A11C-62FA-2409-AC240F606576.hwp",
+      "publisher": "건설근로자공제회",
+      "document_type": "BID_NOTICE",
+      "title": "국내 부동산 선순위 대출펀드 위탁운용사 선정 공고",
+      "published_at": "2024-02-13",
+      "accessed_at": "2026-08-16T00:00:00Z",
+      "rights_status": "EXCERPT_ALLOWED",
+      "exact_text": "국내 부동산 선순위 대출펀드 위탁운용사 선정 공고\n국내 부동산 선순위 중심 순수 대출형 투자(실물 담보 대출 및 PF 대출)\nLTV(Loan To Value) 65% 이하의 선순위로만 구성된 대출 투자 비중이 70% 이상\n목표 수익률: 6.0% 이상 (보수 차감 후)\n위탁운용규모:총 2,000억원 이내 (운용사당 500억원 이내, 4개사 선정)\n펀드존속기간 : 8년 내외 (투자기간 3년 내외)"
+    },
+    {
+      "id": "src_cw_2024_re_debt_result_fnnews",
+      "url": "https://www.fnnews.com/news/202404290711016886",
+      "publisher": "파이낸셜뉴스",
+      "document_type": "ARTICLE",
+      "title": "[fn마켓워치]건근공, 국내 선순위 부동산대출 운용사에 '삼성SRA·캡스톤' 낙점",
+      "published_at": "2024-04-29",
+      "accessed_at": "2026-08-16T00:00:00Z",
+      "rights_status": "EXCERPT_ALLOWED",
+      "exact_text": "건설근로자공제회가 국내 선순위 부동산 대출펀드 운용사에 삼성SRA자산운용, 캡스톤자산운용, 메테우스자산운용, 하나대체투자자산운용을 낙점했다.\n29일 투자은행(IB) 업계에 따르면 건설근로자공제회는 국내 선순위 부동산 대출펀드 위탁운용사에 운용사에 삼성SRA자산운용, 캡스톤자산운용, 메테우스자산운용, 하나대체투자자산운용을 선정했다. 각각 500억원을 출자, 총 2000억원 규모 투자다.\n실물 담보 대출 및 PF(프로젝트 파이낸싱) 대출 등 선순위를 중심으로 순수 대출형에 투자한다. LTV(담보대출비율) 65% 이하의 선순위로만 구성된 대출 투자 비중이 70% 이상인 조건이다.\n이를 통해 목표 수익률은 보수 차감 후 6.0% 이상이다. 펀드 투자 기간은 3년 내외로 만기는 8년 내외다."
+    }
+  ],
+  "organizations": [
+    {"id": "org_cw", "organization_type": "ASSOCIATION", "canonical_name": "건설근로자공제회"},
+    {"id": "org_samsung_sra", "organization_type": "COMPANY", "canonical_name": "삼성SRA자산운용"},
+    {"id": "org_capstone_am", "organization_type": "COMPANY", "canonical_name": "캡스톤자산운용"},
+    {"id": "org_metheus_am", "organization_type": "COMPANY", "canonical_name": "메테우스자산운용"},
+    {"id": "org_hana_aamc", "organization_type": "COMPANY", "canonical_name": "하나대체투자자산운용"}
+  ],
+  "event": {
+    "id": "event_cw_2024_re_debt",
+    "canonical_title": "건설근로자공제회 2024 국내 부동산 선순위 대출펀드 운용사 선정",
+    "current_stage_code": "MANAGER_SELECTED",
+    "event_date_start": "2024-02-13",
+    "event_date_end": "2024-04-29",
+    "date_precision": "DAY",
+    "lifecycle_status": "COMPLETED",
+    "evidence": {"source_ids": ["src_cw_2024_re_debt_official_hwp", "src_cw_2024_re_debt_result_fnnews"]}
+  },
+  "mandate": {
+    "id": "mandate_cw_2024_re_debt",
+    "lp_organization_id": "org_cw",
+    "mandate_code": "CW-2024-DOMESTIC-SENIOR-RE-DEBT",
+    "mandate_name": "2024 국내 부동산 선순위 대출펀드 위탁운용사 선정",
+    "vintage_year": 2024,
+    "announced_at": "2024-02-13",
+    "application_deadline": "2024-02-26",
+    "selected_at": "2024-04-29",
+    "mandate_status": "SELECTED",
+    "mandate_scope": "DOMESTIC",
+    "evidence": {"source_ids": ["src_cw_2024_re_debt_official_hwp", "src_cw_2024_re_debt_result_fnnews"]}
+  },
+  "tracks": [
+    {"id": "track_cw_2024_re_debt", "track_code": "DOMESTIC_SENIOR_REAL_ESTATE_DEBT", "track_name": "국내 부동산 선순위 대출", "strategy_code": "PRIVATE_DEBT", "geography_code": "DOMESTIC", "target_manager_count": 4, "evidence": {"source_ids": ["src_cw_2024_re_debt_official_hwp"]}}
+  ],
+  "guidelines": [
+    {"id": "guide_cw_2024_strategy", "track_id": "track_cw_2024_re_debt", "term_type": "STRATEGY", "requirement_level": "REQUIRED", "raw_text": "국내 부동산 선순위 중심 순수 대출형 투자(실물 담보 대출 및 PF 대출)", "value_kind": "TEXT", "text_value": "국내 부동산 선순위 순수 대출형", "evidence": {"source_ids": ["src_cw_2024_re_debt_official_hwp"]}},
+    {"id": "guide_cw_2024_ltv", "track_id": "track_cw_2024_re_debt", "term_type": "LEVERAGE", "requirement_level": "REQUIRED", "raw_text": "LTV(Loan To Value) 65% 이하의 선순위로만 구성된 대출 투자 비중이 70% 이상", "value_kind": "TEXT", "text_value": "LTV 65% 이하 선순위 비중 70% 이상", "evidence": {"source_ids": ["src_cw_2024_re_debt_official_hwp"]}},
+    {"id": "guide_cw_2024_return", "track_id": "track_cw_2024_re_debt", "term_type": "TARGET_RETURN", "requirement_level": "MINIMUM", "raw_text": "목표 수익률: 6.0% 이상 (보수 차감 후)", "value_kind": "PERCENT", "value_decimal_text": "6.0", "unit_code": "PERCENT", "comparator_code": "AT_LEAST", "return_basis": "UNSPECIFIED", "evidence": {"source_ids": ["src_cw_2024_re_debt_official_hwp"]}}
+  ],
+  "selections": [
+    {"id": "selection_cw_2024_samsung_sra", "track_id": "track_cw_2024_re_debt", "manager_organization_id": "org_samsung_sra", "selection_status": "SELECTED", "selected_at": "2024-04-29", "evidence": {"source_ids": ["src_cw_2024_re_debt_result_fnnews"]}},
+    {"id": "selection_cw_2024_capstone", "track_id": "track_cw_2024_re_debt", "manager_organization_id": "org_capstone_am", "selection_status": "SELECTED", "selected_at": "2024-04-29", "evidence": {"source_ids": ["src_cw_2024_re_debt_result_fnnews"]}},
+    {"id": "selection_cw_2024_metheus", "track_id": "track_cw_2024_re_debt", "manager_organization_id": "org_metheus_am", "selection_status": "SELECTED", "selected_at": "2024-04-29", "evidence": {"source_ids": ["src_cw_2024_re_debt_result_fnnews"]}},
+    {"id": "selection_cw_2024_hana", "track_id": "track_cw_2024_re_debt", "manager_organization_id": "org_hana_aamc", "selection_status": "SELECTED", "selected_at": "2024-04-29", "evidence": {"source_ids": ["src_cw_2024_re_debt_result_fnnews"]}}
+  ],
+  "selection_members": [],
+  "selection_vehicles": [],
+  "amounts": [
+    {"id": "amount_cw_2024_track", "scope_type": "TRACK", "scope_id": "track_cw_2024_re_debt", "amount_basis": "TRACK_LP_COMMITMENT", "amount": {"kind": "AT_MOST", "decimal": "200000000000", "currency": "KRW", "raw_value": "총 2,000억원 이내"}, "amount_status": "ANNOUNCED", "evidence": {"source_ids": ["src_cw_2024_re_debt_official_hwp"]}},
+    {"id": "amount_cw_2024_samsung_sra", "scope_type": "SELECTION", "scope_id": "selection_cw_2024_samsung_sra", "amount_basis": "SELECTION_LP_COMMITMENT", "amount": {"kind": "EXACT", "decimal": "50000000000", "currency": "KRW", "raw_value": "각각 500억원을 출자"}, "amount_status": "REPORTED", "evidence": {"source_ids": ["src_cw_2024_re_debt_result_fnnews"]}},
+    {"id": "amount_cw_2024_capstone", "scope_type": "SELECTION", "scope_id": "selection_cw_2024_capstone", "amount_basis": "SELECTION_LP_COMMITMENT", "amount": {"kind": "EXACT", "decimal": "50000000000", "currency": "KRW", "raw_value": "각각 500억원을 출자"}, "amount_status": "REPORTED", "evidence": {"source_ids": ["src_cw_2024_re_debt_result_fnnews"]}},
+    {"id": "amount_cw_2024_metheus", "scope_type": "SELECTION", "scope_id": "selection_cw_2024_metheus", "amount_basis": "SELECTION_LP_COMMITMENT", "amount": {"kind": "EXACT", "decimal": "50000000000", "currency": "KRW", "raw_value": "각각 500억원을 출자"}, "amount_status": "REPORTED", "evidence": {"source_ids": ["src_cw_2024_re_debt_result_fnnews"]}},
+    {"id": "amount_cw_2024_hana", "scope_type": "SELECTION", "scope_id": "selection_cw_2024_hana", "amount_basis": "SELECTION_LP_COMMITMENT", "amount": {"kind": "EXACT", "decimal": "50000000000", "currency": "KRW", "raw_value": "각각 500억원을 출자"}, "amount_status": "REPORTED", "evidence": {"source_ids": ["src_cw_2024_re_debt_result_fnnews"]}}
+  ],
+  "deployments": []
+}

@@ -1,0 +1,54 @@
+{
+  "validated_at": "2026-08-16T00:00:00Z",
+  "scope": "fixtures/approved-sale-processes/historical-logistics",
+  "evidence_gate": {
+    "input_process_count": 15,
+    "approved_count": 1,
+    "excluded_count": 14,
+    "approved_process_ids": ["LOG-2020-DANCHON-01"],
+    "approved_sources": [
+      {
+        "source_ref": "S01",
+        "chars_in_local_extract": 6682,
+        "supports": ["FINAL_BID_DEADLINE", "19_PARTICIPANTS", "HIGHEST_BID", "PREFERRED_BIDDER", "APPROX_PRICE"]
+      },
+      {
+        "source_ref": "S03",
+        "chars_in_local_extract": 2008,
+        "supports": ["2020_ACQUISITION_TERMINAL", "ACQUISITION_VEHICLE", "SENIOR_LENDERS"]
+      }
+    ]
+  },
+  "manifest_contract": {
+    "validate_manifest": "PASS",
+    "global_source_id_count_across_all_approved_manifests": 11,
+    "duplicate_source_ids": []
+  },
+  "sequential_temp_sqlite_import": {
+    "database_scope": "TEMP_ONLY",
+    "live_or_shared_database_touched": false,
+    "manifests_in_order": [
+      "cheongna-logistics-2025.json",
+      "hyundai-yeonji-2025.json",
+      "historical-logistics/log-2020-danchon-01.json"
+    ],
+    "first_import_inserted_rows": [53, 50, 31],
+    "repeat_import_inserted_rows": [0, 0, 0],
+    "foreign_key_check_rows": 0,
+    "integrity_check": "ok",
+    "sale_process_count": 3
+  },
+  "semantic_checks": {
+    "terminal_unconfirmed_promoted_to_closed": false,
+    "approved_closed_at": null,
+    "approved_terminal_precision": "YEAR",
+    "seller_existing_debt_imported_as_buyer_funding": false,
+    "related_processes_preserved_in_exclusion_json": true
+  },
+  "repository_compatibility_note": {
+    "current_db_schema_version": "2.4.0",
+    "importer_required_schema_version": "2.4.0",
+    "verification_method": "현재 schema.sql/seed.sql로 OS temp DB를 생성해 importer 계약 그대로 검증. 저장소 importer/schema/live DB는 수정하지 않음.",
+    "compatibility_status": "MATCH"
+  }
+}

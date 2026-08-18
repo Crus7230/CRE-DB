@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.example/schemas/lp-mandate-verification-candidate.schema.json",
+  "title": "LP Mandate Verification Candidate",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "candidate_version", "candidate_id", "verification_layer", "resolution_status",
+    "claim_type", "claim_subject", "claim_payload", "sources", "verification_needed",
+    "first_seen_at", "last_checked_at"
+  ],
+  "properties": {
+    "candidate_version": {"const": "1.0"},
+    "candidate_id": {"type": "string", "minLength": 1},
+    "verification_layer": {"const": "VERIFICATION_CANDIDATE"},
+    "resolution_status": {
+      "enum": [
+        "NEWS_ONLY_PENDING_PRIMARY",
+        "LIKELY_REPORTED_PENDING_PRIMARY",
+        "HIGHLY_LIKELY_REPORTED_PENDING_PRIMARY",
+        "MULTISOURCE_CORROBORATED_PENDING_PRIMARY",
+        "OFFICIAL_PLAN_RESULT_PENDING",
+        "CONFLICT_REVIEW_REQUIRED",
+        "PROMOTED",
+        "CONTRADICTED",
+        "WITHDRAWN",
+        "FALSE_POSITIVE",
+        "OUT_OF_SCOPE"
+      ]
+    },
+    "claim_type": {
+      "enum": [
+        "MANDATE_EXISTS", "SELECTED_MANAGER", "SELECTION_AMOUNT", "COMMITMENT",
+        "FUND_OR_VEHICLE", "DEAL_DEPLOYMENT", "GUIDELINE", "OTHER"
+      ]
+    },
+    "claim_subject": {"type": "string", "minLength": 1},
+    "claim_payload": {"type": "object", "additionalProperties": true},
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": ["url", "publisher", "document_type", "published_at", "exact_text", "source_family"],
+        "properties": {
+          "url": {"type": "string", "format": "uri"},
+          "publisher": {"type": "string"},
+          "document_type": {"enum": ["ARTICLE", "REPORT", "RSS_ITEM", "SEARCH_SNIPPET", "OTHER"]},
+          "published_at": {"type": ["string", "null"]},
+          "exact_text": {"type": "string", "minLength": 1},
+          "source_family": {"type": "string", "minLength": 1},
+          "independent_from_other_sources": {"type": "boolean"}
+        }
+      }
+    },
+    "verification_needed": {
+      "type": "array", "minItems": 1, "uniqueItems": true,
+      "items": {
+        "enum": [
+          "OFFICIAL_NOTICE", "OFFICIAL_SELECTION_RESULT", "OFFICIAL_DISCLOSURE",
+          "PARTY_PRIMARY_CONFIRMATION", "REGULATORY_FILING", "FUND_DOCUMENT",
+          "VEHICLE_IDENTITY", "DEAL_SOURCE_LINK", "AMOUNT_BASIS", "DATE", "OTHER"
+        ]
+      }
+    },
+    "first_seen_at": {"type": "string"},
+    "last_checked_at": {"type": "string"},
+    "promoted_manifest_id": {"type": ["string", "null"]},
+    "resolution_note": {"type": ["string", "null"]},
+    "contradicting_source_urls": {"type": "array", "items": {"type": "string", "format": "uri"}}
+  }
+}

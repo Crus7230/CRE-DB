@@ -1,0 +1,247 @@
+{
+  "manifest_version": "1.0",
+  "manifest_id": "approved-kvic-2021-september-urban-regeneration",
+  "status": "APPROVED",
+  "review": {
+    "reviewed_by": "hermes-policy-funds-research",
+    "reviewed_at": "2026-08-16T00:50:00Z",
+    "approved_by": "hermes-parent-official-document-review",
+    "approved_at": "2026-08-16T00:51:00Z"
+  },
+  "sources": [
+    {
+      "id": "src_kvic_2021_sep_plan",
+      "url": "https://www.kvic.or.kr/fileDown?boardDataNo=3356&idx=1",
+      "publisher": "한국벤처투자",
+      "document_type": "NOTICE",
+      "title": "한국모태펀드 2021년 9월 수시 출자사업 계획 공고",
+      "published_at": "2021-09-03",
+      "accessed_at": "2026-08-16T09:00:00+09:00",
+      "rights_status": "EXCERPT_ALLOWED",
+      "exact_text": "모태펀드 2021년 9월 수시 출자사업 계획 공고(도시재생, 고용계정)\n출자 규모 · 총 145억원 이내\n계정 | 분야 | 출자예산(변동가능) | 결성목표액 | 최대출자비율\n도시재생 | 도시재생 | 100 | 125 | 80%\n도시재생 ○ 다음 중 하나에 해당하는 창업자, 기술혁신형·경영혁신형 중소기업, 벤처기업 또는 사회적기업*에 약정총액의 60% 이상 투자\n- (도시재생활성화사업 참여형) 도시재생 활성화 및 지원에 관한 특별법 제2조제1항제7호**에 따른 사업을 영위\n- (지역기반 도시재생활성화 기여형)*** 도시재생 활성화지역의 경제적·사회적·문화적 분야의 활력회복과 지역주민 삶의 질 향상에 기여\n접수마감 시한 • 2021년 9월 17일(금), 14:00 (온라인 방식으로만 접수)\n조합 결성 시한 · 결성시한 : 3개월 이내\n투자(납입)기간 ○ (도시재생) 2년 이상\n존속기간 ○ (도시재생) 5년 이상 10년 이내\n기준수익률 ○ 1% 이상",
+      "retrieved_sha256": "b022bd9e44b92f2b2dedba276e110cbb4ec3694f97ced3819561b36072cf8095"
+    },
+    {
+      "id": "src_kvic_2021_sep_result",
+      "url": "https://www.kvic.or.kr/fileDown?boardDataNo=3390&idx=1",
+      "publisher": "한국벤처투자",
+      "document_type": "NOTICE",
+      "title": "한국모태펀드 2021년 9월 수시 출자사업 선정 결과",
+      "published_at": "2021-11-01",
+      "accessed_at": "2026-08-16T09:00:00+09:00",
+      "rights_status": "EXCERPT_ALLOWED",
+      "exact_text": "한국모태펀드 2021년 9월 수시 출자사업 선정 결과\n□ 선정 조합 수 2개, 결성예정액 185억원, 출자요청액 145억원\n계정 | 출자분야 | 결성예정액 | 출자요청액 | 회사명\n도시재생 | 도시재생 | 125 | 100 | 쿨리지코너인베스트먼트\n중진(고용) | 사회적기업 | 60 | 45 | 임팩트스퀘어",
+      "retrieved_sha256": "a9b0ca0d5943540b1f996fba3251bfe4ef47f284bfc6c66f674890247ffbcd5a"
+    }
+  ],
+  "organizations": [
+    {
+      "id": "org_kvic",
+      "organization_type": "GOVERNMENT",
+      "canonical_name": "한국벤처투자"
+    },
+    {
+      "id": "org_coolidge_corner",
+      "organization_type": "COMPANY",
+      "canonical_name": "쿨리지코너인베스트먼트"
+    }
+  ],
+  "event": {
+    "id": "event_kvic_2021_sep_urban",
+    "canonical_title": "한국모태펀드 2021년 9월 수시 도시재생 운용사 선정",
+    "current_stage_code": "MANAGER_SELECTED",
+    "event_date_start": "2021-11-01",
+    "date_precision": "DAY",
+    "lifecycle_status": "COMPLETED",
+    "verification_level": "V3",
+    "evidence": {
+      "source_ids": [
+        "src_kvic_2021_sep_plan",
+        "src_kvic_2021_sep_result"
+      ]
+    }
+  },
+  "mandate": {
+    "id": "mandate_kvic_2021_sep_urban",
+    "lp_organization_id": "org_kvic",
+    "mandate_code": "KVIC-2021-SEP-URBAN-REGEN",
+    "mandate_name": "한국모태펀드 2021년 9월 수시 도시재생",
+    "vintage_year": 2021,
+    "announced_at": "2021-09-03",
+    "application_deadline": "2021-09-17",
+    "selected_at": "2021-11-01",
+    "mandate_status": "SELECTED",
+    "mandate_scope": "DOMESTIC",
+    "evidence": {
+      "source_ids": [
+        "src_kvic_2021_sep_plan",
+        "src_kvic_2021_sep_result"
+      ]
+    }
+  },
+  "tracks": [
+    {
+      "id": "track_kvic_2021_sep_urban",
+      "track_code": "URBAN_REGENERATION",
+      "track_name": "도시재생",
+      "strategy_code": "OTHER",
+      "geography_code": "DOMESTIC",
+      "target_manager_count": 1,
+      "evidence": {
+        "source_ids": [
+          "src_kvic_2021_sep_plan"
+        ]
+      }
+    }
+  ],
+  "guidelines": [
+    {
+      "id": "guide_kvic21_urban_target",
+      "track_id": "track_kvic_2021_sep_urban",
+      "term_type": "ELIGIBLE_ASSET",
+      "requirement_level": "REQUIRED",
+      "raw_text": "약정총액의 60% 이상 투자",
+      "value_kind": "PERCENT",
+      "value_decimal_text": "60",
+      "unit_code": "PERCENT",
+      "comparator_code": "AT_LEAST",
+      "evidence": {
+        "source_ids": [
+          "src_kvic_2021_sep_plan"
+        ]
+      }
+    },
+    {
+      "id": "guide_kvic21_urban_invest_period",
+      "track_id": "track_kvic_2021_sep_urban",
+      "term_type": "INVESTMENT_PERIOD",
+      "requirement_level": "MINIMUM",
+      "raw_text": "(도시재생) 2년 이상",
+      "value_kind": "DURATION",
+      "text_value": "2Y minimum",
+      "evidence": {
+        "source_ids": [
+          "src_kvic_2021_sep_plan"
+        ]
+      }
+    },
+    {
+      "id": "guide_kvic21_urban_term",
+      "track_id": "track_kvic_2021_sep_urban",
+      "term_type": "FUND_TERM",
+      "requirement_level": "REQUIRED",
+      "raw_text": "(도시재생) 5년 이상 10년 이내",
+      "value_kind": "DURATION",
+      "text_value": "5Y-10Y",
+      "evidence": {
+        "source_ids": [
+          "src_kvic_2021_sep_plan"
+        ]
+      }
+    },
+    {
+      "id": "guide_kvic21_urban_return",
+      "track_id": "track_kvic_2021_sep_urban",
+      "term_type": "TARGET_RETURN",
+      "requirement_level": "MINIMUM",
+      "raw_text": "기준수익률 ○ 1% 이상",
+      "value_kind": "PERCENT",
+      "value_decimal_text": "1",
+      "unit_code": "PERCENT",
+      "comparator_code": "AT_LEAST",
+      "return_basis": "UNSPECIFIED",
+      "evidence": {
+        "source_ids": [
+          "src_kvic_2021_sep_plan"
+        ]
+      }
+    }
+  ],
+  "selections": [
+    {
+      "id": "selection_candidate-kvic-2021-september-urban-regeneration",
+      "track_id": "track_kvic_2021_sep_urban",
+      "manager_organization_id": "org_coolidge_corner",
+      "selection_status": "SELECTED",
+      "selected_at": "2021-11-01",
+      "confidence": 1.0,
+      "evidence": {
+        "source_ids": [
+          "src_kvic_2021_sep_result"
+        ]
+      }
+    }
+  ],
+  "selection_members": [],
+  "selection_vehicles": [],
+  "amounts": [
+    {
+      "id": "amount_kvic21_track",
+      "scope_type": "TRACK",
+      "scope_id": "track_kvic_2021_sep_urban",
+      "amount_basis": "TRACK_LP_COMMITMENT",
+      "amount": {
+        "kind": "EXACT",
+        "decimal": "10000000000",
+        "currency": "KRW",
+        "raw_value": "도시재생 | 도시재생 | 100 | 125 | 80%"
+      },
+      "amount_status": "ANNOUNCED",
+      "metadata": {
+        "source_table_column": "출자예산(변동가능)",
+        "display_value": "100억원"
+      },
+      "evidence": {
+        "source_ids": [
+          "src_kvic_2021_sep_plan"
+        ]
+      }
+    },
+    {
+      "id": "amount_kvic21_target",
+      "scope_type": "TRACK",
+      "scope_id": "track_kvic_2021_sep_urban",
+      "amount_basis": "TARGET_FUND_SIZE",
+      "amount": {
+        "kind": "EXACT",
+        "decimal": "12500000000",
+        "currency": "KRW",
+        "raw_value": "도시재생 | 도시재생 | 100 | 125 | 80%"
+      },
+      "amount_status": "ANNOUNCED",
+      "metadata": {
+        "source_table_column": "결성목표액",
+        "display_value": "125억원"
+      },
+      "evidence": {
+        "source_ids": [
+          "src_kvic_2021_sep_plan"
+        ]
+      }
+    },
+    {
+      "id": "amount_kvic21_selection",
+      "scope_type": "SELECTION",
+      "scope_id": "selection_candidate-kvic-2021-september-urban-regeneration",
+      "amount_basis": "OTHER",
+      "amount": {
+        "kind": "EXACT",
+        "decimal": "10000000000",
+        "currency": "KRW",
+        "raw_value": "도시재생 | 도시재생 | 125 | 100 | 쿨리지코너인베스트먼트"
+      },
+      "amount_status": "REPORTED",
+      "metadata": {
+        "source_table_column": "출자요청액",
+        "display_value": "100억원",
+        "semantic": "REQUESTED_NOT_CONFIRMED_COMMITMENT_OR_PAID_IN"
+      },
+      "evidence": {
+        "source_ids": [
+          "src_kvic_2021_sep_result"
+        ]
+      }
+    }
+  ],
+  "deployments": []
+}

@@ -1,0 +1,217 @@
+{
+  "manifest_version": "1.0",
+  "manifest_id": "candidate-kvic-2020-q4-urban-regeneration",
+  "status": "REVIEW_READY",
+  "review": {
+    "reviewed_by": "UNASSIGNED",
+    "reviewed_at": "PENDING_HUMAN_REVIEW",
+    "approved_by": "UNASSIGNED",
+    "approved_at": "PENDING_HUMAN_REVIEW"
+  },
+  "candidate_policy": {
+    "importable": false,
+    "reason": "human review and explicit approval required; approved importer intentionally rejects REVIEW_READY",
+    "live_db_allowed": false
+  },
+  "sources": [
+    {
+      "id": "src_kvic_2020_q4_plan",
+      "url": "https://www.kvic.or.kr/fileDown?boardDataNo=3138&idx=1",
+      "publisher": "한국벤처투자",
+      "document_type": "NOTICE",
+      "title": "한국모태펀드 2020년 4차 정시 출자사업 계획 공고",
+      "published_at": "2020-09-28",
+      "accessed_at": "2026-08-16T09:00:00+09:00",
+      "rights_status": "EXCERPT_ALLOWED",
+      "exact_text": "모태펀드 2020년 4차 정시 출자사업 계획 공고\n출자 규모 · 총 200억원 내외\n계정 | 분야 | 출자예산 (변동가능) | 결성 목표액 | 최대 출자비율\n도시재생 | 도시재생 | 200 | 250 | 80%\n도시재생 | ◦ 다음 중 하나에 해당하는 창업자, 기술혁신형·경영혁신형 중소기업, 벤처기업 또는 사회적기업*에 약정총액의 60% 이상 투자\n- (도시재생활성화사업 참여형) 도시재생 활성화 및 지원에 관한 특별법 제2조제1항제7호**에 따른 사업을 영위\n- (지역기반 도시재생활성화 기여형)*** 도시재생 활성화지역의 경제적·사회적·문화적 분야의 활력회복과 지역주민 삶의 질 향상에 기여\n접수마감 시한 · 접수 : 2020년 10월 15일(목), 14:00 (온라인 방식으로만 접수)\n조합 결성 시한 · 결성시한 : 3개월 이내"
+    },
+    {
+      "id": "src_kvic_2020_q4_result",
+      "url": "https://www.kvic.or.kr/fileDown?boardDataNo=3163&idx=1",
+      "publisher": "한국벤처투자",
+      "document_type": "NOTICE",
+      "title": "한국모태펀드 2020년 4차 정시 출자사업 선정 결과",
+      "published_at": "2020-11-17",
+      "accessed_at": "2026-08-16T09:00:00+09:00",
+      "rights_status": "EXCERPT_ALLOWED",
+      "exact_text": "한국모태펀드 2020년 4차 정시 출자사업 선정 결과\n- 선정조합 수 1개, 결성예정액 250억원, 출자요청액 200억원\n출자분야 | 결성예정액 | 출자요청액 | 회사명\n도시재생 | 250 | 200 | 쿨리지코너인베스트먼트"
+    }
+  ],
+  "organizations": [
+    {
+      "id": "org_kvic",
+      "organization_type": "GOVERNMENT",
+      "canonical_name": "한국벤처투자"
+    },
+    {
+      "id": "org_coolidge_corner",
+      "organization_type": "COMPANY",
+      "canonical_name": "쿨리지코너인베스트먼트"
+    }
+  ],
+  "event": {
+    "id": "event_kvic_2020_q4_urban",
+    "canonical_title": "한국모태펀드 2020년 4차 정시 도시재생 운용사 선정",
+    "current_stage_code": "MANAGER_SELECTED",
+    "event_date_start": "2020-11-17",
+    "date_precision": "DAY",
+    "lifecycle_status": "COMPLETED",
+    "verification_level": "V3",
+    "evidence": {
+      "source_ids": [
+        "src_kvic_2020_q4_plan",
+        "src_kvic_2020_q4_result"
+      ]
+    }
+  },
+  "mandate": {
+    "id": "mandate_kvic_2020_q4_urban",
+    "lp_organization_id": "org_kvic",
+    "mandate_code": "KVIC-2020-Q4-URBAN-REGEN",
+    "mandate_name": "한국모태펀드 2020년 4차 정시 도시재생",
+    "vintage_year": 2020,
+    "announced_at": "2020-09-28",
+    "application_deadline": "2020-10-15",
+    "selected_at": "2020-11-17",
+    "mandate_status": "SELECTED",
+    "mandate_scope": "DOMESTIC",
+    "evidence": {
+      "source_ids": [
+        "src_kvic_2020_q4_plan",
+        "src_kvic_2020_q4_result"
+      ]
+    }
+  },
+  "tracks": [
+    {
+      "id": "track_kvic_2020_q4_urban",
+      "track_code": "URBAN_REGENERATION",
+      "track_name": "도시재생",
+      "strategy_code": "OTHER",
+      "geography_code": "DOMESTIC",
+      "target_manager_count": 1,
+      "evidence": {
+        "source_ids": [
+          "src_kvic_2020_q4_plan"
+        ]
+      }
+    }
+  ],
+  "guidelines": [
+    {
+      "id": "guide_kvic20_urban_target",
+      "track_id": "track_kvic_2020_q4_urban",
+      "term_type": "ELIGIBLE_ASSET",
+      "requirement_level": "REQUIRED",
+      "raw_text": "약정총액의 60% 이상 투자",
+      "value_kind": "PERCENT",
+      "value_decimal_text": "60",
+      "unit_code": "PERCENT",
+      "comparator_code": "AT_LEAST",
+      "evidence": {
+        "source_ids": [
+          "src_kvic_2020_q4_plan"
+        ]
+      }
+    },
+    {
+      "id": "guide_kvic20_urban_sector",
+      "track_id": "track_kvic_2020_q4_urban",
+      "term_type": "SECTOR",
+      "requirement_level": "REQUIRED",
+      "raw_text": "도시재생활성화사업 참여형",
+      "value_kind": "TEXT",
+      "text_value": "도시재생활성화사업 참여",
+      "evidence": {
+        "source_ids": [
+          "src_kvic_2020_q4_plan"
+        ]
+      }
+    }
+  ],
+  "selections": [
+    {
+      "id": "selection_candidate-kvic-2020-q4-urban-regeneration",
+      "track_id": "track_kvic_2020_q4_urban",
+      "manager_organization_id": "org_coolidge_corner",
+      "selection_status": "SELECTED",
+      "selected_at": "2020-11-17",
+      "confidence": 1.0,
+      "evidence": {
+        "source_ids": [
+          "src_kvic_2020_q4_result"
+        ]
+      }
+    }
+  ],
+  "selection_members": [],
+  "selection_vehicles": [],
+  "amounts": [
+    {
+      "id": "amount_kvic20_track",
+      "scope_type": "TRACK",
+      "scope_id": "track_kvic_2020_q4_urban",
+      "amount_basis": "TRACK_LP_COMMITMENT",
+      "amount": {
+        "kind": "EXACT",
+        "decimal": "20000000000",
+        "currency": "KRW",
+        "raw_value": "도시재생 | 도시재생 | 200 | 250 | 80%"
+      },
+      "amount_status": "ANNOUNCED",
+      "metadata": {
+        "source_table_column": "출자예산 (변동가능)",
+        "display_value": "200억원"
+      },
+      "evidence": {
+        "source_ids": [
+          "src_kvic_2020_q4_plan"
+        ]
+      }
+    },
+    {
+      "id": "amount_kvic20_target",
+      "scope_type": "TRACK",
+      "scope_id": "track_kvic_2020_q4_urban",
+      "amount_basis": "TARGET_FUND_SIZE",
+      "amount": {
+        "kind": "EXACT",
+        "decimal": "25000000000",
+        "currency": "KRW",
+        "raw_value": "도시재생 | 도시재생 | 200 | 250 | 80%"
+      },
+      "amount_status": "ANNOUNCED",
+      "metadata": {
+        "source_table_column": "결성 목표액",
+        "display_value": "250억원"
+      },
+      "evidence": {
+        "source_ids": [
+          "src_kvic_2020_q4_plan"
+        ]
+      }
+    },
+    {
+      "id": "amount_kvic20_request",
+      "scope_type": "SELECTION",
+      "scope_id": "selection_candidate-kvic-2020-q4-urban-regeneration",
+      "amount_basis": "OTHER",
+      "amount": {
+        "kind": "EXACT",
+        "decimal": "20000000000",
+        "currency": "KRW",
+        "raw_value": "도시재생 | 250 | 200 | 쿨리지코너인베스트먼트"
+      },
+      "amount_status": "REPORTED",
+      "metadata": {
+        "semantic": "REQUESTED_NOT_CONFIRMED_COMMITMENT"
+      },
+      "evidence": {
+        "source_ids": [
+          "src_kvic_2020_q4_result"
+        ]
+      }
+    }
+  ],
+  "deployments": []
+}

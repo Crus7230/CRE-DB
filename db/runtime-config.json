@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "cutoverStatus": "ACTIVE",
+  "main": {
+    "backend": "supabase-postgresql",
+    "schema": "market_intelligence",
+    "credentialSource": "C:\\10137_WorkSpace\\env\\.env.supabase.local"
+  },
+  "sub": {
+    "backend": "sqlite",
+    "path": "data/market.db",
+    "mode": "read-only-replica",
+    "refreshDirection": "supabase-to-sqlite",
+    "refreshMode": "validated-full-snapshot-atomic-replace"
+  },
+  "writePolicy": {
+    "supabaseMain": true,
+    "sqliteSub": false,
+    "automaticSQLiteToSupabase": false,
+    "emergencyPromotionRequiresApproval": true
+  },
+  "artifacts": {
+    "initialMigration": "artifacts/supabase-initial-migration-result.json",
+    "migrationQa": "artifacts/supabase-migration-qa.json",
+    "subRefresh": "artifacts/supabase-to-sqlite-replica-result.json"
+  }
+}

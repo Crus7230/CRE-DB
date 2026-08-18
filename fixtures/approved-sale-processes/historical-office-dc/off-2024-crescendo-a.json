@@ -1,0 +1,572 @@
+{
+  "manifest_version": "1.0",
+  "manifest_id": "sale-historical-cres24-v1",
+  "status": "APPROVED",
+  "review": {
+    "reviewed_by": "hermes-agent-source-review",
+    "reviewed_at": "2026-08-16T00:00:00Z",
+    "approved_by": "hermes-agent-evidence-gate",
+    "approved_at": "2026-08-16T00:00:00Z",
+    "notes": "BODY_READ 또는 공개 본문 범위에서 경쟁절차와 terminal을 함께 확인한 normalized facts만 승인. 검색 title/snippet만의 claim은 제외하고 날짜·금액·순위를 추정하지 않음."
+  },
+  "sources": [
+    {
+      "id": "src_cres24_s26",
+      "url": "https://www.sedaily.com/NewsView/2DI1Z8N07K",
+      "publisher": "서울경제",
+      "document_type": "ARTICLE",
+      "published_at": "2024-12-09",
+      "accessed_at": "2026-08-16T00:00:00Z",
+      "title": "광화문 크레센도빌딩 매각 입찰 흥행 성공",
+      "rights_status": "METADATA_ONLY",
+      "access_status_reviewed": "BODY_READ",
+      "metadata": {
+        "chronology_source_id": "S26"
+      }
+    },
+    {
+      "id": "src_cres24_s28",
+      "url": "https://www.hankyung.com/article/202501222520r",
+      "publisher": "한국경제",
+      "document_type": "ARTICLE",
+      "published_at": "2025-01-22",
+      "accessed_at": "2026-08-16T00:00:00Z",
+      "title": "광화문 김앤장 빌딩 매각 무산",
+      "rights_status": "METADATA_ONLY",
+      "access_status_reviewed": "BODY_READ",
+      "metadata": {
+        "chronology_source_id": "S28"
+      }
+    },
+    {
+      "id": "src_cres24_s29",
+      "url": "http://www.edaily.co.kr/news/newspath.asp?newsid=04122966642041000",
+      "publisher": "이데일리",
+      "document_type": "ARTICLE",
+      "published_at": "2025-01-24",
+      "accessed_at": "2026-08-16T00:00:00Z",
+      "title": "크레센도빌딩 코람코 우협",
+      "rights_status": "METADATA_ONLY",
+      "access_status_reviewed": "BODY_READ",
+      "metadata": {
+        "chronology_source_id": "S29"
+      }
+    },
+    {
+      "id": "src_cres24_s30",
+      "url": "https://www.hankyung.com/article/202506105330r",
+      "publisher": "한국경제",
+      "document_type": "ARTICLE",
+      "published_at": "2025-06-10",
+      "accessed_at": "2026-08-16T00:00:00Z",
+      "title": "크레센도빌딩 4월 소유권 이전 완료 후속",
+      "rights_status": "METADATA_ONLY",
+      "access_status_reviewed": "BODY_READ",
+      "metadata": {
+        "chronology_source_id": "S30"
+      }
+    }
+  ],
+  "asset": {
+    "id": "asset_crescendo_gwanghwamun",
+    "canonical_name": "광화문 크레센도빌딩",
+    "asset_class_id": "ac_office",
+    "jibun_address": "서울 종로구 새문안로",
+    "status_code": "ACTIVE",
+    "evidence": {
+      "source_ids": [
+        "src_cres24_s26"
+      ]
+    }
+  },
+  "organizations": [
+    {
+      "id": "org_dws_am",
+      "canonical_name": "DWS자산운용",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_cres24_s26",
+          "src_cres24_s28",
+          "src_cres24_s29",
+          "src_cres24_s30"
+        ]
+      }
+    },
+    {
+      "id": "org_deloitte_anjin",
+      "canonical_name": "딜로이트안진",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_cres24_s26"
+        ]
+      }
+    },
+    {
+      "id": "org_mastern_am",
+      "canonical_name": "마스턴투자운용",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_cres24_s26",
+          "src_cres24_s28"
+        ]
+      }
+    },
+    {
+      "id": "org_koramco_trust",
+      "canonical_name": "코람코자산신탁",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_cres24_s26",
+          "src_cres24_s29",
+          "src_cres24_s30"
+        ]
+      }
+    },
+    {
+      "id": "org_shinhan_reit_am",
+      "canonical_name": "신한리츠운용",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_cres24_s26",
+          "src_cres24_s29"
+        ]
+      }
+    },
+    {
+      "id": "org_hangang_asset_am",
+      "canonical_name": "한강에셋자산운용",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_cres24_s26"
+        ]
+      }
+    },
+    {
+      "id": "org_heungkuk_am",
+      "canonical_name": "흥국자산운용",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_cres24_s26"
+        ]
+      }
+    },
+    {
+      "id": "org_samsung_sra_am",
+      "canonical_name": "삼성SRA자산운용",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_cres24_s29"
+        ]
+      }
+    }
+  ],
+  "event": {
+    "id": "event_sale_cres24",
+    "canonical_title": "광화문 크레센도빌딩 매각",
+    "current_stage_code": "CLOSED",
+    "date_precision": "MONTH",
+    "lifecycle_status": "COMPLETED",
+    "verification_level": "V2",
+    "overall_confidence": 0.9,
+    "evidence": {
+      "source_ids": [
+        "src_cres24_s26",
+        "src_cres24_s28",
+        "src_cres24_s29",
+        "src_cres24_s30"
+      ]
+    }
+  },
+  "process": {
+    "id": "sp_cres24",
+    "process_code": "KR-SALE-OFF-2024-CRESCENDO-A",
+    "sale_method": "COMPETITIVE_BID",
+    "process_status": "CLOSED",
+    "currency_code": "KRW",
+    "evidence": {
+      "source_ids": [
+        "src_cres24_s26",
+        "src_cres24_s28",
+        "src_cres24_s29",
+        "src_cres24_s30"
+      ]
+    },
+    "metadata": {
+      "source_process_id": "OFF-2024-CRESCENDO-A",
+      "related_process_ids": [],
+      "related_attempts": [
+        {
+          "attempt_id": "OFF-2024-CRESCENDO-A:first-round",
+          "relationship": "PREFERRED_REVOKED",
+          "preferred_party": "마스턴투자운용"
+        },
+        {
+          "attempt_id": "OFF-2024-CRESCENDO-A:rebid",
+          "relationship": "REBID_AFTER_PREFERRED_REVOCATION",
+          "preferred_party": "코람코자산신탁"
+        }
+      ]
+    }
+  },
+  "roles": [
+    {
+      "id": "role_cres24_seller",
+      "organization_id": "org_dws_am",
+      "role_code": "SELLER",
+      "evidence": {
+        "source_ids": [
+          "src_cres24_s26",
+          "src_cres24_s28",
+          "src_cres24_s29",
+          "src_cres24_s30"
+        ]
+      }
+    },
+    {
+      "id": "role_cres24_advisor",
+      "organization_id": "org_deloitte_anjin",
+      "role_code": "SELL_SIDE_ADVISOR",
+      "evidence": {
+        "source_ids": [
+          "src_cres24_s26"
+        ]
+      }
+    }
+  ],
+  "rounds": [
+    {
+      "id": "round_cres24_first",
+      "round_no": 1,
+      "round_code": "FINAL_20241209",
+      "round_type": "FINAL",
+      "round_status": "COMPLETED",
+      "deadline_at": "2024-12-09",
+      "evidence": {
+        "source_ids": [
+          "src_cres24_s26"
+        ]
+      }
+    },
+    {
+      "id": "round_cres24_rebid",
+      "round_no": 2,
+      "round_code": "REBID_20250124",
+      "round_type": "REBID",
+      "round_status": "COMPLETED",
+      "deadline_at": "2025-01-24",
+      "evidence": {
+        "source_ids": [
+          "src_cres24_s29"
+        ]
+      }
+    }
+  ],
+  "participations": [
+    {
+      "id": "part_cres24_mastern_first",
+      "round_id": "round_cres24_first",
+      "bidder_organization_id": "org_mastern_am",
+      "participation_status": "LOST",
+      "status_as_of": "2025-01-22",
+      "confidence": 0.95,
+      "metadata": {
+        "previous_status": "PREFERRED",
+        "status_change": "PREFERRED_REVOKED"
+      },
+      "evidence": {
+        "source_ids": [
+          "src_cres24_s26",
+          "src_cres24_s28"
+        ]
+      }
+    },
+    {
+      "id": "part_cres24_koramco_first",
+      "round_id": "round_cres24_first",
+      "bidder_organization_id": "org_koramco_trust",
+      "participation_status": "LOST",
+      "confidence": 0.9,
+      "evidence": {
+        "source_ids": [
+          "src_cres24_s26"
+        ]
+      }
+    },
+    {
+      "id": "part_cres24_shinhan_first",
+      "round_id": "round_cres24_first",
+      "bidder_organization_id": "org_shinhan_reit_am",
+      "participation_status": "LOST",
+      "confidence": 0.9,
+      "evidence": {
+        "source_ids": [
+          "src_cres24_s26"
+        ]
+      }
+    },
+    {
+      "id": "part_cres24_hangang_first",
+      "round_id": "round_cres24_first",
+      "bidder_organization_id": "org_hangang_asset_am",
+      "participation_status": "LOST",
+      "confidence": 0.9,
+      "evidence": {
+        "source_ids": [
+          "src_cres24_s26"
+        ]
+      }
+    },
+    {
+      "id": "part_cres24_heungkuk_first",
+      "round_id": "round_cres24_first",
+      "bidder_organization_id": "org_heungkuk_am",
+      "participation_status": "LOST",
+      "confidence": 0.9,
+      "evidence": {
+        "source_ids": [
+          "src_cres24_s26"
+        ]
+      }
+    },
+    {
+      "id": "part_cres24_koramco_rebid",
+      "round_id": "round_cres24_rebid",
+      "bidder_organization_id": "org_koramco_trust",
+      "participation_status": "PREFERRED",
+      "status_as_of": "2025-01-24",
+      "confidence": 0.95,
+      "evidence": {
+        "source_ids": [
+          "src_cres24_s29"
+        ]
+      }
+    },
+    {
+      "id": "part_cres24_shinhan_rebid",
+      "round_id": "round_cres24_rebid",
+      "bidder_organization_id": "org_shinhan_reit_am",
+      "participation_status": "LOST",
+      "confidence": 0.9,
+      "evidence": {
+        "source_ids": [
+          "src_cres24_s29"
+        ]
+      }
+    },
+    {
+      "id": "part_cres24_samsung_rebid",
+      "round_id": "round_cres24_rebid",
+      "bidder_organization_id": "org_samsung_sra_am",
+      "participation_status": "LOST",
+      "confidence": 0.9,
+      "evidence": {
+        "source_ids": [
+          "src_cres24_s29"
+        ]
+      }
+    }
+  ],
+  "participation_members": [],
+  "submissions": [
+    {
+      "id": "submission_cres24_mastern_first",
+      "claim_id": "claim_cres24_mastern_first_price",
+      "participation_id": "part_cres24_mastern_first",
+      "amount": {
+        "kind": "EXACT",
+        "raw_value": "5600억원",
+        "decimal": "560000000000",
+        "currency": "KRW",
+        "price_basis": "TOTAL_CONSIDERATION",
+        "vat_inclusion": "UNKNOWN",
+        "debt_assumption": "UNKNOWN"
+      },
+      "confidence": 0.9,
+      "evidence": {
+        "source_ids": [
+          "src_cres24_s28"
+        ]
+      },
+      "metadata": {
+        "amount_basis": "FIRST_ROUND_PREFERRED_BID"
+      }
+    },
+    {
+      "id": "submission_cres24_koramco_first",
+      "claim_id": "claim_cres24_koramco_first_price",
+      "participation_id": "part_cres24_koramco_first",
+      "amount": null,
+      "evidence": {
+        "source_ids": [
+          "src_cres24_s26"
+        ]
+      }
+    },
+    {
+      "id": "submission_cres24_shinhan_first",
+      "claim_id": "claim_cres24_shinhan_first_price",
+      "participation_id": "part_cres24_shinhan_first",
+      "amount": null,
+      "evidence": {
+        "source_ids": [
+          "src_cres24_s26"
+        ]
+      }
+    },
+    {
+      "id": "submission_cres24_hangang_first",
+      "claim_id": "claim_cres24_hangang_first_price",
+      "participation_id": "part_cres24_hangang_first",
+      "amount": null,
+      "evidence": {
+        "source_ids": [
+          "src_cres24_s26"
+        ]
+      }
+    },
+    {
+      "id": "submission_cres24_heungkuk_first",
+      "claim_id": "claim_cres24_heungkuk_first_price",
+      "participation_id": "part_cres24_heungkuk_first",
+      "amount": null,
+      "evidence": {
+        "source_ids": [
+          "src_cres24_s26"
+        ]
+      }
+    },
+    {
+      "id": "submission_cres24_koramco_rebid",
+      "claim_id": "claim_cres24_koramco_rebid_price",
+      "participation_id": "part_cres24_koramco_rebid",
+      "amount": null,
+      "evidence": {
+        "source_ids": [
+          "src_cres24_s29",
+          "src_cres24_s30"
+        ]
+      },
+      "metadata": {
+        "final_ownership_transfer_amount": {
+          "kind": "EXACT",
+          "decimal": "556700000000",
+          "currency": "KRW",
+          "basis": "FINAL_OWNERSHIP_TRANSFER_VALUE_REPORTED"
+        }
+      }
+    },
+    {
+      "id": "submission_cres24_shinhan_rebid",
+      "claim_id": "claim_cres24_shinhan_rebid_price",
+      "participation_id": "part_cres24_shinhan_rebid",
+      "amount": null,
+      "evidence": {
+        "source_ids": [
+          "src_cres24_s29"
+        ]
+      }
+    },
+    {
+      "id": "submission_cres24_samsung_rebid",
+      "claim_id": "claim_cres24_samsung_rebid_price",
+      "participation_id": "part_cres24_samsung_rebid",
+      "amount": null,
+      "evidence": {
+        "source_ids": [
+          "src_cres24_s29"
+        ]
+      }
+    }
+  ],
+  "funding": [],
+  "decisions": [
+    {
+      "id": "decision_cres24_mastern_preferred_revoked",
+      "round_id": "round_cres24_first",
+      "participation_id": "part_cres24_mastern_first",
+      "decision_type": "PREFERRED",
+      "decision_status": "REVOKED",
+      "confidence": 0.9,
+      "metadata": {
+        "selection_date": "NOT_IMPORTED_TITLE_SNIPPET_ONLY"
+      },
+      "evidence": {
+        "source_ids": [
+          "src_cres24_s28"
+        ]
+      }
+    },
+    {
+      "id": "decision_cres24_koramco_rebid_preferred",
+      "round_id": "round_cres24_rebid",
+      "participation_id": "part_cres24_koramco_rebid",
+      "decision_type": "PREFERRED",
+      "decision_date": "2025-01-24",
+      "decision_status": "VERIFIED",
+      "confidence": 0.95,
+      "evidence": {
+        "source_ids": [
+          "src_cres24_s29"
+        ]
+      }
+    }
+  ],
+  "milestones": [
+    {
+      "id": "milestone_cres24_first_terminated",
+      "milestone_code": "CONTRACT_TERMINATED",
+      "milestone_status": "CONFIRMED",
+      "source_note": "마스턴 우협 지위가 자금조달 실패로 취소",
+      "effective_date": "2025-01-22",
+      "confidence": 0.95,
+      "evidence": {
+        "source_ids": [
+          "src_cres24_s28"
+        ]
+      }
+    },
+    {
+      "id": "milestone_cres24_rebid",
+      "milestone_code": "REBID",
+      "milestone_status": "CONFIRMED",
+      "source_note": "코람코·신한리츠·삼성SRA 재입찰",
+      "effective_date": "2025-01-24",
+      "confidence": 0.95,
+      "evidence": {
+        "source_ids": [
+          "src_cres24_s29"
+        ]
+      }
+    },
+    {
+      "id": "milestone_cres24_ownership_transferred",
+      "milestone_code": "OWNERSHIP_TRANSFERRED",
+      "milestone_status": "CONFIRMED",
+      "source_note": "2025년 4월 코람코로 소유권 이전 완료; 정확한 일자 미공개",
+      "confidence": 0.95,
+      "evidence": {
+        "source_ids": [
+          "src_cres24_s30"
+        ]
+      },
+      "metadata": {
+        "date_precision": "MONTH",
+        "period": "2025-04",
+        "final_amount": {
+          "kind": "EXACT",
+          "decimal": "556700000000",
+          "currency": "KRW",
+          "basis": "FINAL_OWNERSHIP_TRANSFER_VALUE_REPORTED"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,134 @@
+{
+  "manifest_version": "1.0",
+  "manifest_id": "approved-lpmandate-poba-2021-global-private-infra-sma",
+  "status": "APPROVED",
+  "review": {
+    "reviewed_by": "hermes-research-consolidation",
+    "reviewed_at": "2026-08-16T00:30:00Z",
+    "approved_by": "hermes-parent-official-url-review",
+    "approved_at": "2026-08-16T00:31:00Z"
+  },
+  "sources": [
+    {
+      "id": "src-poba-74913",
+      "url": "https://www.poba.or.kr/bbs/selectNttDetail?sechBbsSeq=10&sechBbstSeq=74913",
+      "title": "글로벌 사모인프라 SMA 위탁운용사 선정공고",
+      "publisher": "대한지방행정공제회",
+      "document_type": "BID_NOTICE",
+      "published_at": "2021-05-10",
+      "accessed_at": "2026-08-16",
+      "rights_status": "EXCERPT_ALLOWED",
+      "exact_text": "본회 글로벌 사모인프라 SMA 위탁운용사 선정계획을 아래와 같이 공고하오니, 많은 관심과 참여바랍니다. - 아 래 - ○ 선정 운용사 수 : 1개사 ○ 선정기준 및 세부사항 : 제안요청서(첨부) 참조 ○ 제안서 제출 마감일시 : 2021년 5월 21일(금), 15:00"
+    },
+    {
+      "id": "src-poba-75327",
+      "url": "https://www.poba.or.kr/bbs/selectNttDetail?sechBbsSeq=10&sechBbstSeq=75327",
+      "title": "글로벌 사모인프라 SMA 위탁운용사 선정결과",
+      "publisher": "대한지방행정공제회",
+      "document_type": "NOTICE",
+      "published_at": "2021-07-07",
+      "accessed_at": "2026-08-16",
+      "rights_status": "EXCERPT_ALLOWED",
+      "exact_text": "금번 위탁운용사 선정에 관심을 가지고 지원해 주신 관계자 여러분께 깊이 감사드리며, 선정결과를 다음과 같이 안내합니다. - 다 음 - ○ 선정 운용사 : GCM Grosvenor. 끝."
+    }
+  ],
+  "organizations": [
+    {
+      "id": "org-poba",
+      "organization_type": "ASSOCIATION",
+      "canonical_name": "대한지방행정공제회"
+    },
+    {
+      "id": "org-gcm-grosvenor",
+      "organization_type": "FINANCIAL_INSTITUTION",
+      "canonical_name": "GCM Grosvenor"
+    }
+  ],
+  "event": {
+    "id": "evt-poba-2021-global-private-infra-sma",
+    "canonical_title": "대한지방행정공제회 글로벌 사모인프라 SMA 위탁운용사 선정",
+    "current_stage_code": "MANAGER_SELECTED",
+    "event_date_start": "2021-05-10",
+    "event_date_end": "2021-07-07",
+    "date_precision": "RANGE",
+    "verification_level": "V2",
+    "evidence": {
+      "source_ids": [
+        "src-poba-74913",
+        "src-poba-75327"
+      ]
+    }
+  },
+  "mandate": {
+    "id": "mandate-poba-2021-global-private-infra-sma",
+    "lp_organization_id": "org-poba",
+    "mandate_code": "POBA-2021-GLOBAL-PRIVATE-INFRA-SMA",
+    "mandate_name": "글로벌 사모인프라 SMA 위탁운용사 선정",
+    "vintage_year": 2021,
+    "announced_at": "2021-05-10",
+    "application_deadline": "2021-05-21T15:00:00+09:00",
+    "selected_at": "2021-07-07",
+    "mandate_status": "SELECTED",
+    "mandate_scope": "GLOBAL",
+    "metadata": {
+      "parent_approval_status": "APPROVED",
+      "import_eligibility": "APPROVED_OFFICIAL_NOTICE_AND_RESULT_NO_AMOUNT_DISCLOSED"
+    },
+    "evidence": {
+      "source_ids": [
+        "src-poba-74913",
+        "src-poba-75327"
+      ]
+    }
+  },
+  "tracks": [
+    {
+      "id": "track-poba-2021-global-private-infra-sma",
+      "track_code": "GLOBAL_PRIVATE_INFRA_SMA",
+      "track_name": "글로벌 사모인프라 SMA",
+      "strategy_code": "INFRASTRUCTURE",
+      "geography_code": "GLOBAL",
+      "target_manager_count": 1,
+      "evidence": {
+        "source_ids": [
+          "src-poba-74913"
+        ]
+      }
+    }
+  ],
+  "guidelines": [
+    {
+      "id": "guideline-poba-2021-manager-count",
+      "track_id": "track-poba-2021-global-private-infra-sma",
+      "term_type": "OTHER",
+      "raw_text": "○ 선정 운용사 수 : 1개사",
+      "value_kind": "NUMBER",
+      "value_decimal_text": "1",
+      "requirement_level": "REQUIRED",
+      "evidence": {
+        "source_ids": [
+          "src-poba-74913"
+        ]
+      }
+    }
+  ],
+  "selections": [
+    {
+      "id": "selection-poba-2021-gcm-grosvenor",
+      "track_id": "track-poba-2021-global-private-infra-sma",
+      "manager_organization_id": "org-gcm-grosvenor",
+      "selection_status": "SELECTED",
+      "selected_at": "2021-07-07",
+      "confidence": 1.0,
+      "evidence": {
+        "source_ids": [
+          "src-poba-75327"
+        ]
+      }
+    }
+  ],
+  "selection_members": [],
+  "selection_vehicles": [],
+  "amounts": [],
+  "deployments": []
+}

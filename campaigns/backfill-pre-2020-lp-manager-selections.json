@@ -1,0 +1,64 @@
+{
+  "campaignId": "backfill-pre-2020-kr-lp-manager-selections-v1",
+  "policyPath": "config/lp-manager-selection-policies.json",
+  "institutionUniverseFrom": "campaigns/backfill-2020-2025-lp-manager-selections.json",
+  "dateRange": {
+    "start": null,
+    "startRule": "EARLIEST_PUBLICLY_DISCOVERABLE_RECORD",
+    "endExclusive": "2020-01-01"
+  },
+  "priority": "OFFICIAL_SOURCE_FIRST_WITH_ARCHIVE_RECOVERY",
+  "evidenceHandling": {
+    "canonicalLayer": "CANONICAL_VERIFIED",
+    "candidateLayer": "VERIFICATION_CANDIDATE",
+    "rejectedLayer": "REJECTED_OR_CONTRADICTED_ARCHIVE",
+    "newsOnlyRule": "RETAIN_AS_VERIFICATION_CANDIDATE_NOT_LIVE",
+    "promotionRule": "PROMOTE_THE_PRIMARY_CLAIM_AND_RETAIN_SECONDARY_DISCOVERY_PROVENANCE"
+  },
+  "eraPartitions": [
+    {
+      "start": "2015-01-01",
+      "endExclusive": "2020-01-01",
+      "coverageTier": "TIER_1_WEB_AND_ATTACHMENT_BACKFILL",
+      "methods": ["official board pagination", "attachment recovery", "official result follow-up", "DART and manager filing cross-check"]
+    },
+    {
+      "start": "2010-01-01",
+      "endExclusive": "2015-01-01",
+      "coverageTier": "TIER_2_PARTIAL_WEB_ARCHIVE",
+      "methods": ["official board and old-domain search", "annual and audit reports", "regulatory filings", "later retrospective official documents"]
+    },
+    {
+      "start": "2000-01-01",
+      "endExclusive": "2010-01-01",
+      "coverageTier": "TIER_3_ARCHIVAL_DOCUMENT_RECOVERY",
+      "methods": ["institution annual reports", "government and public-record archives", "regulatory filings", "party fund documents", "media discovery queue"]
+    },
+    {
+      "start": null,
+      "endExclusive": "2000-01-01",
+      "coverageTier": "TIER_4_DISCOVERY_AND_ARCHIVE_ONLY",
+      "methods": ["institution history and annual reports", "public archives", "library or manual archive locator", "media discovery queue"]
+    }
+  ],
+  "historicalDateRules": [
+    "Separate publication date, mandate vintage, selection date, fund formation date and later retrospective disclosure date.",
+    "A later official report may verify an earlier selection; retain both dates and document versions.",
+    "Missing or broken old attachments create SOURCE_ARCHIVE_GAP, not a negative mandate finding.",
+    "A current manager name or successor organization must not be back-projected without alias and succession evidence.",
+    "Reannouncements, amendments and renamed tracks must preserve relation to the earlier program rather than becoming automatic new mandates."
+  ],
+  "partitionAuditFields": [
+    "institution", "era_partition", "official_board_attempted", "attachment_attempted",
+    "annual_report_attempted", "regulatory_filing_attempted", "archive_attempted",
+    "result", "source_archive_gap", "last_checked_at"
+  ],
+  "outputs": {
+    "researchJson": "artifacts/lp-manager-selections-pre-2020-research.json",
+    "coverageJson": "artifacts/lp-manager-selections-pre-2020-coverage.json",
+    "coverageMarkdown": "artifacts/lp-manager-selections-pre-2020-coverage.md",
+    "speculativeDir": "artifacts/lp-mandate-speculative/pre-2020",
+    "verificationCandidatesDir": "fixtures/lp-mandate-candidates/pre-2020",
+    "approvedFixturesDir": "fixtures/approved-lp-mandates/pre-2020"
+  }
+}

@@ -1,0 +1,141 @@
+{
+  "schema_version": "approved-sale-process-exclusions-v1.0",
+  "research_date": "2026-08-16",
+  "evidence_gate": {
+    "approved_access": [
+      "BODY_READ",
+      "BODY_READ_PARTIAL_PAYWALL_NOTICE when cited fact was in accessible body"
+    ],
+    "rejected_access": [
+      "TITLE_SNIPPET_REVIEW_ONLY",
+      "SEARCH_SNIPPET_ONLY_DYNAMIC_EMPTY_BODY",
+      "SEARCH_RESULT_SNIPPET_VERIFIED when no body/terminal corroboration"
+    ],
+    "terminal_required": true
+  },
+  "eligible_manifest_process_ids": [
+    "OFF-2022-SDS-TOWER-A",
+    "OFF-2023-ARC-PLACE-A",
+    "DC-2023-HANAM-A",
+    "OFF-2024-THE-ASSET-A",
+    "OFF-2024-DTOWER-DONUMUN-A",
+    "OFF-2024-CRESCENDO-A"
+  ],
+  "exclusions": [
+    {
+      "process_id": "OFF-2019-TWINCITY-NAMSAN-A",
+      "asset": "트윈시티 남산 오피스",
+      "classification": "TERMINAL_EVIDENCE_INSUFFICIENT",
+      "reason": "preferred switch 핵심 S40과 2020 종결 S41이 검색 snippet 범위뿐이라 승인 terminal gate를 통과하지 못함.",
+      "source_ids": [
+        "S38",
+        "S40",
+        "S41"
+      ],
+      "source_access": {
+        "S38": "BODY_READ",
+        "S40": "SEARCH_SNIPPET_ONLY_DYNAMIC_EMPTY_BODY",
+        "S41": "SEARCH_RESULT_SNIPPET_VERIFIED"
+      }
+    },
+    {
+      "process_id": "OFF-2020-CJ-CENTER-A",
+      "asset": "CJ제일제당센터",
+      "classification": "TITLE_SNIPPET_REVIEW_ONLY",
+      "reason": "실제 경쟁입찰·우협·종결 핵심 근거 S01~S04가 모두 검색 title/snippet 범위이며 terminal 본문 근거가 없음.",
+      "source_ids": [
+        "S01",
+        "S02",
+        "S03",
+        "S04"
+      ]
+    },
+    {
+      "process_id": "OFF-2020-PINE-B-A",
+      "asset": "파인에비뉴 B동",
+      "classification": "TITLE_SNIPPET_REVIEW_ONLY_AND_TERMINAL_INSUFFICIENT",
+      "reason": "입찰·우협 S05와 종결 S05·S06이 검색 snippet 범위뿐임.",
+      "source_ids": [
+        "S05",
+        "S06"
+      ]
+    },
+    {
+      "process_id": "OFF-2021-IFC-SEOUL-A",
+      "asset": "IFC 서울 패키지",
+      "classification": "TERMINAL_EVIDENCE_INSUFFICIENT",
+      "reason": "우협 S10 본문은 읽었으나 실제 본입찰 S08 및 최종 결렬 S11이 검색 snippet 범위라 process와 terminal을 함께 승인할 수 없음.",
+      "source_ids": [
+        "S08",
+        "S10",
+        "S11"
+      ]
+    },
+    {
+      "process_id": "REVIEW-2024-TCC-A",
+      "asset": "TCC동양타워",
+      "classification": "PLANNED_MILESTONE_ONLY_FOR_2024_ATTEMPT",
+      "reason": "2024 근거는 입찰 예정만 확인; 실제 입찰 제출·우협·종결 미확인. 2025 재출시는 구조와 자문사가 달라 별도 attempt.",
+      "source_ids": [
+        "S31",
+        "S32"
+      ],
+      "related_process_ids": [
+        "OUT_OF_PERIOD-2025-TCC-B"
+      ],
+      "related_attempts": [
+        {
+          "attempt_id": "REVIEW-2024-TCC-A",
+          "relationship": "PRECEDES_SEPARATE_2025_RELAUNCH"
+        },
+        {
+          "attempt_id": "OUT_OF_PERIOD-2025-TCC-B",
+          "relationship": "SEPARATE_RELAUNCH"
+        }
+      ]
+    },
+    {
+      "process_id": "EXCL-2023-GURO-DC-DEV",
+      "asset": "구로 개봉동 데이터센터 개발사업",
+      "classification": "DEVELOPMENT_SITE_OR_RIGHTS_NOT_OPERATING_ASSET",
+      "reason": "운영 데이터센터 실물이 아니라 선매입 부지/개발사업권 거래.",
+      "source_ids": [
+        "S33",
+        "S34"
+      ]
+    },
+    {
+      "process_id": "EXCL-2023-KSQUARE-GASAN-PFV",
+      "asset": "케이스퀘어 데이터센터 가산 PFV 지분",
+      "classification": "DEVELOPMENT_PFV_SHARE_SALE",
+      "reason": "개발 중 자산의 PFV 지분 거래로 운영 실물자산 매각이 아님.",
+      "source_ids": [
+        "S35"
+      ]
+    },
+    {
+      "process_id": "REVIEW-2021-O2",
+      "asset": "여의도 오투타워",
+      "classification": "COMPETITIVE_SUBMISSION_NOT_FULLY_VERIFIED",
+      "reason": "실제 제출자/입찰 실시 본문 근거 부족.",
+      "source_ids": [
+        "S05"
+      ]
+    },
+    {
+      "process_id": "REVIEW-2021-BUNDANG-DOOSAN",
+      "asset": "분당두산타워",
+      "classification": "COMPETITION_UNVERIFIED",
+      "reason": "공개 경쟁입찰 및 참가자 제출 근거 미확인.",
+      "source_ids": [
+        "S06"
+      ]
+    }
+  ],
+  "counts": {
+    "eligible": 6,
+    "excluded": 9,
+    "excluded_from_qualified_chronology": 4,
+    "preexisting_excluded_or_unresolved": 5
+  }
+}

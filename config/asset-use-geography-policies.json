@@ -1,0 +1,48 @@
+{
+  "policyVersion": "ASSET_USE_GEOGRAPHY_V1_2025",
+  "effectiveFrom": "2025-01-01",
+  "effectiveTo": "2025-12-31",
+  "retrievedAt": "2026-08-16T00:00:00+09:00",
+  "principles": [
+    "행정구역은 검색 coverage이며 자산 위치의 canonical geography가 아니다.",
+    "호텔·물류·데이터센터는 전국 coverage를 유지하고 권역별 우선순위를 별도 부여한다.",
+    "국토부 조회 geography와 event-time geography를 분리한다."
+  ],
+  "regionGroups": {
+    "CAPITAL": {"sidoCodes": ["11", "28", "41"], "terms": ["서울", "인천", "경기", "수도권"]},
+    "BUSAN_ULSAN_GYEONGNAM": {"sidoCodes": ["26", "31", "48"], "terms": ["부산", "울산", "경남", "부울경", "창원", "김해", "양산", "거제"]},
+    "HONAM": {"sidoCodes": ["29", "46", "52"], "terms": ["광주", "전남", "전북", "호남", "여수", "순천", "목포", "전주", "군산"]},
+    "CHUNGCHEONG": {"sidoCodes": ["30", "36", "43", "44"], "terms": ["대전", "세종", "충북", "충남", "충청", "천안", "청주", "아산"]},
+    "DAEGU_GYEONGBUK": {"sidoCodes": ["27", "47"], "terms": ["대구", "경북", "포항", "구미", "경주"]},
+    "GANGWON_JEJU": {"sidoCodes": ["51", "50"], "terms": ["강원", "제주", "춘천", "원주", "강릉", "서귀포"]}
+  },
+  "assetUsePolicies": {
+    "OFFICE": {
+      "coverageMode": "INCLUDED_GROUPS_ONLY",
+      "includedGroups": ["CAPITAL"],
+      "priorityGroups": ["CAPITAL"],
+      "reason": "기관투자 오피스의 2025 기본 시장을 서울·인천·경기로 한정"
+    },
+    "HOTEL": {
+      "coverageMode": "NATIONWIDE_GROUPED",
+      "includedGroups": ["CAPITAL", "BUSAN_ULSAN_GYEONGNAM", "HONAM", "CHUNGCHEONG", "DAEGU_GYEONGBUK", "GANGWON_JEJU"],
+      "priorityGroups": ["CAPITAL", "BUSAN_ULSAN_GYEONGNAM", "HONAM", "GANGWON_JEJU"],
+      "spatialClusters": ["주요 관광도시", "공항·항만 배후", "리조트·관광단지"],
+      "reason": "관광·출장·리조트 수요는 수도권 밖 주요 도시 비중이 큼"
+    },
+    "LOGISTICS": {
+      "coverageMode": "NATIONWIDE_GROUPED",
+      "includedGroups": ["CAPITAL", "BUSAN_ULSAN_GYEONGNAM", "HONAM", "CHUNGCHEONG", "DAEGU_GYEONGBUK", "GANGWON_JEJU"],
+      "priorityGroups": ["CAPITAL", "BUSAN_ULSAN_GYEONGNAM", "HONAM", "CHUNGCHEONG"],
+      "spatialClusters": ["고속도로 IC", "항만 배후단지", "국가·일반산업단지", "광역 소비권 배송축"],
+      "reason": "물류자산은 행정권역보다 항만·IC·산업축 연결성이 중요"
+    },
+    "DATA_CENTER": {
+      "coverageMode": "NATIONWIDE_GROUPED",
+      "includedGroups": ["CAPITAL", "BUSAN_ULSAN_GYEONGNAM", "HONAM", "CHUNGCHEONG", "DAEGU_GYEONGBUK", "GANGWON_JEJU"],
+      "priorityGroups": ["CAPITAL", "BUSAN_ULSAN_GYEONGNAM", "HONAM"],
+      "spatialClusters": ["전력계통 여유지역", "해저케이블·IX·통신거점", "산업단지", "인허가 수용 가능지역"],
+      "reason": "전력·통신·인허가 조건 때문에 수도권 외 후보를 체계적으로 포함"
+    }
+  }
+}

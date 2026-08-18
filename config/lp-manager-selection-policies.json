@@ -1,0 +1,141 @@
+{
+  "policyVersion": "1.1",
+  "period": {"start": "2020-01-01", "endExclusive": "2026-01-01"},
+  "temporalApplicability": {
+    "policyScope": "ALL_DISCOVERABLE_YEARS",
+    "periodFieldMeaning": "DEFAULT_OR_ACTIVE_CAMPAIGN_RANGE_ONLY",
+    "historicalBackfillAllowed": true,
+    "pre2020Rule": "Apply the same evidence tiers and promotion gates. Record source-access gaps by era; do not interpret missing web archives as no mandate."
+  },
+  "researchUnit": "LP_ORGANIZATION_X_SELECTION_PROGRAM_X_TRACK_X_SELECTION_ROUND_X_MANAGER",
+  "purpose": "Trace disclosed institutional-LP allocations through selected managers and vehicles to verified CRE deployments without treating untraced capital as available dry powder.",
+  "institutionCategories": [
+    "PENSION_OR_SOVEREIGN",
+    "MUTUAL_AID_OR_BENEFIT_ASSOCIATION",
+    "POLICY_FUND_OR_FUND_OF_FUNDS",
+    "PUBLIC_FINANCIAL_INSTITUTION",
+    "INSURANCE_OR_FINANCIAL_GROUP_LP",
+    "CENTRAL_ASSOCIATION_OR_COOPERATIVE_LP"
+  ],
+  "includedStrategies": [
+    "REAL_ESTATE",
+    "INFRASTRUCTURE",
+    "REAL_ASSETS",
+    "PRIVATE_DEBT_WHERE_CRE_ELIGIBLE",
+    "MULTI_ASSET_WHERE_CRE_ELIGIBLE",
+    "PROJECT_OR_BLIND_FUND_WHERE_CRE_ELIGIBLE"
+  ],
+  "excludedStrategies": [
+    "PURE_VENTURE_CAPITAL_WITHOUT_CRE_ELIGIBILITY",
+    "PURE_LISTED_EQUITY",
+    "PURE_BOND_MANDATE",
+    "MANAGER_MARKETING_WITHOUT_LP_NOTICE_OR_RESULT",
+    "NEWS_ONLY_UNVERIFIED_SELECTION_FROM_CANONICAL_LIVE_ONLY"
+  ],
+  "evidenceLayers": [
+    {
+      "layer": "CANONICAL_VERIFIED",
+      "verificationStatuses": ["OFFICIAL_VERIFIED", "PARTY_PRIMARY_VERIFIED"],
+      "storage": "live authority DB plus approved manifest",
+      "liveEligible": true,
+      "rule": "The promoted claim itself must cite at least one official or transaction-party primary notice, result, disclosure, filing, API record, legal document, report or press release. News may remain as corroboration but cannot be the only evidence."
+    },
+    {
+      "layer": "VERIFICATION_CANDIDATE",
+      "verificationStatuses": ["NEWS_ONLY_PENDING_PRIMARY", "LIKELY_REPORTED_PENDING_PRIMARY", "HIGHLY_LIKELY_REPORTED_PENDING_PRIMARY", "MULTISOURCE_CORROBORATED_PENDING_PRIMARY", "OFFICIAL_PLAN_RESULT_PENDING", "CONFLICT_REVIEW_REQUIRED"],
+      "storage": "artifacts/lp-mandate-speculative and fixtures/lp-mandate-candidates",
+      "liveEligible": false,
+      "rule": "Retain article, research-report, search-snippet and industry-rumor claims as a verification queue with exact wording, source URL, dates and the missing official evidence. Never present them as established selections, commitments or deployments."
+    },
+    {
+      "layer": "REJECTED_OR_CONTRADICTED_ARCHIVE",
+      "verificationStatuses": ["CONTRADICTED", "WITHDRAWN", "FALSE_POSITIVE", "OUT_OF_SCOPE"],
+      "storage": "audited exclusion or supersession artifact",
+      "liveEligible": false,
+      "rule": "Do not delete the record. Preserve rejection reason, contradicting source and supersession relation so the same claim is not repeatedly rediscovered."
+    }
+  ],
+  "promotionRules": [
+    "An article claim later matched to an official disclosure is promoted using the official claim as canonical evidence; the article remains corroborating provenance.",
+    "A news-only manager, amount, vehicle or deal link remains a verification candidate even when repeated by syndicated articles.",
+    "Two articles copied from one press release are one document family, not independent verification.",
+    "Promotion is claim-level: an official RFP can verify a mandate and guideline without verifying the manager result.",
+    "Every candidate records verification_needed, last_checked_at, source_family and resolution_status."
+  ],
+  "likelyInformationRule": {
+    "purpose": "Do not leave best-available fields blank when a concrete, plausible secondary claim exists; expose it with an explicit non-canonical status.",
+    "statuses": {
+      "LIKELY_REPORTED_PENDING_PRIMARY": "A matching official recruitment/plan exists and at least one reputable full-text report gives concrete manager, date, amount or strategy details without contradiction.",
+      "HIGHLY_LIKELY_REPORTED_PENDING_PRIMARY": "The likely criteria are met and at least two genuinely independent source families report materially consistent details."
+    },
+    "requiredFactors": ["MATCHING_OFFICIAL_NOTICE_OR_PLAN", "FULL_TEXT_NOT_SNIPPET", "CONCRETE_IDENTIFIERS_OR_NUMBERS", "DATE_AND_STRATEGY_CONSISTENCY", "NO_KNOWN_CONTRADICTION"],
+    "sourceFamilyRule": "Repeated or syndicated copies from one source family increase visibility but count as one evidentiary family. Independent-family count, article count and raw occurrence count are stored separately.",
+    "projectionRule": "Keep canonical value null when unverified, but populate best_available_value with value_status, confidence, independent_family_count, occurrence_count and verification_needed.",
+    "liveRule": "Likely values may enter the relational verification layer and user-facing best-available projections, but never lp_mandate_selections, commitment balances or deal deployments before primary verification."
+  },
+  "sourceHierarchy": [
+    {"rank": 1, "kind": "OFFICIAL_NOTICE_OR_RFP_ATTACHMENT", "canonicalEligible": true},
+    {"rank": 2, "kind": "OFFICIAL_SELECTION_RESULT_OR_PRESS_RELEASE", "canonicalEligible": true},
+    {"rank": 3, "kind": "OFFICIAL_DISCLOSURE_OR_AUDIT_REPORT", "canonicalEligible": true},
+    {"rank": 4, "kind": "SELECTED_MANAGER_REGULATORY_FILING_OR_FUND_DOCUMENT", "canonicalEligible": true},
+    {"rank": 5, "kind": "REPUTABLE_NEWS_FULL_TEXT", "canonicalEligible": false, "use": "VERIFICATION_CANDIDATE_OR_CORROBORATION; RETAIN IN SPECULATIVE SUBLAYER"},
+    {"rank": 6, "kind": "SEARCH_SNIPPET", "canonicalEligible": false, "use": "DISCOVERY_ONLY; RETAIN ONLY WITH QUERY_AND_TIMESTAMP"}
+  ],
+  "amountBases": {
+    "PROGRAM_TOTAL": "전체 선정 프로그램 공고 규모",
+    "LP_COMMITMENT_TOTAL": "LP의 전체 출자·약정 총액",
+    "TRACK_LP_COMMITMENT": "전략·섹터 track별 LP 출자·배정액",
+    "ALLOCATION_PER_MANAGER": "운용사 1개사당 배정 예정액",
+    "SELECTION_LP_COMMITMENT": "특정 선정 운용사에 귀속된 검증된 LP 배정·약정액",
+    "TARGET_FUND_SIZE": "LP 출자액과 구분되는 목표 펀드 결성 규모",
+    "MANAGER_COMMITMENT": "GP·운용사 자기출자액",
+    "CO_INVESTMENT_RESERVE": "공개된 공동투자 별도 재원"
+  },
+  "guidelineTerms": [
+    "TARGET_RETURN",
+    "STRATEGY",
+    "SECTOR",
+    "GEOGRAPHY",
+    "RISK_PROFILE",
+    "INVESTMENT_PERIOD",
+    "FUND_TERM",
+    "LEVERAGE",
+    "DEAL_SIZE",
+    "ELIGIBLE_ASSET",
+    "EXCLUSION",
+    "MANAGER_COMMITMENT",
+    "CO_INVESTMENT",
+    "ESG"
+  ],
+  "returnRules": [
+    "IRR·multiple·cash yield·total return을 구분한다.",
+    "gross와 net을 구분하고 불명확하면 UNSPECIFIED로 둔다.",
+    "목표·최소·최대·참고 기준을 requirement_level로 구분한다.",
+    "요구수익률 비공개를 0 또는 시장 관행 수치로 대체하지 않는다."
+  ],
+  "selectionLifecycle": [
+    "ANNOUNCED",
+    "APPLICATION_DEADLINE",
+    "SHORTLISTED",
+    "DUE_DILIGENCE_OR_INTERVIEW",
+    "SELECTED",
+    "COMMITMENT_SIGNED",
+    "CAPITAL_CALLED",
+    "PAID_IN",
+    "DEPLOYED",
+    "REALISED",
+    "CANCELLED_OR_REVOKED"
+  ],
+  "deploymentApprovalRule": "Manager-name equality alone is insufficient. Approve mandate-to-deal deployment only when vehicle, investment timing, amount or explicit source wording supports the edge.",
+  "balanceRule": {
+    "formula": "verified exact ALLOCATION_PER_MANAGER or SELECTION_LP_COMMITMENT - verified exact LP_SOURCE_DEPLOYMENT",
+    "outputSemantics": [
+      "UNTRACED_AWARDED_NOT_CONFIRMED_COMMITTED_OR_AVAILABLE",
+      "UNTRACED_COMMITTED_NOT_CONFIRMED_AVAILABLE"
+    ],
+    "prohibitedLabelsWithoutFurtherEvidence": ["DRY_POWDER", "AVAILABLE_CAPITAL", "UNUSED_COMMITMENT"],
+    "prohibitedInputs": ["TARGET_FUND_SIZE", "GROSS_ASSET_VALUE", "TOTAL_DEAL_PRICE", "PROGRAM_TOTAL_WITHOUT_MANAGER_ALLOCATION"]
+  },
+  "unknownRule": "Unpublished applicants, shortlist, commitment, capital call, paid-in amount, deployment and residual source remain UNKNOWN; do not infer.",
+  "candidateRetentionRule": "Unverified information is separated from canonical live data, not discarded. Preserve it as a dated verification candidate until promoted, contradicted, withdrawn, rejected or explicitly left unresolved."
+}

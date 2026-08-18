@@ -1,0 +1,259 @@
+{
+  "manifest_version": "1.0",
+  "manifest_id": "sale-historical-hotel-shilla-mapo-2023-a1-v1",
+  "status": "APPROVED",
+  "review": {
+    "reviewed_by": "hermes-agent-hotel-source-review",
+    "reviewed_at": "2026-08-16T00:00:00Z",
+    "approved_by": "hermes-agent-strict-evidence-gate",
+    "approved_at": "2026-08-16T00:00:00Z",
+    "notes": "Strict gate: only FULL_TEXT/OFFICIAL/CROSS_ARTIFACT_VERIFIED core competition and terminal claims are normalized. Unknown exact vehicle, lender, price and date are left null or omitted. "
+  },
+  "sources": [
+    {
+      "id": "src_hh_shilla_mapo_dealsite_20230901",
+      "url": "https://dealsite.co.kr/articles/109409",
+      "publisher": "딜사이트",
+      "document_type": "ARTICLE",
+      "published_at": "2023-09-01",
+      "accessed_at": "2026-08-16T00:00:00Z",
+      "title": "신라스테이 마포 입찰 및 매각자문 보도",
+      "rights_status": "METADATA_ONLY"
+    },
+    {
+      "id": "src_hh_shilla_mapo_mtn_20240202",
+      "url": "https://news.mtn.co.kr/news-detail/2024020217061638648",
+      "publisher": "머니투데이방송",
+      "document_type": "ARTICLE",
+      "published_at": "2024-02-02",
+      "accessed_at": "2026-08-16T00:00:00Z",
+      "title": "키움자산운용 우선협상대상자 및 리츠 계획",
+      "rights_status": "METADATA_ONLY"
+    },
+    {
+      "id": "src_hh_shilla_mapo_investchosun_20240327",
+      "url": "http://www.investchosun.com/site/data/html_dir/2024/03/27/2024032780209.html",
+      "publisher": "인베스트조선",
+      "document_type": "ARTICLE",
+      "published_at": "2024-03-27",
+      "accessed_at": "2026-08-16T00:00:00Z",
+      "title": "신라스테이 마포 MOU 미연장 및 자금모집 실패",
+      "rights_status": "METADATA_ONLY"
+    }
+  ],
+  "asset": {
+    "id": "asset_hh_shilla_stay_mapo",
+    "canonical_name": "신라스테이 마포",
+    "asset_class_id": "ac_hotel",
+    "status_code": "ACTIVE",
+    "metadata": {
+      "location": "서울 마포구 도화동"
+    },
+    "evidence": {
+      "source_ids": [
+        "src_hh_shilla_mapo_dealsite_20230901",
+        "src_hh_shilla_mapo_mtn_20240202",
+        "src_hh_shilla_mapo_investchosun_20240327"
+      ]
+    }
+  },
+  "organizations": [
+    {
+      "id": "org_hh_hana_alt_fund_undisclosed",
+      "canonical_name": "하나대체투자자산운용 보유 펀드(명칭 미공개)",
+      "organization_type": "FUND",
+      "evidence": {
+        "source_ids": [
+          "src_hh_shilla_mapo_dealsite_20230901",
+          "src_hh_shilla_mapo_mtn_20240202",
+          "src_hh_shilla_mapo_investchosun_20240327"
+        ]
+      },
+      "metadata": {
+        "identity_status": "UNDISCLOSED"
+      }
+    },
+    {
+      "id": "org_hh_avisonyoung_korea",
+      "canonical_name": "에비슨영코리아",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_hh_shilla_mapo_dealsite_20230901"
+        ]
+      }
+    },
+    {
+      "id": "org_hh_kiwoom_am",
+      "canonical_name": "키움투자자산운용",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_hh_shilla_mapo_mtn_20240202",
+          "src_hh_shilla_mapo_investchosun_20240327"
+        ]
+      }
+    },
+    {
+      "id": "org_hh_kiwoom_core_hotel_reit1",
+      "canonical_name": "키움코어호텔제1호리츠",
+      "organization_type": "REIT",
+      "evidence": {
+        "source_ids": [
+          "src_hh_shilla_mapo_mtn_20240202",
+          "src_hh_shilla_mapo_investchosun_20240327"
+        ]
+      },
+      "metadata": {
+        "formation_status": "PLANNED_NOT_COMPLETED"
+      }
+    }
+  ],
+  "event": {
+    "id": "event_hh_shilla_mapo_sale_a1",
+    "canonical_title": "신라스테이 마포 매각 A1",
+    "current_stage_code": "SALE_FAILED",
+    "event_date_start": "2023-09-01",
+    "date_precision": "RANGE",
+    "lifecycle_status": "COMPLETED",
+    "verification_level": "V2",
+    "overall_confidence": 0.95,
+    "evidence": {
+      "source_ids": [
+        "src_hh_shilla_mapo_dealsite_20230901",
+        "src_hh_shilla_mapo_mtn_20240202",
+        "src_hh_shilla_mapo_investchosun_20240327"
+      ]
+    }
+  },
+  "process": {
+    "id": "sp_hh_shilla_mapo_2023_a1",
+    "process_code": "KR-HOTEL-SHILLA-MAPO-2023-A1",
+    "sale_method": "COMPETITIVE_BID",
+    "process_status": "FAILED",
+    "launched_at": "2023-09-01",
+    "currency_code": "KRW",
+    "metadata": {
+      "source_process_id": "HOTEL-SHILLA-MAPO-2023-A1",
+      "source_classification": "IN_SCOPE_ATTEMPT",
+      "source_current_status": "FAILED_RELAUNCHED_2025",
+      "related_process_ids": [
+        "2025 재매각은 2025 산출물 HOTEL-SHILLA-MAPO-2025로 연결"
+      ],
+      "reported_funding_context": "키움코어호텔제1호리츠 계획; 약 1,450억원 모집 중 우선주 포함 약 180억원 미모집. 개별 LP·lender 미공개"
+    },
+    "evidence": {
+      "source_ids": [
+        "src_hh_shilla_mapo_dealsite_20230901",
+        "src_hh_shilla_mapo_mtn_20240202",
+        "src_hh_shilla_mapo_investchosun_20240327"
+      ]
+    }
+  },
+  "roles": [
+    {
+      "id": "role_hh_shilla_mapo_seller",
+      "organization_id": "org_hh_hana_alt_fund_undisclosed",
+      "role_code": "SELLER",
+      "evidence": {
+        "source_ids": [
+          "src_hh_shilla_mapo_dealsite_20230901",
+          "src_hh_shilla_mapo_mtn_20240202",
+          "src_hh_shilla_mapo_investchosun_20240327"
+        ]
+      }
+    },
+    {
+      "id": "role_hh_shilla_mapo_advisor",
+      "organization_id": "org_hh_avisonyoung_korea",
+      "role_code": "SELL_SIDE_ADVISOR",
+      "evidence": {
+        "source_ids": [
+          "src_hh_shilla_mapo_dealsite_20230901"
+        ]
+      }
+    }
+  ],
+  "rounds": [
+    {
+      "id": "round_hh_shilla_mapo_final",
+      "round_no": 1,
+      "round_code": "BID_2023_09",
+      "round_type": "FINAL",
+      "deadline_at": "2023-09-01",
+      "round_status": "COMPLETED",
+      "evidence": {
+        "source_ids": [
+          "src_hh_shilla_mapo_dealsite_20230901",
+          "src_hh_shilla_mapo_mtn_20240202"
+        ]
+      }
+    }
+  ],
+  "participations": [
+    {
+      "id": "part_hh_shilla_mapo_kiwoom",
+      "round_id": "round_hh_shilla_mapo_final",
+      "bidder_organization_id": "org_hh_kiwoom_am",
+      "participation_status": "PREFERRED",
+      "status_as_of": "2023-09",
+      "confidence": 0.95,
+      "evidence": {
+        "source_ids": [
+          "src_hh_shilla_mapo_mtn_20240202",
+          "src_hh_shilla_mapo_investchosun_20240327"
+        ]
+      }
+    }
+  ],
+  "participation_members": [
+    {
+      "id": "member_hh_shilla_mapo_planned_reit",
+      "participation_id": "part_hh_shilla_mapo_kiwoom",
+      "organization_id": "org_hh_kiwoom_core_hotel_reit1",
+      "member_role": "REIT",
+      "metadata": {
+        "status": "PLANNED_NOT_COMPLETED"
+      },
+      "evidence": {
+        "source_ids": [
+          "src_hh_shilla_mapo_mtn_20240202",
+          "src_hh_shilla_mapo_investchosun_20240327"
+        ]
+      }
+    }
+  ],
+  "submissions": [],
+  "funding": [],
+  "decisions": [
+    {
+      "id": "decision_hh_shilla_mapo_preferred",
+      "round_id": "round_hh_shilla_mapo_final",
+      "participation_id": "part_hh_shilla_mapo_kiwoom",
+      "decision_type": "PREFERRED",
+      "decision_status": "REVOKED",
+      "source_reason": "MOU 미연장 및 자금모집 부족",
+      "confidence": 0.95,
+      "evidence": {
+        "source_ids": [
+          "src_hh_shilla_mapo_mtn_20240202"
+        ]
+      }
+    }
+  ],
+  "milestones": [
+    {
+      "id": "milestone_hh_shilla_mapo_negotiation_failed",
+      "milestone_code": "NEGOTIATION_FAILED",
+      "milestone_status": "CONFIRMED",
+      "announced_at": "2024-03-27",
+      "source_note": "2024년 3월 MOU 미연장; 약 180억원 미모집",
+      "confidence": 0.95,
+      "evidence": {
+        "source_ids": [
+          "src_hh_shilla_mapo_investchosun_20240327"
+        ]
+      }
+    }
+  ]
+}

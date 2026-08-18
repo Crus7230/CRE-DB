@@ -1,0 +1,201 @@
+{
+  "manifest_version": "1.0",
+  "manifest_id": "sale-historical-hotel-take-gwangmyeong-2024-a1-v1",
+  "status": "APPROVED",
+  "review": {
+    "reviewed_by": "hermes-agent-hotel-source-review",
+    "reviewed_at": "2026-08-16T00:00:00Z",
+    "approved_by": "hermes-agent-strict-evidence-gate",
+    "approved_at": "2026-08-16T00:00:00Z",
+    "notes": "Strict gate: only FULL_TEXT/OFFICIAL/CROSS_ARTIFACT_VERIFIED core competition and terminal claims are normalized. Unknown exact vehicle, lender, price and date are left null or omitted. No SPA, balance payment, ownership transfer, exact vehicle or lender is asserted."
+  },
+  "sources": [
+    {
+      "id": "src_hh_take_sedaily_20240510",
+      "url": "https://www.sedaily.com/article/13888092",
+      "publisher": "서울경제",
+      "document_type": "ARTICLE",
+      "published_at": "2024-05-10",
+      "accessed_at": "2026-08-16T00:00:00Z",
+      "title": "테이크호텔 재입찰 및 스타로드 우선협상대상자 선정",
+      "rights_status": "METADATA_ONLY"
+    }
+  ],
+  "asset": {
+    "id": "asset_hh_take_gwangmyeong_package",
+    "canonical_name": "테이크호텔·IVEX 스튜디오·아이리스홀 패키지",
+    "asset_class_id": "ac_mixed",
+    "status_code": "ACTIVE",
+    "metadata": {
+      "location": "경기 광명",
+      "hotel_component": true
+    },
+    "evidence": {
+      "source_ids": [
+        "src_hh_take_sedaily_20240510"
+      ]
+    }
+  },
+  "organizations": [
+    {
+      "id": "org_hh_taeyoung_ec",
+      "canonical_name": "태영건설",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_hh_take_sedaily_20240510"
+        ]
+      }
+    },
+    {
+      "id": "org_hh_starroad_am",
+      "canonical_name": "스타로드자산운용",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_hh_take_sedaily_20240510"
+        ]
+      }
+    }
+  ],
+  "event": {
+    "id": "event_hh_take_gwangmyeong_sale_a1",
+    "canonical_title": "테이크호텔 광명 패키지 매각 A1",
+    "current_stage_code": "PREFERRED_BIDDER_SELECTED",
+    "event_date_start": "2024-05-10",
+    "date_precision": "RANGE",
+    "lifecycle_status": "ACTIVE",
+    "verification_level": "V2",
+    "overall_confidence": 0.95,
+    "evidence": {
+      "source_ids": [
+        "src_hh_take_sedaily_20240510"
+      ]
+    }
+  },
+  "process": {
+    "id": "sp_hh_take_gwangmyeong_2024_a1",
+    "process_code": "KR-HOTEL-TAKE-GWANGMYEONG-2024-A1",
+    "sale_method": "COMPETITIVE_BID",
+    "process_status": "PREFERRED_NEGOTIATION",
+    "currency_code": "KRW",
+    "metadata": {
+      "source_process_id": "HOTEL-TAKE-GWANGMYEONG-2024-A1",
+      "source_classification": "IN_SCOPE_PACKAGE_ATTEMPT",
+      "source_current_status": "PREFERRED_NEGOTIATION_NO_TERMINAL_PROOF",
+      "related_process_ids": [],
+      "reported_funding_context": "대주단 승인만 확인; 펀드·LP·lender 미공개"
+    },
+    "evidence": {
+      "source_ids": [
+        "src_hh_take_sedaily_20240510"
+      ]
+    }
+  },
+  "roles": [
+    {
+      "id": "role_hh_take_seller",
+      "organization_id": "org_hh_taeyoung_ec",
+      "role_code": "SELLER",
+      "evidence": {
+        "source_ids": [
+          "src_hh_take_sedaily_20240510"
+        ]
+      }
+    }
+  ],
+  "rounds": [
+    {
+      "id": "round_hh_take_initial",
+      "round_no": 1,
+      "round_code": "INITIAL_2024_02",
+      "round_type": "FINAL",
+      "round_status": "CANCELLED",
+      "metadata": {
+        "reported_proposal_count": 1,
+        "result": "FAILED_INSUFFICIENT_COMPETITION"
+      },
+      "evidence": {
+        "source_ids": [
+          "src_hh_take_sedaily_20240510"
+        ]
+      }
+    },
+    {
+      "id": "round_hh_take_rebid",
+      "round_no": 2,
+      "round_code": "REBID_2024_02",
+      "round_type": "REBID",
+      "round_status": "COMPLETED",
+      "metadata": {
+        "reported_applicant_count": 6
+      },
+      "evidence": {
+        "source_ids": [
+          "src_hh_take_sedaily_20240510"
+        ]
+      }
+    }
+  ],
+  "participations": [
+    {
+      "id": "part_hh_take_starroad",
+      "round_id": "round_hh_take_rebid",
+      "bidder_organization_id": "org_hh_starroad_am",
+      "participation_status": "PREFERRED",
+      "status_as_of": "2024-05-10",
+      "confidence": 0.95,
+      "evidence": {
+        "source_ids": [
+          "src_hh_take_sedaily_20240510"
+        ]
+      }
+    }
+  ],
+  "participation_members": [],
+  "submissions": [
+    {
+      "id": "submission_hh_take_starroad",
+      "claim_id": "claim_hh_take_starroad_bid",
+      "participation_id": "part_hh_take_starroad",
+      "submission_no": 1,
+      "submitted_at": null,
+      "amount": {
+        "kind": "AT_LEAST",
+        "raw_value": "1,100억원 이상",
+        "decimal": "110000000000",
+        "currency": "KRW",
+        "price_basis": "TOTAL_CONSIDERATION",
+        "vat_inclusion": "UNKNOWN",
+        "debt_assumption": "UNKNOWN"
+      },
+      "reported_rank": 1,
+      "rank_scope": "preferred bidder reported",
+      "rank_as_of": "2024-05-10",
+      "confidence": 0.9,
+      "evidence": {
+        "source_ids": [
+          "src_hh_take_sedaily_20240510"
+        ]
+      }
+    }
+  ],
+  "funding": [],
+  "decisions": [
+    {
+      "id": "decision_hh_take_starroad_preferred",
+      "round_id": "round_hh_take_rebid",
+      "participation_id": "part_hh_take_starroad",
+      "decision_type": "PREFERRED",
+      "decision_date": "2024-05-10",
+      "decision_status": "VERIFIED",
+      "confidence": 0.95,
+      "evidence": {
+        "source_ids": [
+          "src_hh_take_sedaily_20240510"
+        ]
+      }
+    }
+  ],
+  "milestones": []
+}

@@ -1,0 +1,217 @@
+{
+  "manifest_version": "1.0",
+  "manifest_id": "sale-historical-asset24-v1",
+  "status": "APPROVED",
+  "review": {
+    "reviewed_by": "hermes-agent-source-review",
+    "reviewed_at": "2026-08-16T00:00:00Z",
+    "approved_by": "hermes-agent-evidence-gate",
+    "approved_at": "2026-08-16T00:00:00Z",
+    "notes": "BODY_READ 또는 공개 본문 범위에서 경쟁절차와 terminal을 함께 확인한 normalized facts만 승인. 검색 title/snippet만의 claim은 제외하고 날짜·금액·순위를 추정하지 않음."
+  },
+  "sources": [
+    {
+      "id": "src_asset24_s21",
+      "url": "https://dealsite.co.kr/articles/125990",
+      "publisher": "딜사이트",
+      "document_type": "ARTICLE",
+      "published_at": "2024-07-29",
+      "accessed_at": "2026-08-16T00:00:00Z",
+      "title": "서초동 더에셋 삼성SRA 품으로, 매각가 1.1조",
+      "rights_status": "METADATA_ONLY",
+      "access_status_reviewed": "BODY_READ_PARTIAL_PAYWALL_NOTICE",
+      "metadata": {
+        "chronology_source_id": "S21"
+      }
+    },
+    {
+      "id": "src_asset24_s36",
+      "url": "https://dealsite.co.kr/articles/134198",
+      "publisher": "딜사이트",
+      "document_type": "ARTICLE",
+      "published_at": "2025-01-03",
+      "accessed_at": "2026-08-16T00:00:00Z",
+      "title": "2024 부동산 리그테이블",
+      "rights_status": "METADATA_ONLY",
+      "access_status_reviewed": "BODY_READ_PARTIAL_PAYWALL_NOTICE",
+      "metadata": {
+        "chronology_source_id": "S36"
+      }
+    }
+  ],
+  "asset": {
+    "id": "asset_the_asset_seocho",
+    "canonical_name": "더에셋(삼성화재 서초사옥)",
+    "asset_class_id": "ac_office",
+    "jibun_address": "서울 서초구 서초동",
+    "status_code": "ACTIVE",
+    "evidence": {
+      "source_ids": [
+        "src_asset24_s21"
+      ]
+    }
+  },
+  "organizations": [
+    {
+      "id": "org_koramco_trust",
+      "canonical_name": "코람코자산신탁",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_asset24_s21",
+          "src_asset24_s36"
+        ]
+      }
+    },
+    {
+      "id": "org_samsung_sra_am",
+      "canonical_name": "삼성SRA자산운용",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_asset24_s21",
+          "src_asset24_s36"
+        ]
+      }
+    }
+  ],
+  "event": {
+    "id": "event_sale_asset24",
+    "canonical_title": "더에셋(삼성화재 서초사옥) 매각",
+    "current_stage_code": "CLOSED",
+    "date_precision": "DAY",
+    "lifecycle_status": "COMPLETED",
+    "verification_level": "V2",
+    "overall_confidence": 0.9,
+    "evidence": {
+      "source_ids": [
+        "src_asset24_s21",
+        "src_asset24_s36"
+      ]
+    },
+    "event_date_start": "2024-09-30"
+  },
+  "process": {
+    "id": "sp_asset24",
+    "process_code": "KR-SALE-OFF-2024-THE-ASSET-A",
+    "sale_method": "COMPETITIVE_BID",
+    "process_status": "CLOSED",
+    "currency_code": "KRW",
+    "evidence": {
+      "source_ids": [
+        "src_asset24_s21",
+        "src_asset24_s36"
+      ]
+    },
+    "metadata": {
+      "source_process_id": "OFF-2024-THE-ASSET-A"
+    },
+    "closed_at": "2024-09-30"
+  },
+  "roles": [
+    {
+      "id": "role_asset24_seller",
+      "organization_id": "org_koramco_trust",
+      "role_code": "SELLER",
+      "evidence": {
+        "source_ids": [
+          "src_asset24_s21"
+        ]
+      }
+    }
+  ],
+  "rounds": [
+    {
+      "id": "round_asset24_final1",
+      "round_no": 1,
+      "round_code": "FINAL_20240701",
+      "round_type": "FINAL",
+      "round_status": "COMPLETED",
+      "deadline_at": "2024-07-01",
+      "evidence": {
+        "source_ids": [
+          "src_asset24_s21"
+        ]
+      }
+    }
+  ],
+  "participations": [
+    {
+      "id": "part_asset24_samsung_sra",
+      "round_id": "round_asset24_final1",
+      "bidder_organization_id": "org_samsung_sra_am",
+      "participation_status": "PREFERRED",
+      "status_as_of": "2024-07-16",
+      "confidence": 0.9,
+      "evidence": {
+        "source_ids": [
+          "src_asset24_s21"
+        ]
+      }
+    }
+  ],
+  "participation_members": [],
+  "submissions": [
+    {
+      "id": "submission_asset24_samsung_sra",
+      "claim_id": "claim_asset24_samsung_sra_price",
+      "participation_id": "part_asset24_samsung_sra",
+      "amount": null,
+      "evidence": {
+        "source_ids": [
+          "src_asset24_s21",
+          "src_asset24_s36"
+        ]
+      },
+      "metadata": {
+        "final_closing_amount": {
+          "kind": "EXACT",
+          "decimal": "1104200000000",
+          "currency": "KRW",
+          "basis": "FINAL_CLOSING_GROSS_ASSET_PRICE"
+        }
+      }
+    }
+  ],
+  "funding": [],
+  "decisions": [
+    {
+      "id": "decision_asset24_samsung_sra_preferred",
+      "round_id": "round_asset24_final1",
+      "participation_id": "part_asset24_samsung_sra",
+      "decision_type": "PREFERRED",
+      "decision_date": "2024-07-16",
+      "decision_status": "VERIFIED",
+      "confidence": 0.9,
+      "source_reason": "우협선정 MOU 발송 보도; MOU 체결일로 승격하지 않음",
+      "evidence": {
+        "source_ids": [
+          "src_asset24_s21"
+        ]
+      }
+    }
+  ],
+  "milestones": [
+    {
+      "id": "milestone_asset24_closed",
+      "milestone_code": "CLOSED",
+      "milestone_status": "CONFIRMED",
+      "source_note": "2024년 리그테이블 기준 거래 종결",
+      "effective_date": "2024-09-30",
+      "confidence": 0.9,
+      "evidence": {
+        "source_ids": [
+          "src_asset24_s36"
+        ]
+      },
+      "metadata": {
+        "final_amount": {
+          "kind": "EXACT",
+          "decimal": "1104200000000",
+          "currency": "KRW",
+          "basis": "FINAL_CLOSING_GROSS_ASSET_PRICE"
+        }
+      }
+    }
+  ]
+}

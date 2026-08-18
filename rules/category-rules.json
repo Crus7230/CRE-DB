@@ -1,0 +1,216 @@
+{
+  "schemaVersion": "1.0.0",
+  "scope": {
+    "country": "KR",
+    "collectionModel": "category-first",
+    "description": "카테고리별 시장 검색으로 여러 상업용 부동산 자산·프로젝트 이벤트를 발견한다.",
+    "includeAssetTypes": [
+      "office", "retail", "logistics", "data_center", "hotel_resort",
+      "knowledge_industry_center", "healthcare_senior", "mixed_use",
+      "commercial_development_land", "alternative"
+    ],
+    "exclude": ["pure_residential_sale", "residential_lease", "individual_mortgage"],
+    "conditionalInclude": ["mixed_use_with_commercial_component", "commercial_or_pf_context_with_residential_component"]
+  },
+  "commonAssetTerms": [
+    "오피스", "업무시설", "빌딩", "사옥", "물류센터", "창고시설",
+    "호텔", "리조트", "상가", "쇼핑몰", "리테일", "판매시설",
+    "데이터센터", "IDC", "지식산업센터", "복합시설", "주유소",
+    "골프장", "토지", "개발부지", "헬스케어", "시니어"
+  ],
+  "geographyExpansion": {
+    "strategy": "전국 검색과 17개 시도·주요 시군구 묶음을 교차 실행",
+    "regions": [
+      "서울", "부산", "대구", "인천", "광주", "대전", "울산", "세종",
+      "경기", "강원", "충북", "충남", "전북", "전남", "경북", "경남", "제주"
+    ]
+  },
+  "categories": [
+    {
+      "code": "SALE",
+      "nameKo": "매각",
+      "primaryActions": [
+        "매각 검토", "매각 추진", "매물로", "매각주관사", "티저레터", "IM 배포",
+        "예비입찰", "본입찰", "우선협상대상자", "우협", "MOU", "실사 착수",
+        "매매계약", "SPA 체결", "거래 종결", "잔금 납입", "소유권 이전",
+        "공매", "경매", "유찰", "재공매", "유형자산 양도 결정"
+      ],
+      "stages": [
+        "RUMOR", "CONSIDERING", "ADVISOR_SELECTED", "MARKETING",
+        "PRELIMINARY_BID", "SHORTLISTED", "FINAL_BID", "PREFERRED_BIDDER",
+        "DUE_DILIGENCE", "MOU", "CONTRACT_SIGNED", "CLOSED",
+        "ON_HOLD", "WITHDRAWN", "FAILED"
+      ],
+      "queryTemplates": [
+        "({assetTerms}) (\"매각 추진\" OR \"매각주관사\" OR 예비입찰 OR 본입찰 OR 우선협상대상자 OR \"매매계약 체결\")",
+        "(\"유형자산 양도 결정\" OR 자산양수도) ({assetTerms})",
+        "(공매 OR 경매 OR 유찰 OR 재공매) ({assetTerms})"
+      ],
+      "requiredSignals": ["commercial_asset_or_project", "sale_action"],
+      "keyFields": [
+        "seller", "buyer", "advisor", "deal_structure", "target_share",
+        "asking_price", "bid_price", "contract_price", "closing_price",
+        "bid_dates", "preferred_bidder_date", "contract_date", "closing_date"
+      ],
+      "exclusions": ["past_transaction_context_only", "non_real_estate_asset_sale", "pure_residential_right"]
+    },
+    {
+      "code": "LEASE",
+      "nameKo": "임대",
+      "subtypes": ["supply_marketing", "tenant_contract_occupancy"],
+      "primaryActions": [
+        "임대 개시", "임차인 모집", "입점업체 모집", "임대공고", "공실",
+        "선임대", "프리리스", "마스터리스", "임대차계약 체결", "신규 임차",
+        "입주 확정", "본사 이전", "입점 확정", "재계약", "증평", "감평", "퇴거"
+      ],
+      "stages": [
+        "PLANNED", "MARKETED", "APPLICATION_OPEN", "BID_CLOSED", "AWARDED",
+        "NEGOTIATING", "LOI", "LEASE_SIGNED", "FIT_OUT", "OCCUPIED",
+        "RENEWED", "EXPANDED", "CONTRACTED", "TERMINATED", "MOVED_OUT"
+      ],
+      "queryTemplates": [
+        "({assetTerms}) (\"임차인 모집\" OR \"임대 개시\" OR \"임대공고\" OR \"입점업체 모집\")",
+        "(\"임대차계약 체결\" OR \"입주 확정\" OR \"본사 이전\" OR \"신규 임차\") ({assetTerms})"
+      ],
+      "requiredSignals": ["commercial_asset", "lease_supply_or_named_tenant"],
+      "keyFields": [
+        "landlord", "tenant", "operator", "lease_area", "rent", "deposit",
+        "management_fee", "lease_start", "lease_end", "incentives", "occupancy_change"
+      ],
+      "exclusions": ["residential_lease", "market_commentary_only", "virtual_office_program_only"]
+    },
+    {
+      "code": "NEW_SUPPLY",
+      "nameKo": "신규공급",
+      "primaryActions": [
+        "개발 계획", "신축", "재개발", "복합개발", "착공", "공사 개시",
+        "골조 완료", "상량식", "준공", "완공", "사용승인", "개장", "개관",
+        "영업 개시", "입주 개시"
+      ],
+      "stages": [
+        "CONCEPT_ANNOUNCED", "DEVELOPMENT_CONFIRMED", "PRE_CONSTRUCTION",
+        "CONSTRUCTION_STARTED", "TOPPED_OUT", "SUBSTANTIALLY_COMPLETED",
+        "USE_APPROVED", "OPENED", "OCCUPANCY_STARTED", "STABILIZED",
+        "DELAYED", "SUSPENDED", "CANCELLED"
+      ],
+      "queryTemplates": [
+        "({assetTerms}) (착공 OR 준공 OR 완공 OR \"사용승인\" OR 개관 OR \"입주 개시\")",
+        "(복합개발 OR 도시개발 OR 역세권개발) (업무시설 OR 판매시설 OR 숙박시설) (착공 OR 준공)"
+      ],
+      "requiredSignals": ["commercial_supply", "project_or_asset_location", "supply_stage"],
+      "keyFields": [
+        "project_name", "developer", "contractor", "operator", "brand",
+        "site_area", "gross_floor_area", "leasable_area", "type_specific_capacity",
+        "construction_start", "expected_completion", "actual_completion", "opening_date"
+      ],
+      "exclusions": ["forecast_presented_as_actual", "renovation_without_new_capacity", "aggregate_statistics_only"]
+    },
+    {
+      "code": "PERMIT",
+      "nameKo": "인허가",
+      "primaryActions": [
+        "건축허가", "건축신고", "착공신고", "사용승인", "용도변경", "증축",
+        "도시관리계획", "지구단위계획", "개발행위허가", "사업시행인가",
+        "실시계획인가", "건축위원회 심의", "환경영향평가", "조건부 승인",
+        "재심의", "보류", "부결", "변경고시", "취소", "실효"
+      ],
+      "stages": [
+        "PRE_APPLICATION", "APPLICATION_FILED", "UNDER_REVIEW", "CONSULTATION",
+        "COMMITTEE_SCHEDULED", "COMMITTEE_REVIEWED", "SUPPLEMENT_REQUESTED",
+        "CONDITIONALLY_APPROVED", "APPROVED", "OFFICIALLY_NOTICED", "EFFECTIVE",
+        "DEFERRED", "RECONSIDERATION", "REJECTED", "AMENDED", "REVOKED", "EXPIRED"
+      ],
+      "queryTemplates": [
+        "({assetTerms}) (\"건축허가\" OR \"건축위원회 심의\" OR \"용도변경\" OR \"사용승인\")",
+        "site:go.kr (고시 OR 공고 OR 심의결과) (건축허가 OR 사업시행인가 OR 실시계획인가 OR 환경영향평가)"
+      ],
+      "requiredSignals": ["permit_type", "authority_or_document_number", "project_or_site"],
+      "keyFields": [
+        "permit_type", "authority", "applicant", "developer", "notice_number",
+        "application_date", "decision_date", "effective_date", "decision_result",
+        "conditions", "parcels", "approved_use", "approved_scale", "legal_effective"
+      ],
+      "exclusions": ["planned_application_as_filed", "public_inspection_as_approval", "committee_opinion_as_final_permit"]
+    },
+    {
+      "code": "PF",
+      "nameKo": "PF",
+      "primaryActions": [
+        "부동산 PF", "프로젝트 파이낸싱", "브릿지론", "본PF", "대주단 구성",
+        "금융주선", "본PF 전환", "만기연장", "차환", "리파이낸싱", "재구조화",
+        "기한이익상실", "EOD", "연체", "부실", "책임준공", "자금보충", "채무인수"
+      ],
+      "stages": [
+        "SITE_ASSEMBLY", "BRIDGE_MARKETING", "BRIDGE_COMMITTED", "BRIDGE_EXECUTED",
+        "PERMITTING", "CONTRACTOR_SELECTED", "MAIN_PF_MARKETING", "MAIN_PF_COMMITTED",
+        "MAIN_PF_EXECUTED", "CONSTRUCTION", "COMPLETED", "REPAID",
+        "EXTENSION_NEGOTIATION", "EXTENDED", "REFINANCING", "RESTRUCTURING",
+        "EOD_DECLARED", "DELINQUENT", "AUCTION_OR_PUBLIC_SALE", "WORKOUT", "CANCELLED"
+      ],
+      "queryTemplates": [
+        "(\"부동산 PF\" OR \"프로젝트 파이낸싱\" OR 브릿지론 OR 본PF) (사업장 OR 개발사업 OR 시행사 OR 시공사 OR 대주단)",
+        "({assetTerms}) (PF OR 브릿지론 OR 본PF OR 금융주선)",
+        "(\"PF 사업장\" OR \"PF 대출\") (기한이익상실 OR EOD OR 연체 OR 부실 OR 공매 OR 워크아웃)"
+      ],
+      "requiredSignals": ["project_or_spc_or_site", "pf_action"],
+      "keyFields": [
+        "project", "spc", "developer", "trustee", "contractor", "arranger", "lenders",
+        "facility_type", "tranches", "commitment_amount", "executed_amount", "rate",
+        "ltv_ltc", "maturity", "collateral", "completion_guarantee", "credit_enhancement"
+      ],
+      "exclusions": ["market_policy_or_aggregate_only", "company_total_guarantee_allocated_to_project"]
+    },
+    {
+      "code": "LOAN",
+      "nameKo": "대출",
+      "primaryActions": [
+        "담보대출", "선순위 대출", "중순위 대출", "후순위 대출", "인수금융",
+        "대출 약정", "대출 실행", "리파이낸싱", "차환", "만기 연장", "셀다운",
+        "채권매각", "연체", "기한이익상실", "담보권실행"
+      ],
+      "stages": [
+        "MARKET_SOUNDING", "ARRANGER_SELECTED", "TERM_SHEET", "CREDIT_APPROVED",
+        "COMMITTED", "EXECUTED", "SYNDICATION_OR_SELLDOWN", "SERVICING", "REPAID",
+        "EXTENSION_REQUESTED", "EXTENDED", "REFINANCED", "COVENANT_BREACH",
+        "DELINQUENT", "EOD", "LOAN_SALE", "COLLATERAL_ENFORCEMENT"
+      ],
+      "queryTemplates": [
+        "({assetTerms}) (\"담보대출\" OR \"선순위 대출\" OR \"인수금융\" OR \"대출 약정\")",
+        "({assetTerms}) (리파이낸싱 OR 차환 OR \"담보대출 만기\" OR \"만기 연장\")"
+      ],
+      "requiredSignals": ["commercial_collateral_or_acquisition", "borrower_or_facility", "loan_action"],
+      "keyFields": [
+        "facility_name", "borrower", "lenders", "arranger", "collateral_assets",
+        "commitment_amount", "executed_amount", "outstanding_amount", "rate", "spread",
+        "ltv", "dscr", "maturity", "security_package", "purpose", "previous_loan"
+      ],
+      "exclusions": ["household_mortgage", "jeonse_loan", "personal_credit", "loan_product_comparison"]
+    },
+    {
+      "code": "INVESTMENT",
+      "nameKo": "투자",
+      "primaryActions": [
+        "자산 편입", "취득", "양수", "현물출자", "부동산 펀드 결성",
+        "프로젝트 펀드", "출자", "약정", "공동투자", "수익증권",
+        "지분 투자", "JV", "클로징"
+      ],
+      "stages": [
+        "SOURCING", "DUE_DILIGENCE", "INVESTMENT_COMMITTEE", "COMMITTED",
+        "FUND_FIRST_CLOSE", "FUND_FINAL_CLOSE", "EXECUTED", "ASSET_ACQUIRED",
+        "FOLLOW_ON", "EXIT_MARKETED", "EXITED", "WITHDRAWN", "FAILED"
+      ],
+      "queryTemplates": [
+        "(리츠 OR 부동산펀드 OR 자산운용사) (\"자산 편입\" OR 취득 OR 양수 OR 현물출자)",
+        "(\"부동산 펀드\" OR \"블라인드펀드\" OR \"프로젝트 펀드\") (결성 OR 출자 OR 약정 OR 클로징)",
+        "(연기금 OR 공제회 OR 보험사 OR 기관투자자) (부동산 AND (출자 OR 공동투자 OR 수익증권))"
+      ],
+      "requiredSignals": ["investment_target", "investor_or_vehicle", "investment_action"],
+      "keyFields": [
+        "target_type", "target_assets", "fund_or_vehicle", "investors", "manager",
+        "commitment_amount", "invested_amount", "ownership_share", "instrument_type",
+        "transaction_structure", "co_investors", "acquisition_financing"
+      ],
+      "exclusions": ["listed_stock_only", "asset_manager_corporate_mna", "foreign_asset", "lease_only"]
+    }
+  ]
+}

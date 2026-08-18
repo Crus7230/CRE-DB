@@ -1,0 +1,70 @@
+# Secrets and local runtime configuration
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+
+# Node / Next.js
+**/node_modules/
+**/.next/
+**/out/
+**/build/
+**/coverage/
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Database snapshots, journals, backups and staging
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.sqlite-*
+/data/
+/backups/
+/tmp/
+
+# Collected/raw/generated artifacts
+/raw/
+/artifacts/
+/reports/
+*.log
+
+# One-off downloaded research artifacts in repository root
+/*.txt
+/*.html
+/*.bin
+/kofia_*.json
+/poba_*.json
+/poba.*.js
+
+# QA media
+**/test-results/
+**/playwright-report/
+**/screenshots/
+*.png
+*.jpg
+*.jpeg
+*.webp
+
+# IDE / OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

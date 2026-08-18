@@ -1,0 +1,27 @@
+{
+  "campaignCode": "BACKFILL_2020_2024_COMPETITIVE_SALE_PROCESS_V1",
+  "campaignVersion": "2020-2024-bid-process-v1",
+  "startYear": 2020,
+  "endYear": 2024,
+  "jobVersion": 1,
+  "queryVersion": "bid-process-query-v1",
+  "jobCodeTemplate": "BACKFILL_{year}_BID_{asset_type}_{region_group}_{bundle_code}",
+  "sourceCode": "GOOGLE_NEWS_RSS",
+  "categoryCode": "SALE",
+  "geographyPolicy": "config/asset-use-geography-policies.json",
+  "saturationResultCount": 100,
+  "assetQueries": {
+    "OFFICE": "(오피스 OR 업무용빌딩 OR 사옥)",
+    "HOTEL": "(호텔 OR 리조트 OR 관광숙박)",
+    "LOGISTICS": "(물류센터 OR 물류창고 OR 풀필먼트 OR 저온창고)",
+    "DATA_CENTER": "(데이터센터 OR IDC OR AI데이터센터)"
+  },
+  "processBundles": {
+    "MANDATE_BID": "(매각주관사 OR 매각자문사 OR 예비입찰 OR 본입찰)",
+    "SHORTLIST_PREFERRED": "(숏리스트 OR 쇼트리스트 OR 적격인수후보 OR 우선협상대상자 OR 우협)",
+    "FUNDING_CLOSING": "(입찰가격 OR 인수금융 OR 블라인드펀드 OR 프로젝트펀드 OR SPA OR 거래종결 OR 잔금납입 OR 매각무산 OR 재입찰)"
+  },
+  "partitioning": "YEAR_X_ASSET_USE_X_INCLUDED_REGION_GROUP_X_PROCESS_BUNDLE_X_MONTH",
+  "canonicalEventPolicy": "CANDIDATES_ONLY_NO_AUTO_CANONICAL_EVENT",
+  "evidencePolicy": "TITLE_SNIPPET_REVIEW_REQUIRED"
+}

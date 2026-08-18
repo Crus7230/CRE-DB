@@ -1,0 +1,166 @@
+{
+  "status": "APPROVED",
+  "sources": [
+    {
+      "id": "src_cw_2024_re_debt_official_hwp",
+      "url": "https://www.cw.or.kr/upload/boardAdmin/2024/02/688D70C7-A11C-62FA-2409-AC240F606576.hwp",
+      "publisher": "건설근로자공제회",
+      "document_type": "BID_NOTICE",
+      "title": "국내 부동산 선순위 대출펀드 위탁운용사 선정 공고",
+      "published_at": "2024-02-13",
+      "accessed_at": "2026-08-16T00:00:00Z",
+      "rights_status": "EXCERPT_ALLOWED",
+      "exact_text": "국내 부동산 선순위 대출펀드 위탁운용사 선정 공고\n국내 부동산 선순위 중심 순수 대출형 투자(실물 담보 대출 및 PF 대출)\nLTV(Loan To Value) 65% 이하의 선순위로만 구성된 대출 투자 비중이 70% 이상\n목표 수익률: 6.0% 이상 (보수 차감 후)\n위탁운용규모:총 2,000억원 이내 (운용사당 500억원 이내, 4개사 선정)\n펀드존속기간 : 8년 내외 (투자기간 3년 내외)",
+      "retrieved_sha256": "ef78278c0bf590f1670c3c5d26c21064da0d9865e8313512041a1c3483783d91"
+    }
+  ],
+  "organizations": [
+    {
+      "id": "org_cw",
+      "organization_type": "ASSOCIATION",
+      "canonical_name": "건설근로자공제회"
+    }
+  ],
+  "event": {
+    "id": "event_cw_2024_re_debt",
+    "canonical_title": "건설근로자공제회 2024 국내 부동산 선순위 대출펀드 운용사 선정",
+    "current_stage_code": "MANAGER_RFP_OPEN",
+    "event_date_start": "2024-02-13",
+    "event_date_end": "2024-02-13",
+    "date_precision": "DAY",
+    "lifecycle_status": "ACTIVE",
+    "evidence": {
+      "source_ids": [
+        "src_cw_2024_re_debt_official_hwp"
+      ]
+    }
+  },
+  "mandate": {
+    "id": "mandate_cw_2024_re_debt",
+    "lp_organization_id": "org_cw",
+    "mandate_code": "CW-2024-DOMESTIC-SENIOR-RE-DEBT",
+    "mandate_name": "2024 국내 부동산 선순위 대출펀드 위탁운용사 선정",
+    "vintage_year": 2024,
+    "announced_at": "2024-02-13",
+    "application_deadline": "2024-02-26",
+    "mandate_status": "UNKNOWN",
+    "mandate_scope": "DOMESTIC",
+    "evidence": {
+      "source_ids": [
+        "src_cw_2024_re_debt_official_hwp"
+      ]
+    }
+  },
+  "tracks": [
+    {
+      "id": "track_cw_2024_re_debt",
+      "track_code": "DOMESTIC_SENIOR_REAL_ESTATE_DEBT",
+      "track_name": "국내 부동산 선순위 대출",
+      "strategy_code": "PRIVATE_DEBT",
+      "geography_code": "DOMESTIC",
+      "target_manager_count": 4,
+      "evidence": {
+        "source_ids": [
+          "src_cw_2024_re_debt_official_hwp"
+        ]
+      }
+    }
+  ],
+  "guidelines": [
+    {
+      "id": "guide_cw_2024_strategy",
+      "track_id": "track_cw_2024_re_debt",
+      "term_type": "STRATEGY",
+      "requirement_level": "REQUIRED",
+      "raw_text": "국내 부동산 선순위 중심 순수 대출형 투자(실물 담보 대출 및 PF 대출)",
+      "value_kind": "TEXT",
+      "text_value": "국내 부동산 선순위 순수 대출형",
+      "evidence": {
+        "source_ids": [
+          "src_cw_2024_re_debt_official_hwp"
+        ]
+      }
+    },
+    {
+      "id": "guide_cw_2024_ltv",
+      "track_id": "track_cw_2024_re_debt",
+      "term_type": "LEVERAGE",
+      "requirement_level": "REQUIRED",
+      "raw_text": "LTV(Loan To Value) 65% 이하의 선순위로만 구성된 대출 투자 비중이 70% 이상",
+      "value_kind": "TEXT",
+      "text_value": "LTV 65% 이하 선순위 비중 70% 이상",
+      "evidence": {
+        "source_ids": [
+          "src_cw_2024_re_debt_official_hwp"
+        ]
+      }
+    },
+    {
+      "id": "guide_cw_2024_return",
+      "track_id": "track_cw_2024_re_debt",
+      "term_type": "TARGET_RETURN",
+      "requirement_level": "MINIMUM",
+      "raw_text": "목표 수익률: 6.0% 이상 (보수 차감 후)",
+      "value_kind": "PERCENT",
+      "value_decimal_text": "6.0",
+      "unit_code": "PERCENT",
+      "comparator_code": "AT_LEAST",
+      "return_basis": "UNSPECIFIED",
+      "evidence": {
+        "source_ids": [
+          "src_cw_2024_re_debt_official_hwp"
+        ]
+      }
+    }
+  ],
+  "selections": [],
+  "selection_members": [],
+  "selection_vehicles": [],
+  "amounts": [
+    {
+      "id": "amount_cw_2024_track",
+      "scope_type": "TRACK",
+      "scope_id": "track_cw_2024_re_debt",
+      "amount_basis": "TRACK_LP_COMMITMENT",
+      "amount": {
+        "kind": "AT_MOST",
+        "decimal": "200000000000",
+        "currency": "KRW",
+        "raw_value": "총 2,000억원 이내"
+      },
+      "amount_status": "ANNOUNCED",
+      "evidence": {
+        "source_ids": [
+          "src_cw_2024_re_debt_official_hwp"
+        ]
+      }
+    },
+    {
+      "id": "amount_cw_2024_announced_per_manager",
+      "scope_type": "TRACK",
+      "scope_id": "track_cw_2024_re_debt",
+      "amount_basis": "ALLOCATION_PER_MANAGER",
+      "amount": {
+        "kind": "AT_MOST",
+        "decimal": "50000000000",
+        "currency": "KRW",
+        "raw_value": "운용사당 500억원 이내"
+      },
+      "amount_status": "ANNOUNCED",
+      "evidence": {
+        "source_ids": [
+          "src_cw_2024_re_debt_official_hwp"
+        ]
+      }
+    }
+  ],
+  "deployments": [],
+  "manifest_version": "1.0",
+  "manifest_id": "approved-official-plan-cw-2024-domestic-senior-re-debt",
+  "review": {
+    "reviewed_by": "hermes-cw-official-plan-review",
+    "reviewed_at": "2026-08-16T00:36:00Z",
+    "approved_by": "hermes-parent-primary-source-gate",
+    "approved_at": "2026-08-16T00:37:00Z"
+  }
+}

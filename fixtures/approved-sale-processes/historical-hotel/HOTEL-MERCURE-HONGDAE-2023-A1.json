@@ -1,0 +1,174 @@
+{
+  "manifest_version": "1.0",
+  "manifest_id": "sale-historical-hotel-mercure-hongdae-2023-a1-v1",
+  "status": "APPROVED",
+  "review": {
+    "reviewed_by": "hermes-agent-hotel-source-review",
+    "reviewed_at": "2026-08-16T00:00:00Z",
+    "approved_by": "hermes-agent-strict-evidence-gate",
+    "approved_at": "2026-08-16T00:00:00Z",
+    "notes": "Strict gate: only FULL_TEXT/OFFICIAL/CROSS_ARTIFACT_VERIFIED core competition and terminal claims are normalized. Unknown exact vehicle, lender, price and date are left null or omitted. "
+  },
+  "sources": [
+    {
+      "id": "src_hh_mercure_hongdae_daily_20240708",
+      "url": "https://daily.hankooki.com/news/articleView.html?idxno=1103452",
+      "publisher": "데일리한국",
+      "document_type": "ARTICLE",
+      "published_at": "2024-07-08",
+      "accessed_at": "2026-08-16T00:00:00Z",
+      "title": "머큐어 홍대 KB 우선협상 및 가격 이견 무산",
+      "rights_status": "METADATA_ONLY"
+    }
+  ],
+  "asset": {
+    "id": "asset_hh_mercure_hongdae_mixed",
+    "canonical_name": "머큐어 앰배서더 서울 홍대 복합건물",
+    "asset_class_id": "ac_mixed",
+    "status_code": "ACTIVE",
+    "metadata": {
+      "location": "서울 마포구 동교동",
+      "hotel_component": true
+    },
+    "evidence": {
+      "source_ids": [
+        "src_hh_mercure_hongdae_daily_20240708"
+      ]
+    }
+  },
+  "organizations": [
+    {
+      "id": "org_hh_hyundai_am_fund_undisclosed",
+      "canonical_name": "현대자산운용 보유 펀드(명칭 미공개)",
+      "organization_type": "FUND",
+      "evidence": {
+        "source_ids": [
+          "src_hh_mercure_hongdae_daily_20240708"
+        ]
+      },
+      "metadata": {
+        "identity_status": "UNDISCLOSED"
+      }
+    },
+    {
+      "id": "org_kb_am",
+      "canonical_name": "KB자산운용",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_hh_mercure_hongdae_daily_20240708"
+        ]
+      }
+    }
+  ],
+  "event": {
+    "id": "event_hh_mercure_hongdae_sale_a1",
+    "canonical_title": "머큐어 앰배서더 서울 홍대 매각 A1",
+    "current_stage_code": "SALE_FAILED",
+    "date_precision": "RANGE",
+    "lifecycle_status": "COMPLETED",
+    "verification_level": "V2",
+    "overall_confidence": 0.93,
+    "evidence": {
+      "source_ids": [
+        "src_hh_mercure_hongdae_daily_20240708"
+      ]
+    }
+  },
+  "process": {
+    "id": "sp_hh_mercure_hongdae_2023_a1",
+    "process_code": "KR-HOTEL-MERCURE-HONGDAE-2023-A1",
+    "sale_method": "COMPETITIVE_BID",
+    "process_status": "FAILED",
+    "currency_code": "KRW",
+    "metadata": {
+      "source_process_id": "HOTEL-MERCURE-HONGDAE-2023-A1",
+      "source_classification": "IN_SCOPE_MIXED_USE_ATTEMPT",
+      "source_current_status": "FAILED_REBID_2024",
+      "related_process_ids": [
+        "HOTEL-MERCURE-HONGDAE-2024-A2"
+      ],
+      "reported_funding_context": "KB 차량·LP·lender 미공개"
+    },
+    "evidence": {
+      "source_ids": [
+        "src_hh_mercure_hongdae_daily_20240708"
+      ]
+    }
+  },
+  "roles": [
+    {
+      "id": "role_hh_mercure_a1_seller",
+      "organization_id": "org_hh_hyundai_am_fund_undisclosed",
+      "role_code": "SELLER",
+      "evidence": {
+        "source_ids": [
+          "src_hh_mercure_hongdae_daily_20240708"
+        ]
+      }
+    }
+  ],
+  "rounds": [
+    {
+      "id": "round_hh_mercure_a1_final",
+      "round_no": 1,
+      "round_code": "FINAL_2023_06",
+      "round_type": "FINAL",
+      "round_status": "COMPLETED",
+      "evidence": {
+        "source_ids": [
+          "src_hh_mercure_hongdae_daily_20240708"
+        ]
+      }
+    }
+  ],
+  "participations": [
+    {
+      "id": "part_hh_mercure_a1_kb",
+      "round_id": "round_hh_mercure_a1_final",
+      "bidder_organization_id": "org_kb_am",
+      "participation_status": "PREFERRED",
+      "status_as_of": "2023-06",
+      "confidence": 0.93,
+      "evidence": {
+        "source_ids": [
+          "src_hh_mercure_hongdae_daily_20240708"
+        ]
+      }
+    }
+  ],
+  "participation_members": [],
+  "submissions": [],
+  "funding": [],
+  "decisions": [
+    {
+      "id": "decision_hh_mercure_a1_kb",
+      "round_id": "round_hh_mercure_a1_final",
+      "participation_id": "part_hh_mercure_a1_kb",
+      "decision_type": "PREFERRED",
+      "decision_status": "REVOKED",
+      "source_reason": "최종가격 이견으로 거래종결 시한 만료",
+      "confidence": 0.93,
+      "evidence": {
+        "source_ids": [
+          "src_hh_mercure_hongdae_daily_20240708"
+        ]
+      }
+    }
+  ],
+  "milestones": [
+    {
+      "id": "milestone_hh_mercure_a1_failed",
+      "milestone_code": "NEGOTIATION_FAILED",
+      "milestone_status": "CONFIRMED",
+      "announced_at": "2024-07-08",
+      "source_note": "2024년 초 최종가격 이견으로 거래종결 시한 만료; 정확한 일자 미공개",
+      "confidence": 0.93,
+      "evidence": {
+        "source_ids": [
+          "src_hh_mercure_hongdae_daily_20240708"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,430 @@
+{
+  "manifest_version": "1.0",
+  "manifest_id": "sale-2025-cheongna-logistics-v1",
+  "status": "APPROVED",
+  "review": {
+    "reviewed_by": "hermes-agent-source-review",
+    "reviewed_at": "2026-08-16T00:00:00Z",
+    "approved_by": "hermes-agent-calibration-gate",
+    "approved_at": "2026-08-16T00:00:00Z",
+    "notes": "Approximate transaction value is retained as approximate. Exact bidder price and SPA date remain unknown."
+  },
+  "sources": [
+    {
+      "id": "src_cl_20250730_cs",
+      "url": "https://biz.chosun.com/stock/stock_general/2025/07/30/7P3YEIGDJRBHDPT4R4A6MRS3DU/",
+      "publisher": "조선비즈",
+      "document_type": "ARTICLE",
+      "published_at": "2025-07-30",
+      "accessed_at": "2026-08-16T00:00:00Z",
+      "title": "청라 로지스틱스 센터 입찰 보도",
+      "rights_status": "METADATA_ONLY"
+    },
+    {
+      "id": "src_cl_20250908_sd",
+      "url": "https://www.sedaily.com/NewsView/2GXTMHQDTH",
+      "publisher": "서울경제",
+      "document_type": "ARTICLE",
+      "published_at": "2025-09-08",
+      "accessed_at": "2026-08-16T00:00:00Z",
+      "title": "KKR·크리에이트 우선협상대상자 보도",
+      "rights_status": "METADATA_ONLY"
+    },
+    {
+      "id": "src_cl_20251230_bl",
+      "url": "https://www.bloter.net/news/articleView.html?idxno=650593",
+      "publisher": "블로터",
+      "document_type": "ARTICLE",
+      "published_at": "2025-12-30",
+      "accessed_at": "2026-08-16T00:00:00Z",
+      "title": "청라 로지스틱스 센터 인수 완료 보도",
+      "rights_status": "METADATA_ONLY"
+    },
+    {
+      "id": "src_cl_20251230_et",
+      "url": "https://www.etoday.co.kr/news/view/2540843",
+      "publisher": "이투데이",
+      "document_type": "ARTICLE",
+      "published_at": "2025-12-30",
+      "accessed_at": "2026-08-16T00:00:00Z",
+      "title": "청라 인수 자금구조 보도",
+      "rights_status": "METADATA_ONLY"
+    }
+  ],
+  "asset": {
+    "id": "asset_cheongna_logistics",
+    "canonical_name": "청라 로지스틱스 센터",
+    "asset_class_id": "ac_logistics",
+    "jibun_address": "인천 서구 원창동 291-1",
+    "status_code": "ACTIVE",
+    "evidence": {
+      "source_ids": [
+        "src_cl_20250730_cs"
+      ]
+    }
+  },
+  "organizations": [
+    {
+      "id": "org_brookfield_am",
+      "canonical_name": "브룩필드자산운용",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_cl_20250730_cs"
+        ]
+      }
+    },
+    {
+      "id": "org_cbre_korea",
+      "canonical_name": "CBRE코리아",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_cl_20250730_cs"
+        ]
+      }
+    },
+    {
+      "id": "org_kkr",
+      "canonical_name": "KKR",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_cl_20250908_sd"
+        ]
+      }
+    },
+    {
+      "id": "org_create_am",
+      "canonical_name": "크리에이트자산운용",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_cl_20250908_sd",
+          "src_cl_20251230_bl"
+        ]
+      }
+    },
+    {
+      "id": "org_igis_am",
+      "canonical_name": "이지스자산운용",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_cl_20250730_cs",
+          "src_cl_20250908_sd"
+        ]
+      }
+    },
+    {
+      "id": "org_create_cheongna_fund",
+      "canonical_name": "크리에이트 설정 청라 인수펀드(명칭 미공개)",
+      "organization_type": "FUND",
+      "evidence": {
+        "source_ids": [
+          "src_cl_20251230_bl",
+          "src_cl_20251230_et"
+        ]
+      },
+      "metadata": {
+        "identity_status": "UNDISCLOSED"
+      }
+    },
+    {
+      "id": "org_cheongna_mortgage_lender_group",
+      "canonical_name": "청라 인수 담보대출 대주단(기관명 일부 미공개)",
+      "organization_type": "FINANCIAL_INSTITUTION",
+      "evidence": {
+        "source_ids": [
+          "src_cl_20251230_et"
+        ]
+      },
+      "metadata": {
+        "identity_status": "PARTIALLY_UNDISCLOSED"
+      }
+    },
+    {
+      "id": "org_japanese_financial_institution_undisclosed",
+      "canonical_name": "청라 인수 일본계 금융기관(명칭 미공개)",
+      "organization_type": "FINANCIAL_INSTITUTION",
+      "evidence": {
+        "source_ids": [
+          "src_cl_20251230_et"
+        ]
+      },
+      "metadata": {
+        "identity_status": "UNDISCLOSED"
+      }
+    },
+    {
+      "id": "org_nh_investment_securities",
+      "canonical_name": "NH투자증권",
+      "organization_type": "FINANCIAL_INSTITUTION",
+      "evidence": {
+        "source_ids": [
+          "src_cl_20251230_et"
+        ]
+      }
+    }
+  ],
+  "event": {
+    "id": "event_sale_cheongna_logistics_2025",
+    "canonical_title": "청라 로지스틱스 센터 매각",
+    "current_stage_code": "CLOSED",
+    "event_date_start": "2025-12-30",
+    "date_precision": "DAY",
+    "lifecycle_status": "COMPLETED",
+    "verification_level": "V2",
+    "overall_confidence": 0.92,
+    "evidence": {
+      "source_ids": [
+        "src_cl_20250908_sd",
+        "src_cl_20251230_bl"
+      ]
+    }
+  },
+  "process": {
+    "id": "sp_cheongna_logistics_2025",
+    "process_code": "KR-SALE-2025-CHEONGNA-LOGISTICS",
+    "sale_method": "COMPETITIVE_BID",
+    "process_status": "CLOSED",
+    "closed_at": "2025-12-30",
+    "currency_code": "KRW",
+    "evidence": {
+      "source_ids": [
+        "src_cl_20250730_cs",
+        "src_cl_20250908_sd",
+        "src_cl_20251230_bl"
+      ]
+    }
+  },
+  "roles": [
+    {
+      "id": "role_cl_seller",
+      "organization_id": "org_brookfield_am",
+      "role_code": "SELLER",
+      "evidence": {
+        "source_ids": [
+          "src_cl_20250730_cs"
+        ]
+      }
+    },
+    {
+      "id": "role_cl_advisor",
+      "organization_id": "org_cbre_korea",
+      "role_code": "SELL_SIDE_ADVISOR",
+      "evidence": {
+        "source_ids": [
+          "src_cl_20250730_cs"
+        ]
+      }
+    },
+    {
+      "id": "role_cl_debt_arranger",
+      "organization_id": "org_nh_investment_securities",
+      "role_code": "DEBT_ARRANGER",
+      "evidence": {
+        "source_ids": [
+          "src_cl_20251230_et"
+        ]
+      }
+    }
+  ],
+  "rounds": [
+    {
+      "id": "round_cl_final_2025",
+      "round_no": 1,
+      "round_code": "FINAL_2025",
+      "round_type": "FINAL",
+      "announced_at": "2025-07-30",
+      "round_status": "COMPLETED",
+      "evidence": {
+        "source_ids": [
+          "src_cl_20250730_cs",
+          "src_cl_20250908_sd"
+        ]
+      }
+    }
+  ],
+  "participations": [
+    {
+      "id": "part_cl_kkr_create",
+      "round_id": "round_cl_final_2025",
+      "bidder_organization_id": "org_kkr",
+      "participation_status": "PREFERRED",
+      "status_as_of": "2025-09-08",
+      "confidence": 0.9,
+      "evidence": {
+        "source_ids": [
+          "src_cl_20250908_sd"
+        ]
+      }
+    },
+    {
+      "id": "part_cl_igis",
+      "round_id": "round_cl_final_2025",
+      "bidder_organization_id": "org_igis_am",
+      "participation_status": "LOST",
+      "status_as_of": "2025-09-08",
+      "confidence": 0.85,
+      "evidence": {
+        "source_ids": [
+          "src_cl_20250908_sd"
+        ]
+      }
+    }
+  ],
+  "submissions": [
+    {
+      "id": "submission_cl_kkr_create",
+      "claim_id": "claim_cl_kkr_create_price",
+      "participation_id": "part_cl_kkr_create",
+      "submission_no": 1,
+      "submitted_at": null,
+      "amount": {
+        "kind": "APPROX",
+        "raw_value": "약 1조원 규모",
+        "decimal": "1000000000000",
+        "currency": "KRW",
+        "price_basis": "TOTAL_CONSIDERATION",
+        "vat_inclusion": "UNKNOWN",
+        "debt_assumption": "UNKNOWN"
+      },
+      "reported_rank": 1,
+      "rank_scope": "preferred bidder reported",
+      "rank_as_of": "2025-09-08",
+      "confidence": 0.8,
+      "evidence": {
+        "source_ids": [
+          "src_cl_20250908_sd",
+          "src_cl_20251230_bl"
+        ]
+      }
+    }
+  ],
+  "funding": [
+    {
+      "id": "fund_cl_common_equity",
+      "submission_id": "submission_cl_kkr_create",
+      "funding_type": "PROJECT_FUND_EQUITY",
+      "recipient_vehicle_id": "org_create_cheongna_fund",
+      "amount_decimal": "444000000000",
+      "currency_code": "KRW",
+      "comparator_code": "EXACT",
+      "commitment_status": "EXECUTED",
+      "confidence": 0.9,
+      "evidence": {
+        "source_ids": [
+          "src_cl_20251230_et"
+        ]
+      }
+    },
+    {
+      "id": "fund_cl_mortgage_debt",
+      "submission_id": "submission_cl_kkr_create",
+      "funding_type": "ACQUISITION_DEBT",
+      "provider_organization_id": "org_cheongna_mortgage_lender_group",
+      "recipient_vehicle_id": "org_create_cheongna_fund",
+      "amount_decimal": "660000000000",
+      "currency_code": "KRW",
+      "comparator_code": "EXACT",
+      "commitment_status": "EXECUTED",
+      "confidence": 0.9,
+      "evidence": {
+        "source_ids": [
+          "src_cl_20251230_et"
+        ]
+      }
+    },
+    {
+      "id": "fund_cl_japan_subset",
+      "submission_id": "submission_cl_kkr_create",
+      "funding_type": "ACQUISITION_DEBT",
+      "provider_organization_id": "org_japanese_financial_institution_undisclosed",
+      "recipient_vehicle_id": "org_create_cheongna_fund",
+      "amount_decimal": "200000000000",
+      "currency_code": "KRW",
+      "comparator_code": "ABOUT",
+      "commitment_status": "EXECUTED",
+      "confidence": 0.85,
+      "metadata": {
+        "component_scope": "SUBSET_OF",
+        "parent_funding_id": "fund_cl_mortgage_debt",
+        "aggregation_rule": "DO_NOT_ADD_TO_PARENT"
+      },
+      "evidence": {
+        "source_ids": [
+          "src_cl_20251230_et"
+        ]
+      }
+    }
+  ],
+  "decisions": [
+    {
+      "id": "decision_cl_kkr_create_preferred",
+      "round_id": "round_cl_final_2025",
+      "participation_id": "part_cl_kkr_create",
+      "decision_type": "PREFERRED",
+      "decision_date": "2025-09-08",
+      "decision_status": "VERIFIED",
+      "confidence": 0.9,
+      "evidence": {
+        "source_ids": [
+          "src_cl_20250908_sd"
+        ]
+      }
+    }
+  ],
+  "milestones": [
+    {
+      "id": "milestone_cl_closed",
+      "milestone_code": "CLOSED",
+      "milestone_status": "CONFIRMED",
+      "effective_date": "2025-12-30",
+      "source_note": "인수 완료 보도",
+      "confidence": 0.95,
+      "evidence": {
+        "source_ids": [
+          "src_cl_20251230_bl"
+        ]
+      }
+    }
+  ],
+  "participation_members": [
+    {
+      "id": "member_cl_kkr_lead",
+      "participation_id": "part_cl_kkr_create",
+      "organization_id": "org_kkr",
+      "member_role": "LEAD_BIDDER",
+      "evidence": {
+        "source_ids": [
+          "src_cl_20250908_sd"
+        ]
+      }
+    },
+    {
+      "id": "member_cl_create_am",
+      "participation_id": "part_cl_kkr_create",
+      "organization_id": "org_create_am",
+      "member_role": "ASSET_MANAGER",
+      "evidence": {
+        "source_ids": [
+          "src_cl_20250908_sd",
+          "src_cl_20251230_bl"
+        ]
+      }
+    },
+    {
+      "id": "member_cl_create_fund",
+      "participation_id": "part_cl_kkr_create",
+      "organization_id": "org_create_cheongna_fund",
+      "member_role": "ACQUISITION_VEHICLE",
+      "evidence": {
+        "source_ids": [
+          "src_cl_20251230_bl",
+          "src_cl_20251230_et"
+        ]
+      }
+    }
+  ]
+}

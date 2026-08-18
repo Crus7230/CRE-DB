@@ -1,0 +1,153 @@
+{
+  "manifest_version": "1.0",
+  "manifest_id": "approved-lpmandate-geps-2023-global-re-debt",
+  "status": "APPROVED",
+  "review": {
+    "reviewed_by": "hermes-research-consolidation",
+    "reviewed_at": "2026-08-16T00:40:00Z",
+    "approved_by": "hermes-parent-official-url-review",
+    "approved_at": "2026-08-16T00:41:00Z"
+  },
+  "sources": [
+    {
+      "id": "src-kofia-2065",
+      "url": "https://www.kofia.or.kr/brd/m_17/view.do?seq=2065",
+      "title": "[공무원연금공단] 위탁운용사 선정계획 공고",
+      "publisher": "금융투자협회(공무원연금공단 공고 재배포)",
+      "document_type": "BID_NOTICE",
+      "published_at": "2023-06-29",
+      "accessed_at": "2026-08-16",
+      "rights_status": "EXCERPT_ALLOWED",
+      "exact_text": "2023년도 공무원연금공단 글로벌 부동산 대출펀드 해외 위탁운용사 선정 계획을 아래와 같이 공고합니다.\n선정방식공개모집을통한일괄심사(정량․정성평가)방식으로선정\n위탁운용금액운용사당35mn이내(USD또는EUR)\n선정운용사2개사\n투자대상글로벌부동산대출펀드(FundofFunds는제외)\n목표수익률IRR7∼12%(비용및수수료차감후내부수익률기준)\n최종 모집금액 기준 USD500mn이상\n2023.07.12. 제안서접수마감 오후15시마감,한국시간"
+    }
+  ],
+  "organizations": [
+    {
+      "id": "org-geps",
+      "organization_type": "GOVERNMENT",
+      "canonical_name": "공무원연금공단"
+    }
+  ],
+  "event": {
+    "id": "evt-geps-2023-global-re-debt",
+    "canonical_title": "공무원연금공단 [공무원연금공단] 위탁운용사 선정계획 공고",
+    "current_stage_code": "MANAGER_RFP_OPEN",
+    "event_date_start": "2023-06-29",
+    "event_date_end": "2023-06-29",
+    "date_precision": "DAY",
+    "lifecycle_status": "ACTIVE",
+    "verification_level": "V2",
+    "evidence": {
+      "source_ids": [
+        "src-kofia-2065"
+      ]
+    }
+  },
+  "mandate": {
+    "id": "mandate-geps-2023-global-re-debt",
+    "lp_organization_id": "org-geps",
+    "mandate_code": "GEPS-2023-GLOBAL-RE-DEBT",
+    "mandate_name": "[공무원연금공단] 위탁운용사 선정계획 공고",
+    "vintage_year": 2023,
+    "announced_at": "2023-06-29",
+    "application_deadline": "2023-07-12T15:00:00+09:00",
+    "mandate_status": "UNKNOWN",
+    "mandate_scope": "GLOBAL",
+    "metadata": {
+      "selection_result_status": "NO_OFFICIAL_RESULT_FOUND",
+      "manager": "UNKNOWN",
+      "import_eligibility": "APPROVED_NOTICE_ONLY_NO_MANAGER_INFERENCE"
+    },
+    "evidence": {
+      "source_ids": [
+        "src-kofia-2065"
+      ]
+    }
+  },
+  "tracks": [
+    {
+      "id": "track-geps-2023-global-re-debt",
+      "track_code": "GEPS-2023-GLOBAL-RE-DEBT",
+      "track_name": "글로벌 부동산 대출펀드",
+      "strategy_code": "PRIVATE_DEBT",
+      "geography_code": "GLOBAL",
+      "target_manager_count": null,
+      "evidence": {
+        "source_ids": [
+          "src-kofia-2065"
+        ]
+      }
+    }
+  ],
+  "guidelines": [
+    {
+      "id": "guideline-geps-2023-global-re-debt-1",
+      "track_id": "track-geps-2023-global-re-debt",
+      "term_type": "TARGET_RETURN",
+      "requirement_level": "REFERENCE",
+      "raw_text": "IRR7∼12%(비용및수수료차감후내부수익률기준)",
+      "value_kind": "PERCENT",
+      "return_basis": "NET_IRR",
+      "evidence": {
+        "source_ids": [
+          "src-kofia-2065"
+        ]
+      },
+      "lower_decimal_text": "7",
+      "upper_decimal_text": "12",
+      "comparator_code": "RANGE"
+    },
+    {
+      "id": "guideline-geps-2023-global-re-debt-2",
+      "track_id": "track-geps-2023-global-re-debt",
+      "term_type": "SECTOR",
+      "requirement_level": "REQUIRED",
+      "raw_text": "글로벌부동산대출펀드",
+      "value_kind": "TEXT",
+      "evidence": {
+        "source_ids": [
+          "src-kofia-2065"
+        ]
+      },
+      "text_value": "글로벌부동산대출펀드"
+    },
+    {
+      "id": "guideline-geps-2023-global-re-debt-3",
+      "track_id": "track-geps-2023-global-re-debt",
+      "term_type": "DEAL_SIZE",
+      "requirement_level": "REQUIRED",
+      "raw_text": "운용사당35mn이내(USD또는EUR)",
+      "value_kind": "TEXT",
+      "evidence": {
+        "source_ids": [
+          "src-kofia-2065"
+        ]
+      },
+      "text_value": "운용사당35mn이내(USD또는EUR)"
+    }
+  ],
+  "selections": [],
+  "selection_members": [],
+  "selection_vehicles": [],
+  "amounts": [
+    {
+      "id": "amount-geps-2023-global-re-debt-2",
+      "scope_type": "TRACK",
+      "scope_id": "track-geps-2023-global-re-debt",
+      "amount_basis": "TARGET_FUND_SIZE",
+      "amount": {
+        "kind": "AT_LEAST",
+        "decimal": "500000000",
+        "currency": "USD",
+        "raw_value": "최종 모집금액 기준 USD500mn이상"
+      },
+      "amount_status": "ANNOUNCED",
+      "evidence": {
+        "source_ids": [
+          "src-kofia-2065"
+        ]
+      }
+    }
+  ],
+  "deployments": []
+}

@@ -1,0 +1,285 @@
+{
+  "manifest_version": "1.0",
+  "manifest_id": "sale-historical-arc23-v1",
+  "status": "APPROVED",
+  "review": {
+    "reviewed_by": "hermes-agent-source-review",
+    "reviewed_at": "2026-08-16T00:00:00Z",
+    "approved_by": "hermes-agent-evidence-gate",
+    "approved_at": "2026-08-16T00:00:00Z",
+    "notes": "BODY_READ 또는 공개 본문 범위에서 경쟁절차와 terminal을 함께 확인한 normalized facts만 승인. 검색 title/snippet만의 claim은 제외하고 날짜·금액·순위를 추정하지 않음."
+  },
+  "sources": [
+    {
+      "id": "src_arc23_s15",
+      "url": "https://www.sedaily.com/NewsView/29VURWNESU",
+      "publisher": "서울경제",
+      "document_type": "ARTICLE",
+      "published_at": "2023-10-06",
+      "accessed_at": "2026-08-16T00:00:00Z",
+      "title": "블랙스톤, 아크플레이스 빅딜 눈앞",
+      "rights_status": "METADATA_ONLY",
+      "access_status_reviewed": "BODY_READ",
+      "metadata": {
+        "chronology_source_id": "S15"
+      }
+    },
+    {
+      "id": "src_arc23_s17",
+      "url": "https://www.etoday.co.kr/news/view/2356421",
+      "publisher": "이투데이",
+      "document_type": "ARTICLE",
+      "published_at": "2024-05-02",
+      "accessed_at": "2026-08-16T00:00:00Z",
+      "title": "오피스빌딩 매매거래 최근 6분기중 최고치",
+      "rights_status": "METADATA_ONLY",
+      "access_status_reviewed": "BODY_READ",
+      "metadata": {
+        "chronology_source_id": "S17"
+      }
+    }
+  ],
+  "asset": {
+    "id": "asset_arc_place",
+    "canonical_name": "아크플레이스",
+    "asset_class_id": "ac_office",
+    "jibun_address": "서울 강남구 역삼동",
+    "status_code": "ACTIVE",
+    "evidence": {
+      "source_ids": [
+        "src_arc23_s15"
+      ]
+    }
+  },
+  "organizations": [
+    {
+      "id": "org_blackstone",
+      "canonical_name": "블랙스톤",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_arc23_s15"
+        ]
+      }
+    },
+    {
+      "id": "org_koramco_trust",
+      "canonical_name": "코람코자산신탁",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_arc23_s15",
+          "src_arc23_s17"
+        ]
+      }
+    },
+    {
+      "id": "org_mirae_asset_am",
+      "canonical_name": "미래에셋자산운용",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_arc23_s15"
+        ]
+      }
+    },
+    {
+      "id": "org_dnd_investment",
+      "canonical_name": "디앤디인베스트먼트",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_arc23_s15"
+        ]
+      }
+    }
+  ],
+  "event": {
+    "id": "event_sale_arc23",
+    "canonical_title": "아크플레이스 매각",
+    "current_stage_code": "CLOSED",
+    "date_precision": "QUARTER",
+    "lifecycle_status": "COMPLETED",
+    "verification_level": "V2",
+    "overall_confidence": 0.9,
+    "evidence": {
+      "source_ids": [
+        "src_arc23_s15",
+        "src_arc23_s17"
+      ]
+    }
+  },
+  "process": {
+    "id": "sp_arc23",
+    "process_code": "KR-SALE-OFF-2023-ARC-PLACE-A",
+    "sale_method": "SHARE_SALE",
+    "process_status": "CLOSED",
+    "currency_code": "KRW",
+    "evidence": {
+      "source_ids": [
+        "src_arc23_s15",
+        "src_arc23_s17"
+      ]
+    },
+    "metadata": {
+      "source_process_id": "OFF-2023-ARC-PLACE-A"
+    }
+  },
+  "roles": [
+    {
+      "id": "role_arc23_seller",
+      "organization_id": "org_blackstone",
+      "role_code": "SELLER",
+      "evidence": {
+        "source_ids": [
+          "src_arc23_s15"
+        ]
+      }
+    }
+  ],
+  "rounds": [
+    {
+      "id": "round_arc23_final",
+      "round_no": 1,
+      "round_code": "FINAL_202309",
+      "round_type": "FINAL",
+      "round_status": "COMPLETED",
+      "metadata": {
+        "date_precision": "MONTH"
+      },
+      "evidence": {
+        "source_ids": [
+          "src_arc23_s15"
+        ]
+      }
+    }
+  ],
+  "participations": [
+    {
+      "id": "part_arc23_koramco",
+      "round_id": "round_arc23_final",
+      "bidder_organization_id": "org_koramco_trust",
+      "participation_status": "PREFERRED",
+      "confidence": 0.9,
+      "evidence": {
+        "source_ids": [
+          "src_arc23_s15",
+          "src_arc23_s17"
+        ]
+      }
+    },
+    {
+      "id": "part_arc23_mirae",
+      "round_id": "round_arc23_final",
+      "bidder_organization_id": "org_mirae_asset_am",
+      "participation_status": "LOST",
+      "confidence": 0.9,
+      "evidence": {
+        "source_ids": [
+          "src_arc23_s15"
+        ]
+      }
+    },
+    {
+      "id": "part_arc23_dnd",
+      "round_id": "round_arc23_final",
+      "bidder_organization_id": "org_dnd_investment",
+      "participation_status": "LOST",
+      "confidence": 0.9,
+      "evidence": {
+        "source_ids": [
+          "src_arc23_s15"
+        ]
+      }
+    }
+  ],
+  "participation_members": [],
+  "submissions": [
+    {
+      "id": "submission_arc23_koramco",
+      "claim_id": "claim_arc23_koramco_price",
+      "participation_id": "part_arc23_koramco",
+      "amount": null,
+      "evidence": {
+        "source_ids": [
+          "src_arc23_s15",
+          "src_arc23_s17"
+        ]
+      },
+      "metadata": {
+        "reported_final_transaction_amount": {
+          "kind": "APPROX",
+          "decimal": "792000000000",
+          "currency": "KRW",
+          "basis": "FINAL_TRANSACTION_VALUE_REPORTED"
+        }
+      }
+    },
+    {
+      "id": "submission_arc23_mirae",
+      "claim_id": "claim_arc23_mirae_price",
+      "participation_id": "part_arc23_mirae",
+      "amount": null,
+      "evidence": {
+        "source_ids": [
+          "src_arc23_s15"
+        ]
+      }
+    },
+    {
+      "id": "submission_arc23_dnd",
+      "claim_id": "claim_arc23_dnd_price",
+      "participation_id": "part_arc23_dnd",
+      "amount": null,
+      "evidence": {
+        "source_ids": [
+          "src_arc23_s15"
+        ]
+      }
+    }
+  ],
+  "funding": [],
+  "decisions": [
+    {
+      "id": "decision_arc23_koramco_preferred",
+      "round_id": "round_arc23_final",
+      "participation_id": "part_arc23_koramco",
+      "decision_type": "PREFERRED",
+      "decision_status": "VERIFIED",
+      "confidence": 0.9,
+      "metadata": {
+        "decision_date_precision": "QUARTER",
+        "decision_period": "2023-Q4"
+      },
+      "evidence": {
+        "source_ids": [
+          "src_arc23_s17"
+        ]
+      }
+    }
+  ],
+  "milestones": [
+    {
+      "id": "milestone_arc23_closed",
+      "milestone_code": "CLOSED",
+      "milestone_status": "CONFIRMED",
+      "source_note": "셰어딜 약 7920억원 종결; 정확한 잔금일 미공개",
+      "confidence": 0.9,
+      "evidence": {
+        "source_ids": [
+          "src_arc23_s17"
+        ]
+      },
+      "metadata": {
+        "date_precision": "QUARTER",
+        "period": "2024-Q1",
+        "final_amount": {
+          "kind": "APPROX",
+          "decimal": "792000000000",
+          "currency": "KRW",
+          "basis": "FINAL_TRANSACTION_VALUE_REPORTED"
+        }
+      }
+    }
+  ]
+}

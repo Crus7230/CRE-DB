@@ -1,0 +1,97 @@
+{
+  "campaignId": "kr-company-tenant-relocation-marketcap-watch-v1",
+  "status": "READY_FOR_COLLECTOR_IMPLEMENTATION",
+  "purpose": "시점별 주요 기업 universe의 임차·이전·사업영역·투자계획·공시를 부동산 사건 및 시장 흐름과 연결",
+  "temporalRule": "POINT_IN_TIME_ONLY_NO_SURVIVORSHIP_BACKFILL",
+  "universe": {
+    "snapshotCadence": "MONTH_END_LAST_KRX_TRADING_DAY",
+    "sourcePriority": ["KRX_OFFICIAL_MARKET_DATA", "OPENDART_CORP_CODE", "COMPANY_PRIMARY"],
+    "sets": [
+      {
+        "code": "KRX_MARKET_CAP_TOP_50",
+        "selection": "전체 상장기업 시가총액 내림차순 50개",
+        "rankingBasis": "KRX official market capitalization as of snapshot date"
+      },
+      {
+        "code": "KRX_INDUSTRY_MARKET_CAP_TOP_10",
+        "selection": "snapshot 시점 산업분류별 시가총액 상위 10개",
+        "rankingBasis": "KRX industry classification and market capitalization as of snapshot date",
+        "deduplication": "한 기업이 여러 집합에 포함되면 organization은 하나로 유지하고 inclusion_reason을 복수 저장"
+      },
+      {
+        "code": "AS_OF_EMERGING_INDUSTRY_WATCHLIST",
+        "selection": "해당 시점 공식 정책·기업투자·시장자료에서 부각된 산업군의 기업",
+        "requirements": ["theme valid_from/valid_to", "theme source claim", "selection rationale", "no present-day retroactive tagging"]
+      }
+    ]
+  },
+  "companyDimensions": [
+    "organization identity and aliases",
+    "DART corp code and stock code",
+    "point-in-time industry taxonomy assignment",
+    "business domain and revenue/activity description",
+    "investment and CAPEX plan",
+    "headcount or facility expansion plan",
+    "headquarters/office/R&D/logistics/data-center/production footprint"
+  ],
+  "eventScope": [
+    "LEASE_MARKETING", "LEASE_NEGOTIATING", "LEASE_SIGNED", "TENANT_OCCUPIED",
+    "RELOCATION_REPORTED", "RELOCATION_ANNOUNCED", "RELOCATION_SITE_SELECTED",
+    "RELOCATION_CONTRACTED", "RELOCATION_COMPLETED", "RELOCATION_CANCELLED",
+    "INVESTMENT_REVIEWED", "INVESTMENT_COMMITTED", "INVESTMENT_CLOSED"
+  ],
+  "collectionCadence": {
+    "KRX_UNIVERSE": "MONTHLY",
+    "OPENDART_DISCLOSURES": "DAILY",
+    "COMPANY_IR_AND_PRESS_RELEASES": "WEEKLY",
+    "RELOCATION_AND_TENANT_NEWS": "DAILY_OR_WEEKLY_BY_SOURCE_LIMIT",
+    "BUSINESS_PROFILE_REFRESH": "QUARTERLY_AND_ANNUAL_REPORT",
+    "VERIFICATION_QUEUE_RECHECK": "MONTHLY"
+  },
+  "filingComparison": {
+    "newsAnchor": "article first_published_at",
+    "searchWindowBeforeDays": 90,
+    "searchWindowAfterDays": 180,
+    "sources": ["OpenDART material disclosure", "business report", "quarterly/semiannual report", "company IR", "exchange disclosure"],
+    "rule": "공시 부재는 임차·이전 기사의 반증이 아니다. 공시대상성·중요성 기준과 회사 공식발표 여부를 별도 기록한다."
+  },
+  "evidenceHandling": {
+    "VERIFIED": "공시·회사 공식발표·계약 당사자 원문이 사건 claim을 직접 확인",
+    "LIKELY_REPORTED_PENDING_PRIMARY": "구체적인 full-text 기사와 시점·회사·위치·숫자 정합성이 있으나 1차 원문 미확인",
+    "HIGHLY_LIKELY_REPORTED_PENDING_PRIMARY": "독립 source family 둘 이상이 구체적 내용을 일치 보도",
+    "NEWS_ONLY_PENDING_PRIMARY": "단일 또는 불충분한 보도·snippet",
+    "CONTRADICTED": "공식 또는 강한 반증 source 존재",
+    "syndicationRule": "전재·보도자료 복사본은 document_family로 묶고 독립 출처 수와 전체 발견 수를 분리"
+  },
+  "requiredRelationalLinks": [
+    "organization -> market_universe_snapshot -> inclusion reason/rank/market cap",
+    "organization -> temporal industry assignment -> industry taxonomy node",
+    "organization -> business activity -> source claim",
+    "organization -> relocation/lease/investment event -> source claim",
+    "event -> origin/destination region or asset/project",
+    "event -> occupancy state",
+    "news document family -> mention -> claim -> verification state",
+    "company event -> nearest prior universe snapshot",
+    "company event -> same-period asset class/region sale, lease, development and financing flows"
+  ],
+  "qa": [
+    "snapshot member count and rank uniqueness",
+    "overall rank 1..50 with explicit gaps",
+    "industry top-10 per point-in-time taxonomy node",
+    "market-cap currency and as-of date required",
+    "no current ranking applied to historical event",
+    "DART corp code/stock code crosswalk reviewed",
+    "article exact text span and source family required for likely claims",
+    "canonical event requires primary source",
+    "no-disclosure is not auto-rejection",
+    "FK, integrity, duplicate family and temporal overlap checks"
+  ],
+  "comparisonOutputs": [
+    "company real-estate event timeline",
+    "universe membership at event date",
+    "relocation origin/destination and asset-class demand",
+    "announced CAPEX versus executed property event",
+    "sector expansion/contraction versus office/logistics/data-center demand",
+    "verified and likely values shown together with visibly different status"
+  ]
+}

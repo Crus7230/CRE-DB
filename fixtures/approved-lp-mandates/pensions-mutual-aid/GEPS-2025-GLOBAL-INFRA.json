@@ -1,0 +1,170 @@
+{
+  "manifest_version": "1.0",
+  "manifest_id": "approved-lpmandate-geps-2025-global-infra",
+  "status": "APPROVED",
+  "review": {
+    "reviewed_by": "hermes-research-consolidation",
+    "reviewed_at": "2026-08-16T00:40:00Z",
+    "approved_by": "hermes-parent-official-url-review",
+    "approved_at": "2026-08-16T00:41:00Z"
+  },
+  "sources": [
+    {
+      "id": "src-kofia-m212-180",
+      "url": "https://www.kofia.or.kr/brd/m_212/view.do?seq=180",
+      "title": "[공무원연금공단] 글로벌 인프라 펀드 해외 위탁운용사 선정 공고",
+      "publisher": "금융투자협회(공무원연금공단 공고 재배포)",
+      "document_type": "BID_NOTICE",
+      "published_at": "2025-09-09",
+      "accessed_at": "2026-08-16",
+      "rights_status": "EXCERPT_ALLOWED",
+      "exact_text": "2025년도 공무원연금공단 글로벌 인프라 펀드 해외 위탁운용사 선정 계획을 다음과 같이 공고합니다.\n위탁 운용금액· 운용사당 50mn 이내(EUR 통화 한정)\n선정 운용사· 2개사(예정)\n투자 대상· 글로벌 인프라 펀드(Equity) *FundofFunds제외\n투자 지역· 글로벌(유럽 80% 이상 투자)\n목표 수익률· Gross IRR 10% 이상\n최종 모집금액 기준 EUR 1bn 이상\n2025.9.22. 제안서 접수 마감· 한국시간 15시"
+    }
+  ],
+  "organizations": [
+    {
+      "id": "org-geps",
+      "organization_type": "GOVERNMENT",
+      "canonical_name": "공무원연금공단"
+    }
+  ],
+  "event": {
+    "id": "evt-geps-2025-global-infra",
+    "canonical_title": "공무원연금공단 [공무원연금공단] 글로벌 인프라 펀드 해외 위탁운용사 선정 공고",
+    "current_stage_code": "MANAGER_RFP_OPEN",
+    "event_date_start": "2025-09-09",
+    "event_date_end": "2025-09-09",
+    "date_precision": "DAY",
+    "lifecycle_status": "ACTIVE",
+    "verification_level": "V2",
+    "evidence": {
+      "source_ids": [
+        "src-kofia-m212-180"
+      ]
+    }
+  },
+  "mandate": {
+    "id": "mandate-geps-2025-global-infra",
+    "lp_organization_id": "org-geps",
+    "mandate_code": "GEPS-2025-GLOBAL-INFRA",
+    "mandate_name": "[공무원연금공단] 글로벌 인프라 펀드 해외 위탁운용사 선정 공고",
+    "vintage_year": 2025,
+    "announced_at": "2025-09-09",
+    "application_deadline": "2025-09-22T15:00:00+09:00",
+    "mandate_status": "UNKNOWN",
+    "mandate_scope": "GLOBAL",
+    "metadata": {
+      "selection_result_status": "NO_OFFICIAL_RESULT_FOUND",
+      "manager": "UNKNOWN",
+      "import_eligibility": "APPROVED_NOTICE_ONLY_NO_MANAGER_INFERENCE"
+    },
+    "evidence": {
+      "source_ids": [
+        "src-kofia-m212-180"
+      ]
+    }
+  },
+  "tracks": [
+    {
+      "id": "track-geps-2025-global-infra",
+      "track_code": "GEPS-2025-GLOBAL-INFRA",
+      "track_name": "글로벌 인프라 펀드",
+      "strategy_code": "INFRASTRUCTURE",
+      "geography_code": "EUROPE",
+      "target_manager_count": null,
+      "evidence": {
+        "source_ids": [
+          "src-kofia-m212-180"
+        ]
+      }
+    }
+  ],
+  "guidelines": [
+    {
+      "id": "guideline-geps-2025-global-infra-1",
+      "track_id": "track-geps-2025-global-infra",
+      "term_type": "TARGET_RETURN",
+      "requirement_level": "MINIMUM",
+      "raw_text": "Gross IRR 10% 이상",
+      "value_kind": "PERCENT",
+      "return_basis": "GROSS_IRR",
+      "evidence": {
+        "source_ids": [
+          "src-kofia-m212-180"
+        ]
+      },
+      "value_decimal_text": "10",
+      "comparator_code": "AT_LEAST"
+    },
+    {
+      "id": "guideline-geps-2025-global-infra-2",
+      "track_id": "track-geps-2025-global-infra",
+      "term_type": "SECTOR",
+      "requirement_level": "REQUIRED",
+      "raw_text": "글로벌 인프라 펀드(Equity)",
+      "value_kind": "TEXT",
+      "evidence": {
+        "source_ids": [
+          "src-kofia-m212-180"
+        ]
+      },
+      "text_value": "글로벌 인프라 펀드(Equity)"
+    },
+    {
+      "id": "guideline-geps-2025-global-infra-3",
+      "track_id": "track-geps-2025-global-infra",
+      "term_type": "GEOGRAPHY",
+      "requirement_level": "REQUIRED",
+      "raw_text": "글로벌(유럽 80% 이상 투자)",
+      "value_kind": "TEXT",
+      "evidence": {
+        "source_ids": [
+          "src-kofia-m212-180"
+        ]
+      },
+      "text_value": "글로벌(유럽 80% 이상 투자)"
+    }
+  ],
+  "selections": [],
+  "selection_members": [],
+  "selection_vehicles": [],
+  "amounts": [
+    {
+      "id": "amount-geps-2025-global-infra-1",
+      "scope_type": "TRACK",
+      "scope_id": "track-geps-2025-global-infra",
+      "amount_basis": "ALLOCATION_PER_MANAGER",
+      "amount": {
+        "kind": "AT_MOST",
+        "decimal": "50000000",
+        "currency": "EUR",
+        "raw_value": "운용사당 50mn 이내(EUR 통화 한정)"
+      },
+      "amount_status": "ANNOUNCED",
+      "evidence": {
+        "source_ids": [
+          "src-kofia-m212-180"
+        ]
+      }
+    },
+    {
+      "id": "amount-geps-2025-global-infra-2",
+      "scope_type": "TRACK",
+      "scope_id": "track-geps-2025-global-infra",
+      "amount_basis": "TARGET_FUND_SIZE",
+      "amount": {
+        "kind": "AT_LEAST",
+        "decimal": "1000000000",
+        "currency": "EUR",
+        "raw_value": "최종 모집금액 기준 EUR 1bn 이상"
+      },
+      "amount_status": "ANNOUNCED",
+      "evidence": {
+        "source_ids": [
+          "src-kofia-m212-180"
+        ]
+      }
+    }
+  ],
+  "deployments": []
+}

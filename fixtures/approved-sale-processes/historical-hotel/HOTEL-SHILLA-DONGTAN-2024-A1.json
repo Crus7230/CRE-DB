@@ -1,0 +1,228 @@
+{
+  "manifest_version": "1.0",
+  "manifest_id": "sale-historical-hotel-shilla-dongtan-2024-a1-v1",
+  "status": "APPROVED",
+  "review": {
+    "reviewed_by": "hermes-agent-hotel-source-review",
+    "reviewed_at": "2026-08-16T00:00:00Z",
+    "approved_by": "hermes-agent-strict-evidence-gate",
+    "approved_at": "2026-08-16T00:00:00Z",
+    "notes": "Strict gate: only FULL_TEXT/OFFICIAL/CROSS_ARTIFACT_VERIFIED core competition and terminal claims are normalized. Unknown exact vehicle, lender, price and date are left null or omitted. The KRW 110bn figure was only an expected price and is not normalized as a bid."
+  },
+  "sources": [
+    {
+      "id": "src_hh_shilla_dongtan_sedaily_20241108",
+      "url": "https://www.sedaily.com/article/13976464",
+      "publisher": "서울경제",
+      "document_type": "ARTICLE",
+      "published_at": "2024-11-08",
+      "accessed_at": "2026-08-16T00:00:00Z",
+      "title": "신라스테이 동탄 매각자문사 선정",
+      "rights_status": "METADATA_ONLY"
+    },
+    {
+      "id": "src_hh_shilla_dongtan_mk_20250820",
+      "url": "https://www.mk.co.kr/article/11398344",
+      "publisher": "매일경제",
+      "document_type": "ARTICLE",
+      "published_at": "2025-08-20",
+      "accessed_at": "2026-08-16T00:00:00Z",
+      "title": "블루코브 우협 후 자금조달 실패",
+      "rights_status": "METADATA_ONLY"
+    }
+  ],
+  "asset": {
+    "id": "asset_hh_shilla_stay_dongtan",
+    "canonical_name": "신라스테이 동탄",
+    "asset_class_id": "ac_hotel",
+    "status_code": "ACTIVE",
+    "metadata": {
+      "location": "경기 화성"
+    },
+    "evidence": {
+      "source_ids": [
+        "src_hh_shilla_dongtan_sedaily_20241108",
+        "src_hh_shilla_dongtan_mk_20250820"
+      ]
+    }
+  },
+  "organizations": [
+    {
+      "id": "org_hh_mirae_am_vehicle_undisclosed",
+      "canonical_name": "미래에셋자산운용 보유차량(명칭 미공개)",
+      "organization_type": "FUND",
+      "evidence": {
+        "source_ids": [
+          "src_hh_shilla_dongtan_sedaily_20241108",
+          "src_hh_shilla_dongtan_mk_20250820"
+        ]
+      },
+      "metadata": {
+        "identity_status": "UNDISCLOSED"
+      }
+    },
+    {
+      "id": "org_hh_avisonyoung_korea",
+      "canonical_name": "에비슨영코리아",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_hh_shilla_dongtan_sedaily_20241108"
+        ]
+      }
+    },
+    {
+      "id": "org_hh_savills_korea",
+      "canonical_name": "세빌스코리아",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_hh_shilla_dongtan_sedaily_20241108"
+        ]
+      }
+    },
+    {
+      "id": "org_hh_bluecove_am",
+      "canonical_name": "블루코브자산운용",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_hh_shilla_dongtan_mk_20250820"
+        ]
+      }
+    }
+  ],
+  "event": {
+    "id": "event_hh_shilla_dongtan_sale_a1",
+    "canonical_title": "신라스테이 동탄 매각 A1",
+    "current_stage_code": "SALE_FAILED",
+    "event_date_start": "2024-11-08",
+    "date_precision": "RANGE",
+    "lifecycle_status": "COMPLETED",
+    "verification_level": "V2",
+    "overall_confidence": 0.92,
+    "evidence": {
+      "source_ids": [
+        "src_hh_shilla_dongtan_sedaily_20241108",
+        "src_hh_shilla_dongtan_mk_20250820"
+      ]
+    }
+  },
+  "process": {
+    "id": "sp_hh_shilla_dongtan_2024_a1",
+    "process_code": "KR-HOTEL-SHILLA-DONGTAN-2024-A1",
+    "sale_method": "COMPETITIVE_BID",
+    "process_status": "FAILED",
+    "launched_at": "2024-11-08",
+    "currency_code": "KRW",
+    "metadata": {
+      "source_process_id": "HOTEL-SHILLA-DONGTAN-2024-A1",
+      "source_classification": "IN_SCOPE_MARKETING",
+      "source_current_status": "FAILED_2025",
+      "related_process_ids": [],
+      "reported_funding_context": "블루코브 투자자 모집 실패만 확인; 예정 LP/lender 미공개"
+    },
+    "evidence": {
+      "source_ids": [
+        "src_hh_shilla_dongtan_sedaily_20241108",
+        "src_hh_shilla_dongtan_mk_20250820"
+      ]
+    }
+  },
+  "roles": [
+    {
+      "id": "role_hh_shilla_dongtan_seller",
+      "organization_id": "org_hh_mirae_am_vehicle_undisclosed",
+      "role_code": "SELLER",
+      "evidence": {
+        "source_ids": [
+          "src_hh_shilla_dongtan_sedaily_20241108",
+          "src_hh_shilla_dongtan_mk_20250820"
+        ]
+      }
+    },
+    {
+      "id": "role_hh_shilla_dongtan_advisor_ay",
+      "organization_id": "org_hh_avisonyoung_korea",
+      "role_code": "SELL_SIDE_ADVISOR",
+      "evidence": {
+        "source_ids": [
+          "src_hh_shilla_dongtan_sedaily_20241108"
+        ]
+      }
+    },
+    {
+      "id": "role_hh_shilla_dongtan_advisor_savills",
+      "organization_id": "org_hh_savills_korea",
+      "role_code": "SELL_SIDE_ADVISOR",
+      "evidence": {
+        "source_ids": [
+          "src_hh_shilla_dongtan_sedaily_20241108"
+        ]
+      }
+    }
+  ],
+  "rounds": [
+    {
+      "id": "round_hh_shilla_dongtan_final",
+      "round_no": 1,
+      "round_code": "FINAL_2025_03",
+      "round_type": "FINAL",
+      "round_status": "COMPLETED",
+      "evidence": {
+        "source_ids": [
+          "src_hh_shilla_dongtan_mk_20250820"
+        ]
+      }
+    }
+  ],
+  "participations": [
+    {
+      "id": "part_hh_shilla_dongtan_bluecove",
+      "round_id": "round_hh_shilla_dongtan_final",
+      "bidder_organization_id": "org_hh_bluecove_am",
+      "participation_status": "PREFERRED",
+      "status_as_of": "2025-03",
+      "confidence": 0.92,
+      "evidence": {
+        "source_ids": [
+          "src_hh_shilla_dongtan_mk_20250820"
+        ]
+      }
+    }
+  ],
+  "participation_members": [],
+  "submissions": [],
+  "funding": [],
+  "decisions": [
+    {
+      "id": "decision_hh_shilla_dongtan_bluecove",
+      "round_id": "round_hh_shilla_dongtan_final",
+      "participation_id": "part_hh_shilla_dongtan_bluecove",
+      "decision_type": "PREFERRED",
+      "decision_status": "REVOKED",
+      "source_reason": "투자자 모집·자금조달 실패",
+      "confidence": 0.92,
+      "evidence": {
+        "source_ids": [
+          "src_hh_shilla_dongtan_mk_20250820"
+        ]
+      }
+    }
+  ],
+  "milestones": [
+    {
+      "id": "milestone_hh_shilla_dongtan_failed",
+      "milestone_code": "NEGOTIATION_FAILED",
+      "milestone_status": "CONFIRMED",
+      "announced_at": "2025-08-20",
+      "source_note": "2025년 3월 우협 뒤 투자자 모집·자금조달 실패; 정확한 실패일 미공개",
+      "confidence": 0.92,
+      "evidence": {
+        "source_ids": [
+          "src_hh_shilla_dongtan_mk_20250820"
+        ]
+      }
+    }
+  ]
+}

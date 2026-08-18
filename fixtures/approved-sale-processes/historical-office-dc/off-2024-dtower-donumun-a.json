@@ -1,0 +1,285 @@
+{
+  "manifest_version": "1.0",
+  "manifest_id": "sale-historical-dtower24-v1",
+  "status": "APPROVED",
+  "review": {
+    "reviewed_by": "hermes-agent-source-review",
+    "reviewed_at": "2026-08-16T00:00:00Z",
+    "approved_by": "hermes-agent-evidence-gate",
+    "approved_at": "2026-08-16T00:00:00Z",
+    "notes": "BODY_READ 또는 공개 본문 범위에서 경쟁절차와 terminal을 함께 확인한 normalized facts만 승인. 검색 title/snippet만의 claim은 제외하고 날짜·금액·순위를 추정하지 않음."
+  },
+  "sources": [
+    {
+      "id": "src_dtower24_s24",
+      "url": "http://www.edaily.co.kr/news/newspath.asp?newsid=02883126638959440",
+      "publisher": "이데일리",
+      "document_type": "ARTICLE",
+      "published_at": "2024-07-29",
+      "accessed_at": "2026-08-16T00:00:00Z",
+      "title": "돈의문 디타워 인수전 승자는 NH농협금융",
+      "rights_status": "METADATA_ONLY",
+      "access_status_reviewed": "BODY_READ",
+      "metadata": {
+        "chronology_source_id": "S24"
+      }
+    },
+    {
+      "id": "src_dtower24_s25",
+      "url": "https://www.newspim.com/news/view/20241115000526",
+      "publisher": "뉴스핌/DL",
+      "document_type": "ARTICLE",
+      "published_at": "2024-11-15",
+      "accessed_at": "2026-08-16T00:00:00Z",
+      "title": "DL 디타워 돈의문 9천억에 매각",
+      "rights_status": "METADATA_ONLY",
+      "access_status_reviewed": "BODY_READ",
+      "metadata": {
+        "chronology_source_id": "S25"
+      }
+    }
+  ],
+  "asset": {
+    "id": "asset_d_tower_donuimun",
+    "canonical_name": "디타워 돈의문",
+    "asset_class_id": "ac_office",
+    "jibun_address": "서울 종로구 평동",
+    "status_code": "ACTIVE",
+    "evidence": {
+      "source_ids": [
+        "src_dtower24_s24"
+      ]
+    }
+  },
+  "organizations": [
+    {
+      "id": "org_mastern_am",
+      "canonical_name": "마스턴투자운용",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_dtower24_s24",
+          "src_dtower24_s25"
+        ]
+      }
+    },
+    {
+      "id": "org_nh_nonghyup_financial_group",
+      "canonical_name": "NH농협금융",
+      "organization_type": "FINANCIAL_INSTITUTION",
+      "evidence": {
+        "source_ids": [
+          "src_dtower24_s24",
+          "src_dtower24_s25"
+        ]
+      }
+    },
+    {
+      "id": "org_poba",
+      "canonical_name": "대한지방행정공제회",
+      "organization_type": "FINANCIAL_INSTITUTION",
+      "evidence": {
+        "source_ids": [
+          "src_dtower24_s24"
+        ]
+      }
+    },
+    {
+      "id": "org_igis_am",
+      "canonical_name": "이지스자산운용",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_dtower24_s24"
+        ]
+      }
+    }
+  ],
+  "event": {
+    "id": "event_sale_dtower24",
+    "canonical_title": "디타워 돈의문 매각",
+    "current_stage_code": "CLOSED",
+    "date_precision": "DAY",
+    "lifecycle_status": "COMPLETED",
+    "verification_level": "V2",
+    "overall_confidence": 0.9,
+    "evidence": {
+      "source_ids": [
+        "src_dtower24_s24",
+        "src_dtower24_s25"
+      ]
+    },
+    "event_date_start": "2024-11-15"
+  },
+  "process": {
+    "id": "sp_dtower24",
+    "process_code": "KR-SALE-OFF-2024-DTOWER-DONUMUN-A",
+    "sale_method": "COMPETITIVE_BID",
+    "process_status": "CLOSED",
+    "currency_code": "KRW",
+    "evidence": {
+      "source_ids": [
+        "src_dtower24_s24",
+        "src_dtower24_s25"
+      ]
+    },
+    "metadata": {
+      "source_process_id": "OFF-2024-DTOWER-DONUMUN-A"
+    },
+    "closed_at": "2024-11-15"
+  },
+  "roles": [
+    {
+      "id": "role_dtower24_seller",
+      "organization_id": "org_mastern_am",
+      "role_code": "SELLER",
+      "evidence": {
+        "source_ids": [
+          "src_dtower24_s24",
+          "src_dtower24_s25"
+        ]
+      }
+    }
+  ],
+  "rounds": [
+    {
+      "id": "round_dtower24_final",
+      "round_no": 1,
+      "round_code": "FINAL_202407",
+      "round_type": "FINAL",
+      "round_status": "COMPLETED",
+      "metadata": {
+        "date_precision": "MONTH"
+      },
+      "evidence": {
+        "source_ids": [
+          "src_dtower24_s24"
+        ]
+      }
+    }
+  ],
+  "participations": [
+    {
+      "id": "part_dtower24_nh",
+      "round_id": "round_dtower24_final",
+      "bidder_organization_id": "org_nh_nonghyup_financial_group",
+      "participation_status": "PREFERRED",
+      "status_as_of": "2024-07-29",
+      "confidence": 0.95,
+      "evidence": {
+        "source_ids": [
+          "src_dtower24_s24"
+        ]
+      }
+    },
+    {
+      "id": "part_dtower24_poba_igis",
+      "round_id": "round_dtower24_final",
+      "bidder_organization_id": "org_poba",
+      "participation_status": "LOST",
+      "confidence": 0.9,
+      "evidence": {
+        "source_ids": [
+          "src_dtower24_s24"
+        ]
+      }
+    }
+  ],
+  "participation_members": [
+    {
+      "id": "member_dtower24_poba_lead",
+      "participation_id": "part_dtower24_poba_igis",
+      "organization_id": "org_poba",
+      "member_role": "LEAD_BIDDER",
+      "evidence": {
+        "source_ids": [
+          "src_dtower24_s24"
+        ]
+      }
+    },
+    {
+      "id": "member_dtower24_igis_manager",
+      "participation_id": "part_dtower24_poba_igis",
+      "organization_id": "org_igis_am",
+      "member_role": "ASSET_MANAGER",
+      "evidence": {
+        "source_ids": [
+          "src_dtower24_s24"
+        ]
+      }
+    }
+  ],
+  "submissions": [
+    {
+      "id": "submission_dtower24_nh",
+      "claim_id": "claim_dtower24_nh_price",
+      "participation_id": "part_dtower24_nh",
+      "amount": null,
+      "evidence": {
+        "source_ids": [
+          "src_dtower24_s24",
+          "src_dtower24_s25"
+        ]
+      },
+      "metadata": {
+        "final_closing_amount": {
+          "kind": "EXACT",
+          "decimal": "895300000000",
+          "currency": "KRW",
+          "basis": "FINAL_CLOSING_GROSS_ASSET_PRICE"
+        }
+      }
+    },
+    {
+      "id": "submission_dtower24_poba_igis",
+      "claim_id": "claim_dtower24_poba_igis_price",
+      "participation_id": "part_dtower24_poba_igis",
+      "amount": null,
+      "evidence": {
+        "source_ids": [
+          "src_dtower24_s24"
+        ]
+      }
+    }
+  ],
+  "funding": [],
+  "decisions": [
+    {
+      "id": "decision_dtower24_nh_preferred",
+      "round_id": "round_dtower24_final",
+      "participation_id": "part_dtower24_nh",
+      "decision_type": "PREFERRED",
+      "decision_date": "2024-07-29",
+      "decision_status": "VERIFIED",
+      "confidence": 0.95,
+      "evidence": {
+        "source_ids": [
+          "src_dtower24_s24"
+        ]
+      }
+    }
+  ],
+  "milestones": [
+    {
+      "id": "milestone_dtower24_closed",
+      "milestone_code": "CLOSED",
+      "milestone_status": "CONFIRMED",
+      "source_note": "DL 공식 발표 인용: 8953억원 매각 작업 마무리",
+      "effective_date": "2024-11-15",
+      "confidence": 0.95,
+      "evidence": {
+        "source_ids": [
+          "src_dtower24_s25"
+        ]
+      },
+      "metadata": {
+        "final_amount": {
+          "kind": "EXACT",
+          "decimal": "895300000000",
+          "currency": "KRW",
+          "basis": "FINAL_CLOSING_GROSS_ASSET_PRICE"
+        }
+      }
+    }
+  ]
+}

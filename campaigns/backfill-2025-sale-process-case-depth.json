@@ -1,0 +1,27 @@
+{
+  "campaignCode": "BACKFILL_2025_SALE_PROCESS_CASE_DEPTH_V1",
+  "runnerVersion": "2025-bid-process-detail-v1",
+  "sourceCode": "GOOGLE_NEWS_RSS",
+  "categoryCode": "SALE",
+  "processTerms": "(입찰자 OR 본입찰 OR 숏리스트 OR 우협 OR 우선협상대상자 OR 인수금융 OR 입찰가 OR 블라인드펀드 OR 프로젝트펀드 OR 거래종결 OR 매각무산 OR 재입찰)",
+  "assets": {
+    "YEONJI_OFFICE": "\"연지동 사옥\"",
+    "HYUNDAI_SECURITIES": "\"현대차증권빌딩\"",
+    "CRESCENDO": "\"크레센도빌딩\"",
+    "DOOSAN_NONHYEON": "\"논현 두산건설 사옥\"",
+    "SAMSUNG_BUILDING": "\"강남 삼성동빌딩\"",
+    "AP_TOWER": "\"AP타워\"",
+    "G1_GONGPYEONG": "\"공평동 G1\"",
+    "FOUR_POINTS_MYEONGDONG": "\"포포인츠 조선 명동\"",
+    "MAISON_GLAD_JEJU": "\"메종글래드 제주\"",
+    "GYEONGWONJAE": "\"경원재\" 호텔",
+    "SHILLA_STAY_MAPO": "\"신라스테이 마포\"",
+    "NINETREE_DDP": "\"나인트리 동대문\"",
+    "GONJIAM_LOGISTICS": "\"곤지암 물류센터\"",
+    "FILA_ICHEON": "\"이천 휠라 물류센터\"",
+    "CHEONGNA_LOGISTICS": "\"청라 로지스틱스\"",
+    "HOBEOP_A": "\"호법A 물류센터\"",
+    "JUKJEON_LOGISTICS": "\"죽전 물류센터\"",
+    "TCC_DANGSAN": "\"TCC동양타워\""
+  }
+}

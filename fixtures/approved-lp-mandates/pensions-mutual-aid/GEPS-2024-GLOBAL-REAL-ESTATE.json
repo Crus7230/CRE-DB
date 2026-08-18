@@ -1,0 +1,167 @@
+{
+  "manifest_version": "1.0",
+  "manifest_id": "approved-lpmandate-geps-2024-global-real-estate",
+  "status": "APPROVED",
+  "review": {
+    "reviewed_by": "hermes-research-consolidation",
+    "reviewed_at": "2026-08-16T00:40:00Z",
+    "approved_by": "hermes-parent-official-url-review",
+    "approved_at": "2026-08-16T00:41:00Z"
+  },
+  "sources": [
+    {
+      "id": "src-kofia-m212-14",
+      "url": "https://www.kofia.or.kr/brd/m_212/view.do?seq=14",
+      "title": "[공무원연금공단] 2024년도 글로벌 부동산 펀드 해외 위탁운용사 선정",
+      "publisher": "금융투자협회(공무원연금공단 공고 재배포)",
+      "document_type": "BID_NOTICE",
+      "published_at": "2024-07-12",
+      "accessed_at": "2026-08-16",
+      "rights_status": "EXCERPT_ALLOWED",
+      "exact_text": "2024년도 공무원연금공단 글로벌 부동산 펀드 해외 위탁운용사 선정 계획을 아래와 같이 공고합니다.\n위탁운용금액운용사당35mn이내(USD또는EUR)\n선정운용사2개사\n대상전략Value-added및Opportunistic전략\n목표수익률IRR10%이상(비용및수수료차감후내부수익률기준)\n펀드레버리지비중75%미만\n최종 모집금액 기준 USD500mn이상\n2024.07.25. 제안서접수마감 오후15시마감,한국시간"
+    }
+  ],
+  "organizations": [
+    {
+      "id": "org-geps",
+      "organization_type": "GOVERNMENT",
+      "canonical_name": "공무원연금공단"
+    }
+  ],
+  "event": {
+    "id": "evt-geps-2024-global-real-estate",
+    "canonical_title": "공무원연금공단 [공무원연금공단] 2024년도 글로벌 부동산 펀드 해외 위탁운용사 선정",
+    "current_stage_code": "MANAGER_RFP_OPEN",
+    "event_date_start": "2024-07-12",
+    "event_date_end": "2024-07-12",
+    "date_precision": "DAY",
+    "lifecycle_status": "ACTIVE",
+    "verification_level": "V2",
+    "evidence": {
+      "source_ids": [
+        "src-kofia-m212-14"
+      ]
+    }
+  },
+  "mandate": {
+    "id": "mandate-geps-2024-global-real-estate",
+    "lp_organization_id": "org-geps",
+    "mandate_code": "GEPS-2024-GLOBAL-REAL-ESTATE",
+    "mandate_name": "[공무원연금공단] 2024년도 글로벌 부동산 펀드 해외 위탁운용사 선정",
+    "vintage_year": 2024,
+    "announced_at": "2024-07-12",
+    "application_deadline": "2024-07-25T15:00:00+09:00",
+    "mandate_status": "UNKNOWN",
+    "mandate_scope": "GLOBAL",
+    "metadata": {
+      "selection_result_status": "NO_OFFICIAL_RESULT_FOUND",
+      "manager": "UNKNOWN",
+      "import_eligibility": "APPROVED_NOTICE_ONLY_NO_MANAGER_INFERENCE"
+    },
+    "evidence": {
+      "source_ids": [
+        "src-kofia-m212-14"
+      ]
+    }
+  },
+  "tracks": [
+    {
+      "id": "track-geps-2024-global-real-estate",
+      "track_code": "GEPS-2024-GLOBAL-REAL-ESTATE",
+      "track_name": "글로벌 부동산 펀드",
+      "strategy_code": "REAL_ESTATE",
+      "geography_code": "GLOBAL",
+      "target_manager_count": null,
+      "evidence": {
+        "source_ids": [
+          "src-kofia-m212-14"
+        ]
+      }
+    }
+  ],
+  "guidelines": [
+    {
+      "id": "guideline-geps-2024-global-real-estate-1",
+      "track_id": "track-geps-2024-global-real-estate",
+      "term_type": "TARGET_RETURN",
+      "requirement_level": "MINIMUM",
+      "raw_text": "IRR10%이상(비용및수수료차감후내부수익률기준)",
+      "value_kind": "PERCENT",
+      "return_basis": "NET_IRR",
+      "evidence": {
+        "source_ids": [
+          "src-kofia-m212-14"
+        ]
+      },
+      "value_decimal_text": "10",
+      "comparator_code": "AT_LEAST"
+    },
+    {
+      "id": "guideline-geps-2024-global-real-estate-2",
+      "track_id": "track-geps-2024-global-real-estate",
+      "term_type": "STRATEGY",
+      "requirement_level": "REQUIRED",
+      "raw_text": "Value-added및Opportunistic전략",
+      "value_kind": "TEXT",
+      "evidence": {
+        "source_ids": [
+          "src-kofia-m212-14"
+        ]
+      },
+      "text_value": "Value-added및Opportunistic전략"
+    },
+    {
+      "id": "guideline-geps-2024-global-real-estate-3",
+      "track_id": "track-geps-2024-global-real-estate",
+      "term_type": "LEVERAGE",
+      "requirement_level": "REQUIRED",
+      "raw_text": "펀드레버리지비중75%미만",
+      "value_kind": "PERCENT",
+      "evidence": {
+        "source_ids": [
+          "src-kofia-m212-14"
+        ]
+      },
+      "value_decimal_text": "75",
+      "comparator_code": "AT_MOST"
+    },
+    {
+      "id": "guideline-geps-2024-global-real-estate-4",
+      "track_id": "track-geps-2024-global-real-estate",
+      "term_type": "DEAL_SIZE",
+      "requirement_level": "REQUIRED",
+      "raw_text": "운용사당35mn이내(USD또는EUR)",
+      "value_kind": "TEXT",
+      "evidence": {
+        "source_ids": [
+          "src-kofia-m212-14"
+        ]
+      },
+      "text_value": "운용사당35mn이내(USD또는EUR)"
+    }
+  ],
+  "selections": [],
+  "selection_members": [],
+  "selection_vehicles": [],
+  "amounts": [
+    {
+      "id": "amount-geps-2024-global-real-estate-2",
+      "scope_type": "TRACK",
+      "scope_id": "track-geps-2024-global-real-estate",
+      "amount_basis": "TARGET_FUND_SIZE",
+      "amount": {
+        "kind": "AT_LEAST",
+        "decimal": "500000000",
+        "currency": "USD",
+        "raw_value": "최종 모집금액 기준 USD500mn이상"
+      },
+      "amount_status": "ANNOUNCED",
+      "evidence": {
+        "source_ids": [
+          "src-kofia-m212-14"
+        ]
+      }
+    }
+  ],
+  "deployments": []
+}

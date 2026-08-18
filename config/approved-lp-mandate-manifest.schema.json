@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.example/schemas/approved-lp-mandate-manifest.schema.json",
+  "title": "Approved Institutional LP Manager Mandate Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "manifest_version", "manifest_id", "status", "review", "sources", "organizations",
+    "event", "mandate", "tracks", "guidelines", "selections", "selection_members",
+    "selection_vehicles", "amounts", "deployments"
+  ],
+  "properties": {
+    "manifest_version": {"const": "1.0"},
+    "manifest_id": {"type": "string", "minLength": 1},
+    "status": {"const": "APPROVED"},
+    "review": {"$ref": "#/$defs/review"},
+    "sources": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/source"}},
+    "organizations": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/organization"}},
+    "event": {"$ref": "#/$defs/event"},
+    "mandate": {"$ref": "#/$defs/mandate"},
+    "tracks": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/track"}},
+    "guidelines": {"type": "array", "items": {"$ref": "#/$defs/guideline"}},
+    "selections": {"type": "array", "items": {"$ref": "#/$defs/selection"}},
+    "selection_members": {"type": "array", "items": {"$ref": "#/$defs/selectionMember"}},
+    "selection_vehicles": {"type": "array", "items": {"$ref": "#/$defs/selectionVehicle"}},
+    "amounts": {"type": "array", "items": {"$ref": "#/$defs/amountRecord"}},
+    "deployments": {"type": "array", "items": {"$ref": "#/$defs/deployment"}}
+  },
+  "$defs": {
+    "evidence": {
+      "type": "object", "additionalProperties": true, "required": ["source_ids"],
+      "properties": {"source_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}}}
+    },
+    "review": {
+      "type": "object", "additionalProperties": false,
+      "required": ["reviewed_by", "reviewed_at", "approved_by", "approved_at"],
+      "properties": {
+        "reviewed_by": {"type": "string"}, "reviewed_at": {"type": "string"},
+        "approved_by": {"type": "string"}, "approved_at": {"type": "string"}
+      }
+    },
+    "source": {
+      "type": "object", "additionalProperties": true,
+      "required": ["id", "url", "publisher", "document_type", "published_at", "accessed_at", "rights_status", "exact_text"],
+      "properties": {
+        "id": {"type": "string"}, "url": {"type": "string", "format": "uri"},
+        "publisher": {"type": "string"},
+        "document_type": {"enum": ["ARTICLE", "PRESS_RELEASE", "DISCLOSURE", "NOTICE", "BID_NOTICE", "REPORT", "RSS_ITEM", "API_RECORD", "LEGAL_DOCUMENT", "OTHER"]},
+        "published_at": {"type": "string"}, "accessed_at": {"type": "string"},
+        "rights_status": {"enum": ["FULL_STORAGE_ALLOWED", "EXCERPT_ALLOWED", "METADATA_ONLY", "MANUAL_ACCESS", "UNKNOWN"]},
+        "exact_text": {"type": "string", "minLength": 1}
+      }
+    },
+    "organization": {
+      "type": "object", "additionalProperties": true,
+      "required": ["id", "organization_type", "canonical_name"],
+      "properties": {
+        "id": {"type": "string"},
+        "organization_type": {"enum": ["COMPANY", "SPC", "FUND", "REIT", "FINANCIAL_INSTITUTION", "GOVERNMENT", "ASSOCIATION", "PERSON", "OTHER"]},
+        "canonical_name": {"type": "string"}
+      }
+    },
+    "event": {
+      "type": "object", "additionalProperties": true,
+      "required": ["id", "canonical_title", "current_stage_code", "evidence"],
+      "properties": {"id": {"type": "string"}, "canonical_title": {"type": "string"}, "current_stage_code": {"enum": ["MANAGER_RFP_OPEN", "SHORTLISTED", "MANAGER_SELECTED", "INVESTMENT_COMMITTED", "INVESTMENT_CLOSED", "INVESTMENT_EXITED"]}, "evidence": {"$ref": "#/$defs/evidence"}}
+    },
+    "mandate": {
+      "type": "object", "additionalProperties": true,
+      "required": ["id", "lp_organization_id", "mandate_code", "mandate_name", "vintage_year", "mandate_status", "evidence"],
+      "properties": {"id": {"type": "string"}, "lp_organization_id": {"type": "string"}, "mandate_code": {"type": "string"}, "mandate_name": {"type": "string"}, "vintage_year": {"type": "integer", "minimum": 1900, "maximum": 2200}, "mandate_status": {"enum": ["PLANNED", "OPEN", "SCREENING", "SHORTLISTED", "SELECTED", "COMMITTED", "CANCELLED", "CLOSED", "UNKNOWN"]}, "evidence": {"$ref": "#/$defs/evidence"}}
+    },
+    "track": {
+      "type": "object", "additionalProperties": true,
+      "required": ["id", "track_code", "track_name", "strategy_code", "evidence"],
+      "properties": {"id": {"type": "string"}, "track_code": {"type": "string"}, "track_name": {"type": "string"}, "strategy_code": {"enum": ["REAL_ESTATE", "INFRASTRUCTURE", "PRIVATE_EQUITY", "PRIVATE_DEBT", "REAL_ASSETS", "MULTI_ASSET", "SECONDARIES", "OTHER", "UNKNOWN"]}, "evidence": {"$ref": "#/$defs/evidence"}}
+    },
+    "guideline": {
+      "type": "object", "additionalProperties": true,
+      "required": ["id", "track_id", "term_type", "raw_text", "value_kind", "evidence"],
+      "properties": {"id": {"type": "string"}, "track_id": {"type": "string"}, "term_type": {"enum": ["TARGET_RETURN", "STRATEGY", "SECTOR", "GEOGRAPHY", "RISK_PROFILE", "INVESTMENT_PERIOD", "FUND_TERM", "LEVERAGE", "DEAL_SIZE", "ELIGIBLE_ASSET", "EXCLUSION", "MANAGER_COMMITMENT", "CO_INVESTMENT", "ESG", "OTHER"]}, "raw_text": {"type": "string"}, "value_kind": {"enum": ["TEXT", "PERCENT", "MONEY", "DURATION", "NUMBER", "JSON"]}, "evidence": {"$ref": "#/$defs/evidence"}}
+    },
+    "selection": {
+      "type": "object", "additionalProperties": true,
+      "required": ["id", "track_id", "manager_organization_id", "selection_status", "evidence"],
+      "properties": {"id": {"type": "string"}, "track_id": {"type": "string"}, "manager_organization_id": {"type": "string"}, "selection_status": {"enum": ["APPLIED", "SHORTLISTED", "SELECTED", "RESERVE", "NOT_SELECTED", "WITHDRAWN", "REVOKED", "UNKNOWN"]}, "evidence": {"$ref": "#/$defs/evidence"}}
+    },
+    "selectionMember": {"type": "object", "additionalProperties": true, "required": ["selection_id", "organization_id", "member_role", "evidence"], "properties": {"evidence": {"$ref": "#/$defs/evidence"}}},
+    "selectionVehicle": {"type": "object", "additionalProperties": true, "required": ["selection_id", "vehicle_organization_id", "vehicle_role", "evidence"], "properties": {"evidence": {"$ref": "#/$defs/evidence"}}},
+    "normalizedAmount": {
+      "type": "object", "additionalProperties": true,
+      "required": ["kind", "currency", "raw_value"],
+      "properties": {"kind": {"enum": ["EXACT", "APPROX", "RANGE", "AT_LEAST", "AT_MOST", "GREATER_THAN", "LESS_THAN", "UNKNOWN"]}, "currency": {"type": "string"}, "raw_value": {"type": "string"}, "decimal": {"type": "string", "pattern": "^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$"}, "lower_decimal": {"type": "string"}, "upper_decimal": {"type": "string"}}
+    },
+    "amountRecord": {
+      "type": "object", "additionalProperties": true,
+      "required": ["id", "scope_type", "scope_id", "amount_basis", "amount", "amount_status", "evidence"],
+      "properties": {"id": {"type": "string"}, "scope_type": {"enum": ["MANDATE", "TRACK", "SELECTION"]}, "scope_id": {"type": "string"}, "amount_basis": {"enum": ["PROGRAM_TOTAL", "LP_COMMITMENT_TOTAL", "TRACK_LP_COMMITMENT", "ALLOCATION_PER_MANAGER", "SELECTION_LP_COMMITMENT", "TARGET_FUND_SIZE", "MANAGER_COMMITMENT", "CO_INVESTMENT_RESERVE", "OTHER", "UNKNOWN"]}, "amount": {"$ref": "#/$defs/normalizedAmount"}, "evidence": {"$ref": "#/$defs/evidence"}}
+    },
+    "deployment": {
+      "type": "object", "additionalProperties": true,
+      "required": ["id", "selection_id", "deployment_basis", "amount", "deployment_status", "evidence"],
+      "properties": {"id": {"type": "string"}, "selection_id": {"type": "string"}, "deployment_basis": {"enum": ["LP_SOURCE_DEPLOYMENT", "FUND_EQUITY_DEPLOYMENT", "TOTAL_EQUITY_COMMITMENT", "CO_INVESTMENT", "OTHER", "UNKNOWN"]}, "amount": {"$ref": "#/$defs/normalizedAmount"}, "evidence": {"$ref": "#/$defs/evidence"}}
+    }
+  }
+}

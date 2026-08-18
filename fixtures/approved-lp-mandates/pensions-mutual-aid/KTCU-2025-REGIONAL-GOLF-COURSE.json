@@ -1,0 +1,122 @@
+{
+  "manifest_version": "1.0",
+  "manifest_id": "approved-lpmandate-ktcu-2025-regional-golf-course",
+  "status": "APPROVED",
+  "review": {
+    "reviewed_by": "hermes-research-consolidation",
+    "reviewed_at": "2026-08-16T00:40:00Z",
+    "approved_by": "hermes-parent-official-url-review",
+    "approved_at": "2026-08-16T00:41:00Z"
+  },
+  "sources": [
+    {
+      "id": "src-kofia-m212-150",
+      "url": "https://www.kofia.or.kr/brd/m_212/view.do?seq=150",
+      "title": "[한국교직원공제회] 권역별 골프장 투자 사업 위탁운용사 선정 공고",
+      "publisher": "금융투자협회(한국교직원공제회 공고 재배포)",
+      "document_type": "BID_NOTICE",
+      "published_at": "2025-07-07",
+      "accessed_at": "2026-08-16",
+      "rights_status": "EXCERPT_ALLOWED",
+      "exact_text": "ㅇ 선정방식 : 공개모집을 통한 경쟁방식\nㅇ 출자규모 : 5,000억원 내외\nㅇ 운용조건 : 권역별 골프장 분산 투자(수도권, 강원권, 충청권, 영남권, 호남권(제주 제외))\nㅇ 제출방법 : 접수 마감일시(2025.08.04. 18:00)까지 제출"
+    }
+  ],
+  "organizations": [
+    {
+      "id": "org-ktcu",
+      "organization_type": "ASSOCIATION",
+      "canonical_name": "한국교직원공제회"
+    }
+  ],
+  "event": {
+    "id": "evt-ktcu-2025-regional-golf-course",
+    "canonical_title": "한국교직원공제회 [한국교직원공제회] 권역별 골프장 투자 사업 위탁운용사 선정 공고",
+    "current_stage_code": "MANAGER_RFP_OPEN",
+    "event_date_start": "2025-07-07",
+    "event_date_end": "2025-07-07",
+    "date_precision": "DAY",
+    "lifecycle_status": "ACTIVE",
+    "verification_level": "V2",
+    "evidence": {
+      "source_ids": [
+        "src-kofia-m212-150"
+      ]
+    }
+  },
+  "mandate": {
+    "id": "mandate-ktcu-2025-regional-golf-course",
+    "lp_organization_id": "org-ktcu",
+    "mandate_code": "KTCU-2025-REGIONAL-GOLF-COURSE",
+    "mandate_name": "[한국교직원공제회] 권역별 골프장 투자 사업 위탁운용사 선정 공고",
+    "vintage_year": 2025,
+    "announced_at": "2025-07-07",
+    "application_deadline": "2025-08-04T18:00:00+09:00",
+    "mandate_status": "UNKNOWN",
+    "mandate_scope": "DOMESTIC",
+    "metadata": {
+      "selection_result_status": "NO_OFFICIAL_RESULT_FOUND",
+      "manager": "UNKNOWN",
+      "import_eligibility": "APPROVED_NOTICE_ONLY_NO_MANAGER_INFERENCE"
+    },
+    "evidence": {
+      "source_ids": [
+        "src-kofia-m212-150"
+      ]
+    }
+  },
+  "tracks": [
+    {
+      "id": "track-ktcu-2025-regional-golf-course",
+      "track_code": "KTCU-2025-REGIONAL-GOLF-COURSE",
+      "track_name": "권역별 골프장 투자 사업",
+      "strategy_code": "REAL_ESTATE",
+      "geography_code": "DOMESTIC",
+      "target_manager_count": null,
+      "evidence": {
+        "source_ids": [
+          "src-kofia-m212-150"
+        ]
+      }
+    }
+  ],
+  "guidelines": [
+    {
+      "id": "guideline-ktcu-2025-regional-golf-course-1",
+      "track_id": "track-ktcu-2025-regional-golf-course",
+      "term_type": "STRATEGY",
+      "requirement_level": "REQUIRED",
+      "raw_text": "권역별 골프장 분산 투자(수도권, 강원권, 충청권, 영남권, 호남권(제주 제외))",
+      "value_kind": "TEXT",
+      "evidence": {
+        "source_ids": [
+          "src-kofia-m212-150"
+        ]
+      },
+      "text_value": "권역별 골프장 분산 투자(수도권, 강원권, 충청권, 영남권, 호남권(제주 제외))"
+    }
+  ],
+  "selections": [],
+  "selection_members": [],
+  "selection_vehicles": [],
+  "amounts": [
+    {
+      "id": "amount-ktcu-2025-regional-golf-course-1",
+      "scope_type": "MANDATE",
+      "scope_id": "mandate-ktcu-2025-regional-golf-course",
+      "amount_basis": "PROGRAM_TOTAL",
+      "amount": {
+        "kind": "APPROX",
+        "decimal": "500000000000",
+        "currency": "KRW",
+        "raw_value": "출자규모 : 5,000억원 내외"
+      },
+      "amount_status": "ANNOUNCED",
+      "evidence": {
+        "source_ids": [
+          "src-kofia-m212-150"
+        ]
+      }
+    }
+  ],
+  "deployments": []
+}

@@ -1,0 +1,303 @@
+{
+  "manifest_version": "1.0",
+  "manifest_id": "sale-historical-logistics-2020-danchon-v1",
+  "status": "APPROVED",
+  "review": {
+    "reviewed_by": "hermes-agent-strict-evidence-review",
+    "reviewed_at": "2026-08-16T00:00:00Z",
+    "approved_by": "hermes-agent-competitive-process-gate",
+    "approved_at": "2026-08-16T00:00:00Z",
+    "notes": "직접 저장된 publisher full text로 경쟁입찰(19곳), 신한리츠운용 최고가·우협 및 2020년 인수를 확인한 유일한 승인 건. 정확한 closing 일자는 공개 근거가 없어 closed_at을 비워 두었다."
+  },
+  "sources": [
+    {
+      "id": "src_histlog_danchon_20200607_edaily",
+      "url": "https://www.edaily.co.kr/News/Read?newsId=01331686625799424&mediaCodeNo=257",
+      "publisher": "이데일리",
+      "document_type": "ARTICLE",
+      "published_at": "2020-06-07",
+      "accessed_at": "2026-08-16T00:00:00Z",
+      "title": "치열했던 이천 물류센터 인수전…신한리츠운용 우협 선정",
+      "rights_status": "METADATA_ONLY",
+      "metadata": {
+        "local_evidence": "artifacts/logistics-competitive-sales-2020-2024-source-extracts.json",
+        "source_ref": "S01",
+        "full_text_verified": true
+      }
+    },
+    {
+      "id": "src_histlog_danchon_20240730_fnnews",
+      "url": "https://www.fnnews.com/news/202407290509013999",
+      "publisher": "파이낸셜뉴스",
+      "document_type": "ARTICLE",
+      "published_at": "2024-07-30",
+      "accessed_at": "2026-08-16T00:00:00Z",
+      "title": "신한리츠, 이천 단천리 물류센터 매각",
+      "rights_status": "METADATA_ONLY",
+      "metadata": {
+        "local_evidence": "artifacts/logistics-competitive-sales-2020-2024-source-extracts.json",
+        "source_ref": "S03",
+        "full_text_verified": true,
+        "evidence_role": "FOLLOW_UP_TERMINAL_CONFIRMATION"
+      }
+    }
+  ],
+  "asset": {
+    "id": "asset_histlog_icheon_danchon",
+    "canonical_name": "이천 단천리 물류센터",
+    "asset_class_id": "ac_logistics",
+    "jibun_address": "경기 이천시 호법면 단천리 234-2 외",
+    "status_code": "ACTIVE",
+    "evidence": {
+      "source_ids": [
+        "src_histlog_danchon_20200607_edaily",
+        "src_histlog_danchon_20240730_fnnews"
+      ]
+    }
+  },
+  "organizations": [
+    {
+      "id": "org_lb_asset_management",
+      "canonical_name": "LB자산운용",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": ["src_histlog_danchon_20200607_edaily"]
+      }
+    },
+    {
+      "id": "org_shinhan_reit_am",
+      "canonical_name": "신한리츠운용",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_histlog_danchon_20200607_edaily",
+          "src_histlog_danchon_20240730_fnnews"
+        ]
+      }
+    },
+    {
+      "id": "org_shinhan_logis_no1",
+      "canonical_name": "신한로지스제1호",
+      "organization_type": "REIT",
+      "evidence": {
+        "source_ids": ["src_histlog_danchon_20240730_fnnews"]
+      }
+    },
+    {
+      "id": "org_tongyang_life",
+      "canonical_name": "동양생명",
+      "organization_type": "FINANCIAL_INSTITUTION",
+      "evidence": {
+        "source_ids": ["src_histlog_danchon_20240730_fnnews"]
+      }
+    },
+    {
+      "id": "org_shinhan_life_2020",
+      "canonical_name": "신한생명(2020년 당시 명칭)",
+      "organization_type": "FINANCIAL_INSTITUTION",
+      "evidence": {
+        "source_ids": ["src_histlog_danchon_20240730_fnnews"]
+      }
+    }
+  ],
+  "event": {
+    "id": "event_histlog_danchon_sale_2020",
+    "canonical_title": "이천 단천리 물류센터 2020년 경쟁매각",
+    "current_stage_code": "CLOSED",
+    "event_date_start": "2020-05-13",
+    "date_precision": "YEAR",
+    "lifecycle_status": "COMPLETED",
+    "verification_level": "V2",
+    "overall_confidence": 0.95,
+    "evidence": {
+      "source_ids": [
+        "src_histlog_danchon_20200607_edaily",
+        "src_histlog_danchon_20240730_fnnews"
+      ]
+    },
+    "metadata": {
+      "terminal_date_precision": "YEAR",
+      "terminal_exact_date": "UNDISCLOSED"
+    }
+  },
+  "process": {
+    "id": "sp_histlog_danchon_2020",
+    "process_code": "KR-SALE-2020-ICHEON-DANCHON",
+    "sale_method": "COMPETITIVE_BID",
+    "process_status": "CLOSED",
+    "launched_at": null,
+    "closed_at": null,
+    "currency_code": "KRW",
+    "evidence": {
+      "source_ids": [
+        "src_histlog_danchon_20200607_edaily",
+        "src_histlog_danchon_20240730_fnnews"
+      ]
+    },
+    "metadata": {
+      "source_process_id": "LOG-2020-DANCHON-01",
+      "process_scope": "FULL_COMPETITIVE_PROCESS_WITH_YEAR_PRECISION_TERMINAL",
+      "competitive_gate": "DIRECT_FULL_TEXT_PASS",
+      "terminal_precision": "YEAR"
+    }
+  },
+  "roles": [
+    {
+      "id": "role_histlog_danchon_seller",
+      "organization_id": "org_lb_asset_management",
+      "role_code": "SELLER",
+      "evidence": {
+        "source_ids": ["src_histlog_danchon_20200607_edaily"]
+      }
+    }
+  ],
+  "rounds": [
+    {
+      "id": "round_histlog_danchon_final_20200513",
+      "round_no": 1,
+      "round_code": "FINAL_20200513",
+      "round_type": "FINAL",
+      "deadline_at": "2020-05-13",
+      "announced_at": "2020-06-07",
+      "round_status": "COMPLETED",
+      "evidence": {
+        "source_ids": ["src_histlog_danchon_20200607_edaily"]
+      },
+      "metadata": {
+        "reported_participant_count": 19
+      }
+    }
+  ],
+  "participations": [
+    {
+      "id": "part_histlog_danchon_shinhan",
+      "round_id": "round_histlog_danchon_final_20200513",
+      "bidder_organization_id": "org_shinhan_reit_am",
+      "participation_status": "PREFERRED",
+      "status_as_of": "2020-06-07",
+      "confidence": 0.98,
+      "evidence": {
+        "source_ids": ["src_histlog_danchon_20200607_edaily"]
+      },
+      "metadata": {
+        "unnamed_other_participants": 18
+      }
+    }
+  ],
+  "participation_members": [
+    {
+      "id": "member_histlog_danchon_shinhan_lead",
+      "participation_id": "part_histlog_danchon_shinhan",
+      "organization_id": "org_shinhan_reit_am",
+      "member_role": "LEAD_BIDDER",
+      "evidence": {
+        "source_ids": ["src_histlog_danchon_20200607_edaily"]
+      }
+    },
+    {
+      "id": "member_histlog_danchon_vehicle",
+      "participation_id": "part_histlog_danchon_shinhan",
+      "organization_id": "org_shinhan_logis_no1",
+      "member_role": "ACQUISITION_VEHICLE",
+      "evidence": {
+        "source_ids": ["src_histlog_danchon_20240730_fnnews"]
+      }
+    }
+  ],
+  "submissions": [
+    {
+      "id": "submission_histlog_danchon_shinhan",
+      "claim_id": "claim_histlog_danchon_shinhan_price",
+      "participation_id": "part_histlog_danchon_shinhan",
+      "submission_no": 1,
+      "submitted_at": "2020-05-13",
+      "amount": {
+        "kind": "APPROX",
+        "raw_value": "600여억원",
+        "decimal": "60000000000",
+        "currency": "KRW",
+        "price_basis": "TOTAL_CONSIDERATION",
+        "vat_inclusion": "UNKNOWN",
+        "debt_assumption": "UNKNOWN"
+      },
+      "reported_rank": 1,
+      "rank_scope": "입찰 참가자 19곳 중 최고가로 보도",
+      "rank_as_of": "2020-06-07",
+      "confidence": 0.95,
+      "evidence": {
+        "source_ids": ["src_histlog_danchon_20200607_edaily"]
+      }
+    }
+  ],
+  "funding": [
+    {
+      "id": "fund_histlog_danchon_tongyang_senior",
+      "submission_id": "submission_histlog_danchon_shinhan",
+      "funding_type": "ACQUISITION_DEBT",
+      "provider_organization_id": "org_tongyang_life",
+      "recipient_vehicle_id": "org_shinhan_logis_no1",
+      "currency_code": "KRW",
+      "comparator_code": "UNKNOWN",
+      "commitment_status": "EXECUTED",
+      "confidence": 0.9,
+      "evidence": {
+        "source_ids": ["src_histlog_danchon_20240730_fnnews"]
+      },
+      "metadata": {
+        "seniority": "SENIOR",
+        "amount_status": "UNDISCLOSED"
+      }
+    },
+    {
+      "id": "fund_histlog_danchon_shinhanlife_senior",
+      "submission_id": "submission_histlog_danchon_shinhan",
+      "funding_type": "ACQUISITION_DEBT",
+      "provider_organization_id": "org_shinhan_life_2020",
+      "recipient_vehicle_id": "org_shinhan_logis_no1",
+      "currency_code": "KRW",
+      "comparator_code": "UNKNOWN",
+      "commitment_status": "EXECUTED",
+      "confidence": 0.9,
+      "evidence": {
+        "source_ids": ["src_histlog_danchon_20240730_fnnews"]
+      },
+      "metadata": {
+        "seniority": "SENIOR",
+        "amount_status": "UNDISCLOSED"
+      }
+    }
+  ],
+  "decisions": [
+    {
+      "id": "decision_histlog_danchon_shinhan_preferred",
+      "round_id": "round_histlog_danchon_final_20200513",
+      "participation_id": "part_histlog_danchon_shinhan",
+      "decision_type": "PREFERRED",
+      "decision_date": "2020-06-07",
+      "decision_status": "VERIFIED",
+      "source_reason": "입찰 참가자 중 가장 높은 가격을 제시한 것으로 보도",
+      "confidence": 0.98,
+      "evidence": {
+        "source_ids": ["src_histlog_danchon_20200607_edaily"]
+      }
+    }
+  ],
+  "milestones": [
+    {
+      "id": "milestone_histlog_danchon_closed",
+      "milestone_code": "CLOSED",
+      "milestone_status": "CONFIRMED",
+      "announced_at": "2024-07-30",
+      "source_note": "후속 원문이 신한리츠운용의 2020년 인수를 확인하지만 정확한 잔금·소유권 이전일은 공개하지 않음",
+      "confidence": 0.9,
+      "evidence": {
+        "source_ids": ["src_histlog_danchon_20240730_fnnews"]
+      },
+      "metadata": {
+        "effective_date_precision": "YEAR",
+        "effective_year": 2020,
+        "exact_date": "UNDISCLOSED"
+      }
+    }
+  ]
+}

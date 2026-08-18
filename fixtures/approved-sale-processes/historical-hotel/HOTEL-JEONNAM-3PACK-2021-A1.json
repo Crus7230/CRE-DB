@@ -1,0 +1,210 @@
+{
+  "manifest_version": "1.0",
+  "manifest_id": "sale-historical-hotel-jeonnam-3pack-2021-a1-v1",
+  "status": "APPROVED",
+  "review": {
+    "reviewed_by": "hermes-agent-hotel-source-review",
+    "reviewed_at": "2026-08-16T00:00:00Z",
+    "approved_by": "hermes-agent-strict-evidence-gate",
+    "approved_at": "2026-08-16T00:00:00Z",
+    "notes": "Strict gate: only FULL_TEXT/OFFICIAL/CROSS_ARTIFACT_VERIFIED core competition and terminal claims are normalized. Unknown exact vehicle, lender, price and date are left null or omitted. The KRW 47.6bn contract amount is retained in source_note and is not mislabeled as an exact bid submission."
+  },
+  "sources": [
+    {
+      "id": "src_hh_jeonnam_3pack_newsis_20241104",
+      "url": "https://www.newsis.com/view/NISX20241104_0002945514",
+      "publisher": "뉴시스",
+      "document_type": "ARTICLE",
+      "published_at": "2024-11-04",
+      "accessed_at": "2026-08-16T00:00:00Z",
+      "title": "전남개발공사 3개 호텔 공매계약 해지",
+      "rights_status": "METADATA_ONLY"
+    }
+  ],
+  "asset": {
+    "id": "asset_hh_jeonnam_three_hotel_package",
+    "canonical_name": "오동재·영산재·땅끝호텔 3개 패키지",
+    "asset_class_id": "ac_hotel",
+    "status_code": "ACTIVE",
+    "metadata": {
+      "locations": [
+        "전남 여수",
+        "전남 영암",
+        "전남 해남"
+      ],
+      "package_member_count": 3
+    },
+    "evidence": {
+      "source_ids": [
+        "src_hh_jeonnam_3pack_newsis_20241104"
+      ]
+    }
+  },
+  "organizations": [
+    {
+      "id": "org_hh_jeonnam_development",
+      "canonical_name": "전남개발공사",
+      "organization_type": "GOVERNMENT",
+      "evidence": {
+        "source_ids": [
+          "src_hh_jeonnam_3pack_newsis_20241104"
+        ]
+      }
+    },
+    {
+      "id": "org_hh_jaerim_enc",
+      "canonical_name": "재림이앤씨",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_hh_jeonnam_3pack_newsis_20241104"
+        ]
+      }
+    },
+    {
+      "id": "org_hh_kamco",
+      "canonical_name": "한국자산관리공사",
+      "organization_type": "GOVERNMENT",
+      "evidence": {
+        "source_ids": [
+          "src_hh_jeonnam_3pack_newsis_20241104"
+        ]
+      }
+    }
+  ],
+  "event": {
+    "id": "event_hh_jeonnam_3pack_sale_a1",
+    "canonical_title": "전남 3개 호텔 온비드 공매 A1",
+    "current_stage_code": "SALE_FAILED",
+    "event_date_start": "2024-11-04",
+    "date_precision": "RANGE",
+    "lifecycle_status": "COMPLETED",
+    "verification_level": "V2",
+    "overall_confidence": 0.98,
+    "evidence": {
+      "source_ids": [
+        "src_hh_jeonnam_3pack_newsis_20241104"
+      ]
+    }
+  },
+  "process": {
+    "id": "sp_hh_jeonnam_3pack_2021_a1",
+    "process_code": "KR-HOTEL-JEONNAM-3PACK-2021-A1",
+    "sale_method": "PUBLIC_AUCTION",
+    "process_status": "FAILED",
+    "currency_code": "KRW",
+    "metadata": {
+      "source_process_id": "HOTEL-JEONNAM-3PACK-2021-A1",
+      "source_classification": "IN_SCOPE_PUBLIC_AUCTION_PACKAGE",
+      "source_current_status": "FAILED_AFTER_CONTRACT",
+      "related_process_ids": [],
+      "reported_funding_context": "매수인 자금조달 실패; lender 미공개"
+    },
+    "evidence": {
+      "source_ids": [
+        "src_hh_jeonnam_3pack_newsis_20241104"
+      ]
+    }
+  },
+  "roles": [
+    {
+      "id": "role_hh_jeonnam_seller",
+      "organization_id": "org_hh_jeonnam_development",
+      "role_code": "SELLER",
+      "evidence": {
+        "source_ids": [
+          "src_hh_jeonnam_3pack_newsis_20241104"
+        ]
+      }
+    },
+    {
+      "id": "role_hh_jeonnam_onbid",
+      "organization_id": "org_hh_kamco",
+      "role_code": "SELL_SIDE_ADVISOR",
+      "metadata": {
+        "platform": "ONBID"
+      },
+      "evidence": {
+        "source_ids": [
+          "src_hh_jeonnam_3pack_newsis_20241104"
+        ]
+      }
+    }
+  ],
+  "rounds": [
+    {
+      "id": "round_hh_jeonnam_onbid",
+      "round_no": 1,
+      "round_code": "ONBID_2021_12",
+      "round_type": "FINAL",
+      "round_status": "COMPLETED",
+      "evidence": {
+        "source_ids": [
+          "src_hh_jeonnam_3pack_newsis_20241104"
+        ]
+      }
+    }
+  ],
+  "participations": [
+    {
+      "id": "part_hh_jeonnam_jaerim",
+      "round_id": "round_hh_jeonnam_onbid",
+      "bidder_organization_id": "org_hh_jaerim_enc",
+      "participation_status": "PREFERRED",
+      "status_as_of": "2021-12",
+      "confidence": 0.98,
+      "evidence": {
+        "source_ids": [
+          "src_hh_jeonnam_3pack_newsis_20241104"
+        ]
+      }
+    }
+  ],
+  "participation_members": [],
+  "submissions": [],
+  "funding": [],
+  "decisions": [
+    {
+      "id": "decision_hh_jeonnam_selected",
+      "round_id": "round_hh_jeonnam_onbid",
+      "participation_id": "part_hh_jeonnam_jaerim",
+      "decision_type": "SELECTED",
+      "decision_status": "REVOKED",
+      "source_reason": "2024-11-04 잔금 미납으로 계약 해지",
+      "confidence": 0.98,
+      "evidence": {
+        "source_ids": [
+          "src_hh_jeonnam_3pack_newsis_20241104"
+        ]
+      }
+    }
+  ],
+  "milestones": [
+    {
+      "id": "milestone_hh_jeonnam_deposit",
+      "milestone_code": "DEPOSIT_PAID",
+      "milestone_status": "CONFIRMED",
+      "announced_at": "2024-11-04",
+      "source_note": "2021년 12월 476억원 계약 및 계약금 10% 납부; 정확한 계약일 미공개",
+      "confidence": 0.98,
+      "evidence": {
+        "source_ids": [
+          "src_hh_jeonnam_3pack_newsis_20241104"
+        ]
+      }
+    },
+    {
+      "id": "milestone_hh_jeonnam_terminated",
+      "milestone_code": "CONTRACT_TERMINATED",
+      "milestone_status": "CONFIRMED",
+      "effective_date": "2024-11-04",
+      "source_note": "잔금 미납; 계약금 46억원 귀속, 중도금 363억원·연체이자 반환",
+      "confidence": 0.98,
+      "evidence": {
+        "source_ids": [
+          "src_hh_jeonnam_3pack_newsis_20241104"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,259 @@
+{
+  "manifest_version": "1.0",
+  "manifest_id": "sale-historical-hotel-gravity-pangyo-2024-a1-v1",
+  "status": "APPROVED",
+  "review": {
+    "reviewed_by": "hermes-agent-hotel-source-review",
+    "reviewed_at": "2026-08-16T00:00:00Z",
+    "approved_by": "hermes-agent-strict-evidence-gate",
+    "approved_at": "2026-08-16T00:00:00Z",
+    "notes": "Strict gate: only FULL_TEXT/OFFICIAL/CROSS_ARTIFACT_VERIFIED core competition and terminal claims are normalized. Unknown exact vehicle, lender, price and date are left null or omitted. The reported low-KRW-200bn price is not normalized as an exact bid or closing amount."
+  },
+  "sources": [
+    {
+      "id": "src_hh_gravity_pangyo_fn_20240528",
+      "url": "https://www.fnnews.com/news/202405280723387128",
+      "publisher": "파이낸셜뉴스",
+      "document_type": "ARTICLE",
+      "published_at": "2024-05-28",
+      "accessed_at": "2026-08-16T00:00:00Z",
+      "title": "그래비티 판교 매각자문 및 입찰 계획",
+      "rights_status": "METADATA_ONLY"
+    },
+    {
+      "id": "src_hh_gravity_pangyo_newstop_20240719",
+      "url": "http://www.newstopkorea.com/news/articleView.html?idxno=23266",
+      "publisher": "뉴스톱",
+      "document_type": "ARTICLE",
+      "published_at": "2024-07-19",
+      "accessed_at": "2026-08-16T00:00:00Z",
+      "title": "퍼시픽자산운용 우협·MOU 및 투자구조",
+      "rights_status": "METADATA_ONLY"
+    },
+    {
+      "id": "src_hh_gravity_pangyo_edaily_20251127",
+      "url": "http://www.edaily.co.kr/news/newspath.asp?newsid=05356246642369984",
+      "publisher": "이데일리",
+      "document_type": "ARTICLE",
+      "published_at": "2025-11-27",
+      "accessed_at": "2026-08-16T00:00:00Z",
+      "title": "그래비티 판교·포포인츠 명동 결합 인수 종결",
+      "rights_status": "METADATA_ONLY"
+    }
+  ],
+  "asset": {
+    "id": "asset_hh_gravity_josun_pangyo",
+    "canonical_name": "그래비티 조선 서울 판교",
+    "asset_class_id": "ac_hotel",
+    "status_code": "ACTIVE",
+    "metadata": {
+      "location": "경기 성남 판교"
+    },
+    "evidence": {
+      "source_ids": [
+        "src_hh_gravity_pangyo_fn_20240528",
+        "src_hh_gravity_pangyo_newstop_20240719",
+        "src_hh_gravity_pangyo_edaily_20251127"
+      ]
+    }
+  },
+  "organizations": [
+    {
+      "id": "org_hh_mastern_private_re_fund71",
+      "canonical_name": "마스턴일반사모부동산투자신탁제71호",
+      "organization_type": "FUND",
+      "evidence": {
+        "source_ids": [
+          "src_hh_gravity_pangyo_fn_20240528"
+        ]
+      }
+    },
+    {
+      "id": "org_hh_s1_corp",
+      "canonical_name": "에스원",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_hh_gravity_pangyo_fn_20240528"
+        ]
+      }
+    },
+    {
+      "id": "org_hh_pacific_am",
+      "canonical_name": "퍼시픽자산운용",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_hh_gravity_pangyo_newstop_20240719",
+          "src_hh_gravity_pangyo_edaily_20251127"
+        ]
+      }
+    },
+    {
+      "id": "org_hh_josun_hotels",
+      "canonical_name": "조선호텔앤리조트",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_hh_gravity_pangyo_newstop_20240719"
+        ]
+      }
+    }
+  ],
+  "event": {
+    "id": "event_hh_gravity_pangyo_sale_a1",
+    "canonical_title": "그래비티 조선 서울 판교 매각 A1",
+    "current_stage_code": "CLOSED",
+    "event_date_start": "2024-05-28",
+    "date_precision": "RANGE",
+    "lifecycle_status": "COMPLETED",
+    "verification_level": "V2",
+    "overall_confidence": 0.92,
+    "evidence": {
+      "source_ids": [
+        "src_hh_gravity_pangyo_fn_20240528",
+        "src_hh_gravity_pangyo_newstop_20240719",
+        "src_hh_gravity_pangyo_edaily_20251127"
+      ]
+    }
+  },
+  "process": {
+    "id": "sp_hh_gravity_pangyo_2024_a1",
+    "process_code": "KR-HOTEL-GRAVITY-PANGYO-2024-A1",
+    "sale_method": "COMPETITIVE_BID",
+    "process_status": "CLOSED",
+    "launched_at": "2024-05-28",
+    "currency_code": "KRW",
+    "metadata": {
+      "source_process_id": "HOTEL-GRAVITY-PANGYO-2024-A1",
+      "source_classification": "IN_SCOPE_ATTEMPT",
+      "source_current_status": "PREFERRED_MOU_2024_CLOSED_2025",
+      "related_process_ids": [
+        "2025 결합 인수는 2025 심층조사와 연결"
+      ],
+      "reported_funding_context": "조선호텔앤리조트 후순위 보통주 투자; 우선주 모집 중. 2025 결합구조 자산별 LP/lender 배분 미공개"
+    },
+    "evidence": {
+      "source_ids": [
+        "src_hh_gravity_pangyo_fn_20240528",
+        "src_hh_gravity_pangyo_newstop_20240719",
+        "src_hh_gravity_pangyo_edaily_20251127"
+      ]
+    }
+  },
+  "roles": [
+    {
+      "id": "role_hh_gravity_seller",
+      "organization_id": "org_hh_mastern_private_re_fund71",
+      "role_code": "SELLER",
+      "evidence": {
+        "source_ids": [
+          "src_hh_gravity_pangyo_fn_20240528"
+        ]
+      }
+    },
+    {
+      "id": "role_hh_gravity_advisor",
+      "organization_id": "org_hh_s1_corp",
+      "role_code": "SELL_SIDE_ADVISOR",
+      "evidence": {
+        "source_ids": [
+          "src_hh_gravity_pangyo_fn_20240528"
+        ]
+      }
+    }
+  ],
+  "rounds": [
+    {
+      "id": "round_hh_gravity_final",
+      "round_no": 1,
+      "round_code": "FINAL_2024_06",
+      "round_type": "FINAL",
+      "round_status": "COMPLETED",
+      "evidence": {
+        "source_ids": [
+          "src_hh_gravity_pangyo_fn_20240528",
+          "src_hh_gravity_pangyo_newstop_20240719"
+        ]
+      }
+    }
+  ],
+  "participations": [
+    {
+      "id": "part_hh_gravity_pacific",
+      "round_id": "round_hh_gravity_final",
+      "bidder_organization_id": "org_hh_pacific_am",
+      "participation_status": "PREFERRED",
+      "status_as_of": "2024-07-19",
+      "confidence": 0.94,
+      "evidence": {
+        "source_ids": [
+          "src_hh_gravity_pangyo_newstop_20240719",
+          "src_hh_gravity_pangyo_edaily_20251127"
+        ]
+      }
+    }
+  ],
+  "participation_members": [
+    {
+      "id": "member_hh_gravity_josun",
+      "participation_id": "part_hh_gravity_pacific",
+      "organization_id": "org_hh_josun_hotels",
+      "member_role": "CO_INVESTOR",
+      "metadata": {
+        "reported_security": "SUBORDINATED_COMMON_EQUITY"
+      },
+      "evidence": {
+        "source_ids": [
+          "src_hh_gravity_pangyo_newstop_20240719"
+        ]
+      }
+    }
+  ],
+  "submissions": [],
+  "funding": [],
+  "decisions": [
+    {
+      "id": "decision_hh_gravity_pacific",
+      "round_id": "round_hh_gravity_final",
+      "participation_id": "part_hh_gravity_pacific",
+      "decision_type": "PREFERRED",
+      "decision_date": "2024-07-19",
+      "decision_status": "VERIFIED",
+      "confidence": 0.94,
+      "evidence": {
+        "source_ids": [
+          "src_hh_gravity_pangyo_newstop_20240719"
+        ]
+      }
+    }
+  ],
+  "milestones": [
+    {
+      "id": "milestone_hh_gravity_mou",
+      "milestone_code": "MOU_SIGNED",
+      "milestone_status": "CONFIRMED",
+      "effective_date": "2024-07-19",
+      "source_note": "퍼시픽자산운용 우협 및 MOU",
+      "confidence": 0.94,
+      "evidence": {
+        "source_ids": [
+          "src_hh_gravity_pangyo_newstop_20240719"
+        ]
+      }
+    },
+    {
+      "id": "milestone_hh_gravity_closed",
+      "milestone_code": "CLOSED",
+      "milestone_status": "CONFIRMED",
+      "announced_at": "2025-11-27",
+      "source_note": "포포인츠 명동과 결합 인수 종결; 정확한 종결일·자산별 가격 미공개",
+      "confidence": 0.9,
+      "evidence": {
+        "source_ids": [
+          "src_hh_gravity_pangyo_edaily_20251127"
+        ]
+      }
+    }
+  ]
+}

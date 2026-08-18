@@ -1,0 +1,208 @@
+{
+  "manifest_version": "1.0",
+  "manifest_id": "sale-historical-hotel-alpensia-2020-2022-a1-v1",
+  "status": "APPROVED",
+  "review": {
+    "reviewed_by": "hermes-agent-hotel-source-review",
+    "reviewed_at": "2026-08-16T00:00:00Z",
+    "approved_by": "hermes-agent-strict-evidence-gate",
+    "approved_at": "2026-08-16T00:00:00Z",
+    "notes": "Strict gate: only FULL_TEXT/OFFICIAL/CROSS_ARTIFACT_VERIFIED core competition and terminal claims are normalized. Unknown exact vehicle, lender, price and date are left null or omitted. Collusive participants and bid prices not individually named in the research artifact are not invented."
+  },
+  "sources": [
+    {
+      "id": "src_hh_alpensia_kado_20220223",
+      "url": "http://www.kado.net/news/articleView.html?idxno=1114326",
+      "publisher": "강원도민일보",
+      "document_type": "ARTICLE",
+      "published_at": "2022-02-23",
+      "accessed_at": "2026-08-16T00:00:00Z",
+      "title": "알펜시아 매각 잔금 및 반복 입찰 경과",
+      "rights_status": "METADATA_ONLY"
+    },
+    {
+      "id": "src_hh_alpensia_ftc_20240417",
+      "url": "https://www.ftc.go.kr/www/selectBbsNttView.do?key=12&bordCd=3&nttSn=43360",
+      "publisher": "공정거래위원회",
+      "document_type": "PRESS_RELEASE",
+      "published_at": "2024-04-17",
+      "accessed_at": "2026-08-16T00:00:00Z",
+      "title": "알펜시아 리조트 매각 입찰 담합 제재",
+      "rights_status": "METADATA_ONLY"
+    }
+  ],
+  "asset": {
+    "id": "asset_hh_alpensia_resort",
+    "canonical_name": "알펜시아 리조트 자산·영업권",
+    "asset_class_id": "ac_hotel",
+    "status_code": "ACTIVE",
+    "metadata": {
+      "location": "강원 평창"
+    },
+    "evidence": {
+      "source_ids": [
+        "src_hh_alpensia_kado_20220223"
+      ]
+    }
+  },
+  "organizations": [
+    {
+      "id": "org_hh_gangwon_development",
+      "canonical_name": "강원도개발공사",
+      "organization_type": "GOVERNMENT",
+      "evidence": {
+        "source_ids": [
+          "src_hh_alpensia_kado_20220223"
+        ]
+      }
+    },
+    {
+      "id": "org_hh_kh_gangwon_development",
+      "canonical_name": "KH강원개발",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_hh_alpensia_kado_20220223",
+          "src_hh_alpensia_ftc_20240417"
+        ]
+      }
+    }
+  ],
+  "event": {
+    "id": "event_hh_alpensia_sale_a1",
+    "canonical_title": "알펜시아 리조트 공개매각 A1",
+    "current_stage_code": "CLOSED",
+    "event_date_start": "2020-07-01",
+    "date_precision": "RANGE",
+    "lifecycle_status": "COMPLETED",
+    "verification_level": "V3",
+    "overall_confidence": 0.98,
+    "evidence": {
+      "source_ids": [
+        "src_hh_alpensia_kado_20220223",
+        "src_hh_alpensia_ftc_20240417"
+      ]
+    }
+  },
+  "process": {
+    "id": "sp_hh_alpensia_2020_2022_a1",
+    "process_code": "KR-HOTEL-ALPENSIA-2020-2022-A1",
+    "sale_method": "COMPETITIVE_BID",
+    "process_status": "CLOSED",
+    "launched_at": "2020-07-01",
+    "closed_at": "2022-02-18",
+    "currency_code": "KRW",
+    "metadata": {
+      "source_process_id": "HOTEL-ALPENSIA-2020-2022-A1",
+      "source_classification": "IN_SCOPE_PUBLIC_COMPETITIVE_ASSET_SALE",
+      "source_current_status": "CLOSED_WITH_COMPETITION_INTEGRITY_FLAG",
+      "related_process_ids": [],
+      "reported_funding_context": "펀드·LP·lender 공개 미확인",
+      "integrity_warning": "공정위가 낙찰예정자·들러리·투찰가격 담합을 공식 인정; 정상 경쟁 bidder/rank로 해석 금지"
+    },
+    "evidence": {
+      "source_ids": [
+        "src_hh_alpensia_kado_20220223",
+        "src_hh_alpensia_ftc_20240417"
+      ]
+    }
+  },
+  "roles": [
+    {
+      "id": "role_hh_alpensia_seller",
+      "organization_id": "org_hh_gangwon_development",
+      "role_code": "SELLER",
+      "evidence": {
+        "source_ids": [
+          "src_hh_alpensia_kado_20220223"
+        ]
+      }
+    }
+  ],
+  "rounds": [
+    {
+      "id": "round_hh_alpensia_public_5",
+      "round_no": 5,
+      "round_code": "PUBLIC_BID_5_2021",
+      "round_type": "FINAL",
+      "round_status": "COMPLETED",
+      "metadata": {
+        "prior_public_rounds_reported": 4,
+        "collusion_finding": true
+      },
+      "evidence": {
+        "source_ids": [
+          "src_hh_alpensia_kado_20220223",
+          "src_hh_alpensia_ftc_20240417"
+        ]
+      }
+    }
+  ],
+  "participations": [
+    {
+      "id": "part_hh_alpensia_kh",
+      "round_id": "round_hh_alpensia_public_5",
+      "bidder_organization_id": "org_hh_kh_gangwon_development",
+      "participation_status": "PREFERRED",
+      "status_as_of": "2021-06",
+      "confidence": 0.98,
+      "metadata": {
+        "competition_integrity": "COLLUSION_OFFICIALLY_FOUND"
+      },
+      "evidence": {
+        "source_ids": [
+          "src_hh_alpensia_kado_20220223",
+          "src_hh_alpensia_ftc_20240417"
+        ]
+      }
+    }
+  ],
+  "participation_members": [],
+  "submissions": [],
+  "funding": [],
+  "decisions": [
+    {
+      "id": "decision_hh_alpensia_selected",
+      "round_id": "round_hh_alpensia_public_5",
+      "participation_id": "part_hh_alpensia_kh",
+      "decision_type": "SELECTED",
+      "decision_status": "VERIFIED",
+      "source_reason": "제5차 공개경쟁입찰 계약; 공정위 담합 판정 경고 포함",
+      "confidence": 0.98,
+      "evidence": {
+        "source_ids": [
+          "src_hh_alpensia_kado_20220223",
+          "src_hh_alpensia_ftc_20240417"
+        ]
+      }
+    }
+  ],
+  "milestones": [
+    {
+      "id": "milestone_hh_alpensia_balance_paid",
+      "milestone_code": "BALANCE_PAID",
+      "milestone_status": "CONFIRMED",
+      "effective_date": "2022-02-18",
+      "source_note": "잔금 입금으로 법률적 매각 효력 발생",
+      "confidence": 0.98,
+      "evidence": {
+        "source_ids": [
+          "src_hh_alpensia_kado_20220223"
+        ]
+      }
+    },
+    {
+      "id": "milestone_hh_alpensia_closed",
+      "milestone_code": "CLOSED",
+      "milestone_status": "CONFIRMED",
+      "effective_date": "2022-02-18",
+      "source_note": "소유권 이전·최종정산은 후속 예정으로 보도됨",
+      "confidence": 0.95,
+      "evidence": {
+        "source_ids": [
+          "src_hh_alpensia_kado_20220223"
+        ]
+      }
+    }
+  ]
+}

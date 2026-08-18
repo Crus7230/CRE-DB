@@ -1,0 +1,373 @@
+{
+  "manifest_version": "1.0",
+  "manifest_id": "sale-2025-hyundai-yeonji-v2",
+  "status": "APPROVED",
+  "review": {
+    "reviewed_by": "hermes-agent-source-review",
+    "reviewed_at": "2026-08-16T00:00:00Z",
+    "approved_by": "hermes-agent-calibration-gate",
+    "approved_at": "2026-08-16T00:00:00Z",
+    "notes": "Corrected calibration: erroneous OpenDART receipt removed. Only normalized facts supported by cited news records are approved; exact fund/trustee identity, SPA date and closing day remain unknown."
+  },
+  "sources": [
+    {
+      "id": "src_hy_20250709_hk",
+      "url": "https://www.hankyung.com/article/202507097551r",
+      "publisher": "한국경제",
+      "document_type": "ARTICLE",
+      "published_at": "2025-07-09",
+      "accessed_at": "2026-08-16T00:00:00Z",
+      "title": "현대그룹 연지동 사옥 추가 제안 관련 보도",
+      "rights_status": "METADATA_ONLY"
+    },
+    {
+      "id": "src_hy_20250714_cs",
+      "url": "https://biz.chosun.com/stock/stock_general/2025/07/14/H5O7EY22BBF7BLRLT7IMDGRDJI/",
+      "publisher": "조선비즈",
+      "document_type": "ARTICLE",
+      "published_at": "2025-07-14",
+      "accessed_at": "2026-08-16T00:00:00Z",
+      "title": "볼트자산운용 우선협상대상자 선정 보도",
+      "rights_status": "METADATA_ONLY"
+    },
+    {
+      "id": "src_hy_20251001_fn",
+      "url": "https://www.fnnews.com/news/202510011641364326",
+      "publisher": "파이낸셜뉴스",
+      "document_type": "ARTICLE",
+      "published_at": "2025-10-01",
+      "accessed_at": "2026-08-16T00:00:00Z",
+      "title": "연지동 사옥 거래 후속 보도",
+      "rights_status": "METADATA_ONLY"
+    },
+    {
+      "id": "src_hy_20260414_dd",
+      "url": "https://www.ddaily.co.kr/page/view/2026041413410716692",
+      "publisher": "디지털데일리",
+      "document_type": "ARTICLE",
+      "published_at": "2026-04-14",
+      "accessed_at": "2026-08-16T00:00:00Z",
+      "title": "연지동 사옥 최종 가격 및 등기 후속 보도",
+      "rights_status": "METADATA_ONLY"
+    },
+    {
+      "id": "src_hy_20250714_se",
+      "url": "https://www.sedaily.com/NewsView/2GVCJQ71AW",
+      "publisher": "서울경제",
+      "document_type": "ARTICLE",
+      "published_at": "2025-07-14",
+      "accessed_at": "2026-08-16T00:00:00Z",
+      "title": "볼트자산운용 인수자금 구성 보도",
+      "rights_status": "METADATA_ONLY"
+    }
+  ],
+  "asset": {
+    "id": "asset_hyundai_yeonji_hq",
+    "canonical_name": "현대그룹 연지동 사옥",
+    "asset_class_id": "ac_office",
+    "road_address": "서울 종로구 율곡로 194",
+    "status_code": "ACTIVE",
+    "evidence": {
+      "source_ids": [
+        "src_hy_20250709_hk"
+      ]
+    }
+  },
+  "organizations": [
+    {
+      "id": "org_hyundai_elevator",
+      "canonical_name": "현대엘리베이터",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_hy_20250709_hk"
+        ]
+      }
+    },
+    {
+      "id": "org_samjong_kpmg",
+      "canonical_name": "삼정KPMG",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_hy_20250709_hk"
+        ]
+      }
+    },
+    {
+      "id": "org_volt_am",
+      "canonical_name": "볼트자산운용",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_hy_20250714_cs",
+          "src_hy_20260414_dd"
+        ]
+      }
+    },
+    {
+      "id": "org_hana_securities",
+      "canonical_name": "하나증권",
+      "organization_type": "FINANCIAL_INSTITUTION",
+      "evidence": {
+        "source_ids": [
+          "src_hy_20250714_se",
+          "src_hy_20260414_dd"
+        ]
+      }
+    },
+    {
+      "id": "org_hy_undisclosed_bank_syndicate",
+      "canonical_name": "연지동 인수 은행계 대주단(기관명 미공개)",
+      "organization_type": "FINANCIAL_INSTITUTION",
+      "evidence": {
+        "source_ids": [
+          "src_hy_20251001_fn",
+          "src_hy_20260414_dd"
+        ]
+      },
+      "metadata": {
+        "identity_status": "UNDISCLOSED"
+      }
+    },
+    {
+      "id": "org_bolt_yeonji_acquisition_fund_undisclosed",
+      "canonical_name": "볼트 운용 연지동 인수펀드(명칭 미공개)",
+      "organization_type": "FUND",
+      "evidence": {
+        "source_ids": [
+          "src_hy_20251001_fn",
+          "src_hy_20260414_dd"
+        ]
+      },
+      "metadata": {
+        "identity_status": "UNDISCLOSED"
+      }
+    }
+  ],
+  "event": {
+    "id": "event_sale_hyundai_yeonji_2025",
+    "canonical_title": "현대그룹 연지동 사옥 매각",
+    "current_stage_code": "CLOSED",
+    "event_date_start": "2025-07-14",
+    "date_precision": "DAY",
+    "lifecycle_status": "COMPLETED",
+    "verification_level": "V2",
+    "overall_confidence": 0.9,
+    "evidence": {
+      "source_ids": [
+        "src_hy_20250714_cs",
+        "src_hy_20260414_dd"
+      ]
+    }
+  },
+  "process": {
+    "id": "sp_hyundai_yeonji_2025",
+    "process_code": "KR-SALE-2025-HYUNDAI-YEONJI",
+    "sale_method": "COMPETITIVE_BID",
+    "process_status": "CLOSED",
+    "currency_code": "KRW",
+    "evidence": {
+      "source_ids": [
+        "src_hy_20250709_hk",
+        "src_hy_20250714_cs",
+        "src_hy_20260414_dd"
+      ]
+    }
+  },
+  "roles": [
+    {
+      "id": "role_hy_seller",
+      "organization_id": "org_hyundai_elevator",
+      "role_code": "SELLER",
+      "evidence": {
+        "source_ids": [
+          "src_hy_20250709_hk"
+        ]
+      }
+    },
+    {
+      "id": "role_hy_advisor",
+      "organization_id": "org_samjong_kpmg",
+      "role_code": "SELL_SIDE_ADVISOR",
+      "evidence": {
+        "source_ids": [
+          "src_hy_20250709_hk"
+        ]
+      }
+    }
+  ],
+  "rounds": [
+    {
+      "id": "round_hy_additional_20250709",
+      "round_no": 1,
+      "round_code": "ADDITIONAL_PROPOSAL_20250709",
+      "round_type": "FINAL",
+      "deadline_at": "2025-07-09",
+      "round_status": "COMPLETED",
+      "evidence": {
+        "source_ids": [
+          "src_hy_20250709_hk"
+        ]
+      }
+    }
+  ],
+  "participations": [
+    {
+      "id": "part_hy_volt_final",
+      "round_id": "round_hy_additional_20250709",
+      "bidder_organization_id": "org_volt_am",
+      "participation_status": "PREFERRED",
+      "status_as_of": "2025-07-14",
+      "confidence": 0.95,
+      "evidence": {
+        "source_ids": [
+          "src_hy_20250714_cs"
+        ]
+      }
+    }
+  ],
+  "submissions": [
+    {
+      "id": "submission_hy_volt_final",
+      "claim_id": "claim_hy_volt_final_price",
+      "participation_id": "part_hy_volt_final",
+      "submission_no": 1,
+      "submitted_at": null,
+      "amount": {
+        "kind": "APPROX",
+        "raw_value": "약 4,500억원",
+        "decimal": "450000000000",
+        "currency": "KRW",
+        "price_basis": "TOTAL_CONSIDERATION",
+        "vat_inclusion": "UNKNOWN",
+        "debt_assumption": "UNKNOWN"
+      },
+      "reported_rank": 1,
+      "rank_scope": "preferred/winner reported",
+      "rank_as_of": "2026-04-14",
+      "confidence": 0.85,
+      "evidence": {
+        "source_ids": [
+          "src_hy_20260414_dd"
+        ]
+      }
+    }
+  ],
+  "funding": [
+    {
+      "id": "fund_hy_hana_equity",
+      "submission_id": "submission_hy_volt_final",
+      "funding_type": "LP_EQUITY",
+      "provider_organization_id": "org_hana_securities",
+      "recipient_vehicle_id": "org_bolt_yeonji_acquisition_fund_undisclosed",
+      "currency_code": "KRW",
+      "comparator_code": "RANGE",
+      "lower_amount_decimal": "183000000000",
+      "upper_amount_decimal": "185000000000",
+      "commitment_status": "EXECUTED",
+      "confidence": 0.85,
+      "metadata": {
+        "reported_amount_conflict": "1,830억원/1,850억원"
+      },
+      "evidence": {
+        "source_ids": [
+          "src_hy_20250714_se",
+          "src_hy_20260414_dd"
+        ]
+      }
+    },
+    {
+      "id": "fund_hy_seller_equity",
+      "submission_id": "submission_hy_volt_final",
+      "funding_type": "CO_INVESTMENT",
+      "provider_organization_id": "org_hyundai_elevator",
+      "recipient_vehicle_id": "org_bolt_yeonji_acquisition_fund_undisclosed",
+      "amount_decimal": "10000000000",
+      "currency_code": "KRW",
+      "comparator_code": "EXACT",
+      "commitment_status": "EXECUTED",
+      "confidence": 0.9,
+      "evidence": {
+        "source_ids": [
+          "src_hy_20251001_fn",
+          "src_hy_20260414_dd"
+        ]
+      }
+    },
+    {
+      "id": "fund_hy_bank_debt",
+      "submission_id": "submission_hy_volt_final",
+      "funding_type": "ACQUISITION_DEBT",
+      "provider_organization_id": "org_hy_undisclosed_bank_syndicate",
+      "recipient_vehicle_id": "org_bolt_yeonji_acquisition_fund_undisclosed",
+      "amount_decimal": "300000000000",
+      "currency_code": "KRW",
+      "comparator_code": "ABOUT",
+      "commitment_status": "EXECUTED",
+      "confidence": 0.8,
+      "evidence": {
+        "source_ids": [
+          "src_hy_20251001_fn",
+          "src_hy_20260414_dd"
+        ]
+      }
+    }
+  ],
+  "decisions": [
+    {
+      "id": "decision_hy_volt_preferred",
+      "round_id": "round_hy_additional_20250709",
+      "participation_id": "part_hy_volt_final",
+      "decision_type": "PREFERRED",
+      "decision_date": "2025-07-14",
+      "decision_status": "VERIFIED",
+      "confidence": 0.95,
+      "evidence": {
+        "source_ids": [
+          "src_hy_20250714_cs"
+        ]
+      }
+    }
+  ],
+  "milestones": [
+    {
+      "id": "milestone_hy_closed",
+      "milestone_code": "CLOSED",
+      "milestone_status": "CONFIRMED",
+      "announced_at": "2026-04-14",
+      "source_note": "2025년 10월 말 등기 완료; 정확한 일자 미공개",
+      "confidence": 0.95,
+      "evidence": {
+        "source_ids": [
+          "src_hy_20260414_dd"
+        ]
+      }
+    }
+  ],
+  "participation_members": [
+    {
+      "id": "member_hy_volt_lead",
+      "participation_id": "part_hy_volt_final",
+      "organization_id": "org_volt_am",
+      "member_role": "LEAD_BIDDER",
+      "evidence": {
+        "source_ids": [
+          "src_hy_20250714_cs"
+        ]
+      }
+    },
+    {
+      "id": "member_hy_bolt_fund",
+      "participation_id": "part_hy_volt_final",
+      "organization_id": "org_bolt_yeonji_acquisition_fund_undisclosed",
+      "member_role": "MANAGED_FUND",
+      "evidence": {
+        "source_ids": [
+          "src_hy_20251001_fn",
+          "src_hy_20260414_dd"
+        ]
+      }
+    }
+  ]
+}

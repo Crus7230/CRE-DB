@@ -1,0 +1,103 @@
+{
+  "manifest_version": "1.0",
+  "manifest_id": "approved-lpmandate-ktcu-2024-the-k-hotel-redevelopment",
+  "status": "APPROVED",
+  "review": {
+    "reviewed_by": "hermes-research-consolidation",
+    "reviewed_at": "2026-08-16T00:40:00Z",
+    "approved_by": "hermes-parent-official-url-review",
+    "approved_at": "2026-08-16T00:41:00Z"
+  },
+  "sources": [
+    {
+      "id": "src-kofia-m212-10",
+      "url": "https://www.kofia.or.kr/brd/m_212/view.do?seq=10",
+      "title": "[한국교직원공제회] The-K호텔서울 부지 재개발 사업 위탁 운용사 선정 공고",
+      "publisher": "금융투자협회(한국교직원공제회 공고 재배포)",
+      "document_type": "BID_NOTICE",
+      "published_at": "2024-07-08",
+      "accessed_at": "2026-08-16",
+      "rights_status": "EXCERPT_ALLOWED",
+      "exact_text": "[한국교직원공제회] The-K호텔서울 부지 재개발 사업 위탁 운용사 선정 공고 접수 마감일시(2024.08.19. 18:00)까지 제출\n본 공고문은 1단계 사업 위탁 운용사 선정에 대한 공고로서, 2단계 사업 위탁 운용사는 1단계 사업 종료시점에 별도 절차를 통해 선정 예정\nThe-K호텔서울 부지 재개발 사업은 과업 내용에 따라 3단계(설계 및 인허가→공사→운영)로 구분하여 순차적 진행 예정임"
+    }
+  ],
+  "organizations": [
+    {
+      "id": "org-ktcu",
+      "organization_type": "ASSOCIATION",
+      "canonical_name": "한국교직원공제회"
+    }
+  ],
+  "event": {
+    "id": "evt-ktcu-2024-the-k-hotel-redevelopment",
+    "canonical_title": "한국교직원공제회 [한국교직원공제회] The-K호텔서울 부지 재개발 사업 위탁 운용사 선정 공고",
+    "current_stage_code": "MANAGER_RFP_OPEN",
+    "event_date_start": "2024-07-08",
+    "event_date_end": "2024-07-08",
+    "date_precision": "DAY",
+    "lifecycle_status": "ACTIVE",
+    "verification_level": "V2",
+    "evidence": {
+      "source_ids": [
+        "src-kofia-m212-10"
+      ]
+    }
+  },
+  "mandate": {
+    "id": "mandate-ktcu-2024-the-k-hotel-redevelopment",
+    "lp_organization_id": "org-ktcu",
+    "mandate_code": "KTCU-2024-THE-K-HOTEL-REDEVELOPMENT",
+    "mandate_name": "[한국교직원공제회] The-K호텔서울 부지 재개발 사업 위탁 운용사 선정 공고",
+    "vintage_year": 2024,
+    "announced_at": "2024-07-08",
+    "application_deadline": "2024-08-19T18:00:00+09:00",
+    "mandate_status": "UNKNOWN",
+    "mandate_scope": "DOMESTIC",
+    "metadata": {
+      "selection_result_status": "NO_OFFICIAL_RESULT_FOUND",
+      "manager": "UNKNOWN",
+      "import_eligibility": "APPROVED_NOTICE_ONLY_NO_MANAGER_INFERENCE"
+    },
+    "evidence": {
+      "source_ids": [
+        "src-kofia-m212-10"
+      ]
+    }
+  },
+  "tracks": [
+    {
+      "id": "track-ktcu-2024-the-k-hotel-redevelopment",
+      "track_code": "KTCU-2024-THE-K-HOTEL-REDEVELOPMENT",
+      "track_name": "The-K호텔서울 부지 재개발 1단계",
+      "strategy_code": "REAL_ESTATE",
+      "geography_code": "DOMESTIC",
+      "target_manager_count": null,
+      "evidence": {
+        "source_ids": [
+          "src-kofia-m212-10"
+        ]
+      }
+    }
+  ],
+  "guidelines": [
+    {
+      "id": "guideline-ktcu-2024-the-k-hotel-redevelopment-1",
+      "track_id": "track-ktcu-2024-the-k-hotel-redevelopment",
+      "term_type": "ELIGIBLE_ASSET",
+      "requirement_level": "REQUIRED",
+      "raw_text": "The-K호텔서울 부지 재개발 사업",
+      "value_kind": "TEXT",
+      "evidence": {
+        "source_ids": [
+          "src-kofia-m212-10"
+        ]
+      },
+      "text_value": "The-K호텔서울 부지 재개발 사업"
+    }
+  ],
+  "selections": [],
+  "selection_members": [],
+  "selection_vehicles": [],
+  "amounts": [],
+  "deployments": []
+}

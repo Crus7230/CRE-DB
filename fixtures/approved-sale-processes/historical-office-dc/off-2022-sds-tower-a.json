@@ -1,0 +1,308 @@
+{
+  "manifest_version": "1.0",
+  "manifest_id": "sale-historical-sds22-v1",
+  "status": "APPROVED",
+  "review": {
+    "reviewed_by": "hermes-agent-source-review",
+    "reviewed_at": "2026-08-16T00:00:00Z",
+    "approved_by": "hermes-agent-evidence-gate",
+    "approved_at": "2026-08-16T00:00:00Z",
+    "notes": "BODY_READ 또는 공개 본문 범위에서 경쟁절차와 terminal을 함께 확인한 normalized facts만 승인. 검색 title/snippet만의 claim은 제외하고 날짜·금액·순위를 추정하지 않음."
+  },
+  "sources": [
+    {
+      "id": "src_sds22_s13",
+      "url": "https://economist.co.kr/article/view/ecn202306300038",
+      "publisher": "이코노미스트",
+      "document_type": "ARTICLE",
+      "published_at": "2023-07-01",
+      "accessed_at": "2026-08-16T00:00:00Z",
+      "title": "삼성SDS타워, 8500억원에 매각 전망",
+      "rights_status": "METADATA_ONLY",
+      "access_status_reviewed": "BODY_READ",
+      "metadata": {
+        "chronology_source_id": "S13"
+      }
+    },
+    {
+      "id": "src_sds22_s14",
+      "url": "https://www.thekpm.com/news/articleView.html?idxno=179336",
+      "publisher": "포인트데일리/컬리어스",
+      "document_type": "ARTICLE",
+      "published_at": "2023-11-03",
+      "accessed_at": "2026-08-16T00:00:00Z",
+      "title": "컬리어스, 삼성SDS타워 8500억원 매각 완료",
+      "rights_status": "METADATA_ONLY",
+      "access_status_reviewed": "BODY_READ",
+      "metadata": {
+        "chronology_source_id": "S14"
+      }
+    }
+  ],
+  "asset": {
+    "id": "asset_samsung_sds_tower_jamsil",
+    "canonical_name": "잠실 삼성SDS타워",
+    "asset_class_id": "ac_office",
+    "jibun_address": "서울 송파구 잠실",
+    "status_code": "ACTIVE",
+    "evidence": {
+      "source_ids": [
+        "src_sds22_s13"
+      ]
+    }
+  },
+  "organizations": [
+    {
+      "id": "org_yukyung_psg_am",
+      "canonical_name": "유경PSG자산운용",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_sds22_s13",
+          "src_sds22_s14"
+        ]
+      }
+    },
+    {
+      "id": "org_kb_am",
+      "canonical_name": "KB자산운용",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_sds22_s13",
+          "src_sds22_s14"
+        ]
+      }
+    },
+    {
+      "id": "org_igis_am",
+      "canonical_name": "이지스자산운용",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_sds22_s13"
+        ]
+      }
+    },
+    {
+      "id": "org_fl_am",
+      "canonical_name": "FL자산운용",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_sds22_s13"
+        ]
+      }
+    },
+    {
+      "id": "org_colliers_korea",
+      "canonical_name": "컬리어스코리아",
+      "organization_type": "COMPANY",
+      "evidence": {
+        "source_ids": [
+          "src_sds22_s14"
+        ]
+      }
+    }
+  ],
+  "event": {
+    "id": "event_sale_sds22",
+    "canonical_title": "잠실 삼성SDS타워 매각",
+    "current_stage_code": "CLOSED",
+    "date_precision": "DAY",
+    "lifecycle_status": "COMPLETED",
+    "verification_level": "V2",
+    "overall_confidence": 0.9,
+    "evidence": {
+      "source_ids": [
+        "src_sds22_s13",
+        "src_sds22_s14"
+      ]
+    },
+    "event_date_start": "2023-10-27"
+  },
+  "process": {
+    "id": "sp_sds22",
+    "process_code": "KR-SALE-OFF-2022-SDS-TOWER-A",
+    "sale_method": "COMPETITIVE_BID",
+    "process_status": "CLOSED",
+    "currency_code": "KRW",
+    "evidence": {
+      "source_ids": [
+        "src_sds22_s13",
+        "src_sds22_s14"
+      ]
+    },
+    "metadata": {
+      "source_process_id": "OFF-2022-SDS-TOWER-A"
+    },
+    "closed_at": "2023-10-27"
+  },
+  "roles": [
+    {
+      "id": "role_sds22_seller",
+      "organization_id": "org_yukyung_psg_am",
+      "role_code": "SELLER",
+      "evidence": {
+        "source_ids": [
+          "src_sds22_s13",
+          "src_sds22_s14"
+        ]
+      }
+    },
+    {
+      "id": "role_sds22_advisor_colliers",
+      "organization_id": "org_colliers_korea",
+      "role_code": "SELL_SIDE_ADVISOR",
+      "evidence": {
+        "source_ids": [
+          "src_sds22_s14"
+        ]
+      }
+    }
+  ],
+  "rounds": [
+    {
+      "id": "round_sds22_final",
+      "round_no": 1,
+      "round_code": "FINAL_20230615",
+      "round_type": "FINAL",
+      "round_status": "COMPLETED",
+      "deadline_at": "2023-06-15",
+      "evidence": {
+        "source_ids": [
+          "src_sds22_s13"
+        ]
+      }
+    }
+  ],
+  "participations": [
+    {
+      "id": "part_sds22_kb",
+      "round_id": "round_sds22_final",
+      "bidder_organization_id": "org_kb_am",
+      "participation_status": "PREFERRED",
+      "status_as_of": "2023-06-28",
+      "confidence": 0.95,
+      "evidence": {
+        "source_ids": [
+          "src_sds22_s13"
+        ]
+      }
+    },
+    {
+      "id": "part_sds22_igis",
+      "round_id": "round_sds22_final",
+      "bidder_organization_id": "org_igis_am",
+      "participation_status": "LOST",
+      "confidence": 0.9,
+      "evidence": {
+        "source_ids": [
+          "src_sds22_s13"
+        ]
+      }
+    },
+    {
+      "id": "part_sds22_fl",
+      "round_id": "round_sds22_final",
+      "bidder_organization_id": "org_fl_am",
+      "participation_status": "LOST",
+      "confidence": 0.9,
+      "evidence": {
+        "source_ids": [
+          "src_sds22_s13"
+        ]
+      }
+    }
+  ],
+  "participation_members": [],
+  "submissions": [
+    {
+      "id": "submission_sds22_kb",
+      "claim_id": "claim_sds22_kb_price",
+      "participation_id": "part_sds22_kb",
+      "amount": {
+        "kind": "EXACT",
+        "raw_value": "3.3㎡당 2800만원",
+        "decimal": "28000000",
+        "currency": "KRW",
+        "price_basis": "PRICE_PER_PYEONG",
+        "vat_inclusion": "UNKNOWN",
+        "debt_assumption": "UNKNOWN"
+      },
+      "submitted_at": "2023-06-15",
+      "confidence": 0.9,
+      "evidence": {
+        "source_ids": [
+          "src_sds22_s13"
+        ]
+      },
+      "metadata": {
+        "amount_basis": "UNIT_PRICE_PER_3_3SQM_BID",
+        "highest_price_not_verified": true
+      }
+    },
+    {
+      "id": "submission_sds22_igis",
+      "claim_id": "claim_sds22_igis_price",
+      "participation_id": "part_sds22_igis",
+      "amount": null,
+      "evidence": {
+        "source_ids": [
+          "src_sds22_s13"
+        ]
+      }
+    },
+    {
+      "id": "submission_sds22_fl",
+      "claim_id": "claim_sds22_fl_price",
+      "participation_id": "part_sds22_fl",
+      "amount": null,
+      "evidence": {
+        "source_ids": [
+          "src_sds22_s13"
+        ]
+      }
+    }
+  ],
+  "funding": [],
+  "decisions": [
+    {
+      "id": "decision_sds22_kb_preferred",
+      "round_id": "round_sds22_final",
+      "participation_id": "part_sds22_kb",
+      "decision_type": "PREFERRED",
+      "decision_date": "2023-06-28",
+      "decision_status": "VERIFIED",
+      "confidence": 0.95,
+      "evidence": {
+        "source_ids": [
+          "src_sds22_s13"
+        ]
+      }
+    }
+  ],
+  "milestones": [
+    {
+      "id": "milestone_sds22_closed",
+      "milestone_code": "CLOSED",
+      "milestone_status": "CONFIRMED",
+      "source_note": "컬리어스 발표 기준 8500억원 거래 완료",
+      "effective_date": "2023-10-27",
+      "confidence": 0.95,
+      "evidence": {
+        "source_ids": [
+          "src_sds22_s14"
+        ]
+      },
+      "metadata": {
+        "final_amount": {
+          "kind": "EXACT",
+          "decimal": "850000000000",
+          "currency": "KRW",
+          "basis": "FINAL_CLOSING_GROSS_ASSET_PRICE"
+        }
+      }
+    }
+  ]
+}

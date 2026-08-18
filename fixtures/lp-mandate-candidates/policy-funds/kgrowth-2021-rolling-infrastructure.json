@@ -1,0 +1,200 @@
+{
+  "manifest_version": "1.0",
+  "manifest_id": "candidate-kgrowth-2021-rolling-infrastructure",
+  "status": "REVIEW_READY",
+  "review": {
+    "reviewed_by": "UNASSIGNED",
+    "reviewed_at": "PENDING_HUMAN_REVIEW",
+    "approved_by": "UNASSIGNED",
+    "approved_at": "PENDING_HUMAN_REVIEW"
+  },
+  "candidate_policy": {
+    "importable": false,
+    "reason": "human review and explicit approval required; approved importer intentionally rejects REVIEW_READY",
+    "live_db_allowed": false
+  },
+  "sources": [
+    {
+      "id": "src_kg_2021_rolling_plan",
+      "url": "https://www.kgrowth.or.kr/down_file.asp?idx=482&SelType=Notice3",
+      "publisher": "한국성장금융투자운용",
+      "document_type": "NOTICE",
+      "title": "정책형 뉴딜펀드 2021년 수시(인프라투자) 선정계획 공고",
+      "published_at": "2021-04-23",
+      "accessed_at": "2026-08-16T09:00:00+09:00",
+      "rights_status": "EXCERPT_ALLOWED",
+      "exact_text": "『정책형 뉴딜펀드』 2021년 수시(인프라투자) 선정계획 공고\n정책출자자 위탁운용금액: 270억원 이내\n- 한국산업은행 90억원, 정부 재정 180억원 이내\n선정 운용사 수 및 배정금액\n○ 1개사\n- 목표결성금액 : 900억원\n- 정책출자자 출자액은 목표결성금액의 30% 이내(최대 270억원)\n접수일시 2021년 5월 18일(화) 16:00까지\n펀드 결성시한 선정일로부터 6개월\n주목적 투자비율 ○ 주목적 투자대상에 목표결성금액의 60% 이상 투자\n- 단, 신재생에너지 발전분야 투자는 목표결성금액의 30% 이내에서 제안\n존속기간 ○ 펀드 결성일로부터 20년 이내(2년 연장가능)에서 운용사가 자율제안\n투자기간 ○ 펀드 결성일로부터 5년 이내"
+    },
+    {
+      "id": "src_kg_2021_rolling_result",
+      "url": "https://www.kgrowth.or.kr/notice_view.asp?idx=509&str_type=1&tab=1",
+      "publisher": "한국성장금융투자운용",
+      "document_type": "NOTICE",
+      "title": "정책형 뉴딜펀드 2021년 수시 위탁운용사 선정 결과",
+      "published_at": "2021-06-28",
+      "accessed_at": "2026-08-16T09:00:00+09:00",
+      "rights_status": "EXCERPT_ALLOWED",
+      "exact_text": "【선정결과】 「정책형 뉴딜펀드」 2021년 수시 위탁운용사 선정 결과\n작성일 2021-06-28\n「정책형 뉴딜펀드」 2021년 수시 위탁운용사 선정 결과를 공지합니다.\nㅇ 인프라투자형\n운용사명\n우리글로벌자산운용"
+    }
+  ],
+  "organizations": [
+    {
+      "id": "org_kgrowth",
+      "organization_type": "FINANCIAL_INSTITUTION",
+      "canonical_name": "한국성장금융투자운용"
+    },
+    {
+      "id": "org_woori_global_am",
+      "organization_type": "COMPANY",
+      "canonical_name": "우리글로벌자산운용"
+    }
+  ],
+  "event": {
+    "id": "event_kgrowth_2021_rolling_infra",
+    "canonical_title": "정책형 뉴딜펀드 2021년 수시 인프라투자형 위탁운용사 선정",
+    "current_stage_code": "MANAGER_SELECTED",
+    "event_date_start": "2021-06-28",
+    "date_precision": "DAY",
+    "lifecycle_status": "COMPLETED",
+    "verification_level": "V3",
+    "evidence": {
+      "source_ids": [
+        "src_kg_2021_rolling_plan",
+        "src_kg_2021_rolling_result"
+      ]
+    }
+  },
+  "mandate": {
+    "id": "mandate_kgrowth_2021_rolling_infra",
+    "lp_organization_id": "org_kgrowth",
+    "mandate_code": "KGROWTH-2021-ROLLING-INFRA",
+    "mandate_name": "정책형 뉴딜펀드 2021년 수시 인프라투자형",
+    "vintage_year": 2021,
+    "announced_at": "2021-04-23",
+    "application_deadline": "2021-05-18",
+    "selected_at": "2021-06-28",
+    "mandate_status": "SELECTED",
+    "mandate_scope": "MIXED",
+    "evidence": {
+      "source_ids": [
+        "src_kg_2021_rolling_plan",
+        "src_kg_2021_rolling_result"
+      ]
+    }
+  },
+  "tracks": [
+    {
+      "id": "track_kgrowth_2021_rolling_infra",
+      "track_code": "INFRASTRUCTURE",
+      "track_name": "인프라투자형",
+      "strategy_code": "INFRASTRUCTURE",
+      "geography_code": "MIXED",
+      "target_manager_count": 1,
+      "evidence": {
+        "source_ids": [
+          "src_kg_2021_rolling_plan"
+        ]
+      }
+    }
+  ],
+  "guidelines": [
+    {
+      "id": "guide_kg_rolling_eligible",
+      "track_id": "track_kgrowth_2021_rolling_infra",
+      "term_type": "ELIGIBLE_ASSET",
+      "requirement_level": "REQUIRED",
+      "raw_text": "주목적 투자대상에 목표결성금액의 60% 이상 투자",
+      "value_kind": "TEXT",
+      "text_value": "뉴딜 인프라 주목적 투자 60% 이상",
+      "evidence": {
+        "source_ids": [
+          "src_kg_2021_rolling_plan"
+        ]
+      }
+    },
+    {
+      "id": "guide_kg_rolling_fund_term",
+      "track_id": "track_kgrowth_2021_rolling_infra",
+      "term_type": "FUND_TERM",
+      "requirement_level": "MAXIMUM",
+      "raw_text": "펀드 결성일로부터 20년 이내(2년 연장가능)",
+      "value_kind": "DURATION",
+      "text_value": "20Y + optional 2Y",
+      "evidence": {
+        "source_ids": [
+          "src_kg_2021_rolling_plan"
+        ]
+      }
+    },
+    {
+      "id": "guide_kg_rolling_invest_period",
+      "track_id": "track_kgrowth_2021_rolling_infra",
+      "term_type": "INVESTMENT_PERIOD",
+      "requirement_level": "MAXIMUM",
+      "raw_text": "펀드 결성일로부터 5년 이내",
+      "value_kind": "DURATION",
+      "text_value": "5Y",
+      "evidence": {
+        "source_ids": [
+          "src_kg_2021_rolling_plan"
+        ]
+      }
+    }
+  ],
+  "selections": [
+    {
+      "id": "selection_candidate-kgrowth-2021-rolling-infrastructure",
+      "track_id": "track_kgrowth_2021_rolling_infra",
+      "manager_organization_id": "org_woori_global_am",
+      "selection_status": "SELECTED",
+      "selected_at": "2021-06-28",
+      "confidence": 1.0,
+      "evidence": {
+        "source_ids": [
+          "src_kg_2021_rolling_result"
+        ]
+      }
+    }
+  ],
+  "selection_members": [],
+  "selection_vehicles": [],
+  "amounts": [
+    {
+      "id": "amount_kg_rolling_track",
+      "scope_type": "TRACK",
+      "scope_id": "track_kgrowth_2021_rolling_infra",
+      "amount_basis": "TRACK_LP_COMMITMENT",
+      "amount": {
+        "kind": "AT_MOST",
+        "decimal": "27000000000",
+        "currency": "KRW",
+        "raw_value": "270억원 이내"
+      },
+      "amount_status": "ANNOUNCED",
+      "evidence": {
+        "source_ids": [
+          "src_kg_2021_rolling_plan"
+        ]
+      }
+    },
+    {
+      "id": "amount_kg_rolling_target",
+      "scope_type": "TRACK",
+      "scope_id": "track_kgrowth_2021_rolling_infra",
+      "amount_basis": "TARGET_FUND_SIZE",
+      "amount": {
+        "kind": "EXACT",
+        "decimal": "90000000000",
+        "currency": "KRW",
+        "raw_value": "900억원"
+      },
+      "amount_status": "ANNOUNCED",
+      "evidence": {
+        "source_ids": [
+          "src_kg_2021_rolling_plan"
+        ]
+      }
+    }
+  ],
+  "deployments": []
+}

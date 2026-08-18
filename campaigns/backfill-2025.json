@@ -1,0 +1,32 @@
+{
+  "campaignCode": "BACKFILL_2025",
+  "campaignVersion": "2025.1",
+  "year": 2025,
+  "country": "KR",
+  "partition": "MONTH",
+  "publicationWindow": {
+    "start": "2025-01-01",
+    "endExclusive": "2026-01-01"
+  },
+  "dateSemantics": {
+    "primary": "DOCUMENT_PUBLISHED_AT",
+    "secondary": ["EVENT_EFFECTIVE_DATE", "MACRO_PERIOD", "RELEASE_DATE", "COLLECTED_AT"],
+    "note": "2025 publication discovery is followed by adjacent-year event and revision reconciliation."
+  },
+  "source": {
+    "code": "GOOGLE_NEWS_RSS",
+    "policy": "RSS_ONLY",
+    "store": ["title", "link", "publisher", "published_at", "rss_snippet"],
+    "exclude": ["article_full_text"]
+  },
+  "saturationResultCount": 100,
+  "categories": {
+    "SALE": "(오피스 OR 빌딩 OR 물류센터 OR 데이터센터 OR 호텔 OR 리조트 OR 상가 OR 쇼핑몰 OR 지식산업센터 OR 개발부지) (매각 OR 매각주관사 OR 예비입찰 OR 본입찰 OR 우선협상대상자 OR 매매계약 OR 거래종결)",
+    "LEASE": "(오피스 OR 빌딩 OR 물류센터 OR 데이터센터 OR 호텔 OR 상가 OR 쇼핑몰 OR 지식산업센터) (임차인모집 OR 임대공고 OR 임대차계약 OR 입주확정 OR 본사이전 OR 신규임차)",
+    "NEW_SUPPLY": "(오피스 OR 업무시설 OR 물류센터 OR 데이터센터 OR 호텔 OR 리조트 OR 쇼핑몰 OR 지식산업센터 OR 복합개발) (착공 OR 준공 OR 완공 OR 사용승인 OR 개관 OR 개장 OR 입주개시)",
+    "PERMIT": "(오피스 OR 업무시설 OR 물류센터 OR 데이터센터 OR 호텔 OR 쇼핑몰 OR 복합개발 OR 개발사업) (건축허가 OR 건축위원회 OR 사업시행인가 OR 실시계획인가 OR 개발행위허가 OR 환경영향평가 OR 변경고시)",
+    "PF": "(부동산PF OR 프로젝트파이낸싱 OR 브릿지론 OR 본PF) (사업장 OR 개발사업 OR 시행사 OR 시공사 OR 대주단 OR 책임준공)",
+    "LOAN": "(오피스 OR 빌딩 OR 물류센터 OR 데이터센터 OR 호텔 OR 쇼핑몰 OR 부동산) (담보대출 OR 인수금융 OR 대출약정 OR 리파이낸싱 OR 차환 OR 만기연장 OR 셀다운)",
+    "INVESTMENT": "(리츠 OR 부동산펀드 OR 자산운용사 OR 기관투자자 OR 연기금 OR 공제회) (자산편입 OR 취득 OR 출자 OR 약정 OR 공동투자 OR 수익증권 OR 클로징)"
+  }
+}

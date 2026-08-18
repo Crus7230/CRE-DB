@@ -1,0 +1,79 @@
+{
+  "candidate_version": "1.0",
+  "candidate_id": "review-ready-cw-2022-domestic-re-debt",
+  "status": "REVIEW_READY",
+  "target_manifest_version": "1.0",
+  "approval_blockers": ["공식 선정결과 원문 확보 및 reviewer/approver 서명 필요"],
+  "sources": [
+    {
+      "id": "src_cw_2022_re_debt_official_hwp",
+      "url": "https://www.cw.or.kr/upload/boardAdmin/2022/10/FA065CDD-F8C0-6154-3420-A03CBEC69453.hwp",
+      "publisher": "건설근로자공제회",
+      "document_type": "BID_NOTICE",
+      "title": "국내부동산 대출형 블라인드 펀드 위탁운용사 선정 공고",
+      "published_at": "2022-10-06",
+      "accessed_at": "2026-08-16T00:00:00Z",
+      "rights_status": "EXCERPT_ALLOWED",
+      "exact_text": "국내부동산 대출형 블라인드 펀드 위탁운용사 선정 공고\n국내부동산 선순위 중심 순수 대출형 투자(실물 담보 대출, PF 대출, 브릿지 대출 등)\nLTV(Loan To Value) 65% 이하의 선순위로만 구성된 대출 투자 비중이 70% 이상\n목표 수익률: 6.0% 이상 (보수 차감 후)\n위탁운용규모:각 1,000억원 이내 2개사 선정 예정\n펀드존속기간 : 7년 내외 (투자기간 3년 내외)"
+    },
+    {
+      "id": "src_cw_2022_re_debt_result_edaily",
+      "url": "https://www.edaily.co.kr/News/Read?newsId=03073366632562784",
+      "publisher": "이데일리",
+      "document_type": "ARTICLE",
+      "title": "[마켓인]건근공, 국내부동산 블라인드 펀드 위탁사에 캡스톤·코람코",
+      "published_at": "2022-12-27T18:55:59+09:00",
+      "accessed_at": "2026-08-16T00:00:00Z",
+      "rights_status": "EXCERPT_ALLOWED",
+      "exact_text": "건설근로자공제회가 국내 부동산 대출형 블라인드 펀드 위탁운용사에 캡스톤자산운용과 코람코자산운용을 최종 선정했다.\n건설근로자공제회는 캡스톤자산운용과 코람코자산운용을 지난 26일 국내 부동산 대출형 블라인드 펀드 위탁운용사로 최종 선정했다. 출자규모는 각각 800억원과 700억원으로 총 1500억원이다.\n이번 출자는 실물 담보 대출·프로젝트파이낸싱(PF) 대출·브릿지 대출 등 국내 부동산 선순위 중심의 순수 대출형 투자다. 또한 담보인정비율(LTV·Loan to Value) 65% 이하의 선순위로만 구성된 대출 투자 비중이 70% 이상이다. 목표 수익률은 보수 차감 후 6.0% 이상으로 펀드 존속 기간은 7년 내외다. 투자 기간은 3년 내외다."
+    }
+  ],
+  "organizations": [
+    {"id": "org_cw", "organization_type": "ASSOCIATION", "canonical_name": "건설근로자공제회"},
+    {"id": "org_capstone_am", "organization_type": "COMPANY", "canonical_name": "캡스톤자산운용"},
+    {"id": "org_koramco_am", "organization_type": "COMPANY", "canonical_name": "코람코자산운용"}
+  ],
+  "event": {
+    "id": "event_cw_2022_re_debt",
+    "canonical_title": "건설근로자공제회 2022 국내 부동산 대출형 블라인드 펀드 운용사 선정",
+    "current_stage_code": "MANAGER_SELECTED",
+    "event_date_start": "2022-10-06",
+    "event_date_end": "2022-12-26",
+    "date_precision": "DAY",
+    "lifecycle_status": "COMPLETED",
+    "evidence": {"source_ids": ["src_cw_2022_re_debt_official_hwp", "src_cw_2022_re_debt_result_edaily"]}
+  },
+  "mandate": {
+    "id": "mandate_cw_2022_re_debt",
+    "lp_organization_id": "org_cw",
+    "mandate_code": "CW-2022-DOMESTIC-RE-DEBT",
+    "mandate_name": "2022 국내 부동산 대출형 블라인드 펀드 위탁운용사 선정",
+    "vintage_year": 2022,
+    "announced_at": "2022-10-06",
+    "application_deadline": "2022-10-18",
+    "selected_at": "2022-12-26",
+    "mandate_status": "SELECTED",
+    "mandate_scope": "DOMESTIC",
+    "evidence": {"source_ids": ["src_cw_2022_re_debt_official_hwp", "src_cw_2022_re_debt_result_edaily"]}
+  },
+  "tracks": [
+    {"id": "track_cw_2022_re_debt", "track_code": "DOMESTIC_REAL_ESTATE_DEBT", "track_name": "국내 부동산 대출형", "strategy_code": "PRIVATE_DEBT", "geography_code": "DOMESTIC", "target_manager_count": 2, "evidence": {"source_ids": ["src_cw_2022_re_debt_official_hwp"]}}
+  ],
+  "guidelines": [
+    {"id": "guide_cw_2022_strategy", "track_id": "track_cw_2022_re_debt", "term_type": "STRATEGY", "requirement_level": "REQUIRED", "raw_text": "국내부동산 선순위 중심 순수 대출형 투자(실물 담보 대출, PF 대출, 브릿지 대출 등)", "value_kind": "TEXT", "text_value": "국내 부동산 선순위 순수 대출형", "evidence": {"source_ids": ["src_cw_2022_re_debt_official_hwp"]}},
+    {"id": "guide_cw_2022_ltv", "track_id": "track_cw_2022_re_debt", "term_type": "LEVERAGE", "requirement_level": "REQUIRED", "raw_text": "LTV(Loan To Value) 65% 이하의 선순위로만 구성된 대출 투자 비중이 70% 이상", "value_kind": "TEXT", "text_value": "LTV 65% 이하 선순위 비중 70% 이상", "evidence": {"source_ids": ["src_cw_2022_re_debt_official_hwp"]}},
+    {"id": "guide_cw_2022_return", "track_id": "track_cw_2022_re_debt", "term_type": "TARGET_RETURN", "requirement_level": "MINIMUM", "raw_text": "목표 수익률: 6.0% 이상 (보수 차감 후)", "value_kind": "PERCENT", "value_decimal_text": "6.0", "unit_code": "PERCENT", "comparator_code": "AT_LEAST", "return_basis": "UNSPECIFIED", "evidence": {"source_ids": ["src_cw_2022_re_debt_official_hwp"]}}
+  ],
+  "selections": [
+    {"id": "selection_cw_2022_capstone", "track_id": "track_cw_2022_re_debt", "manager_organization_id": "org_capstone_am", "selection_status": "SELECTED", "selected_at": "2022-12-26", "evidence": {"source_ids": ["src_cw_2022_re_debt_result_edaily"]}},
+    {"id": "selection_cw_2022_koramco", "track_id": "track_cw_2022_re_debt", "manager_organization_id": "org_koramco_am", "selection_status": "SELECTED", "selected_at": "2022-12-26", "evidence": {"source_ids": ["src_cw_2022_re_debt_result_edaily"]}}
+  ],
+  "selection_members": [],
+  "selection_vehicles": [],
+  "amounts": [
+    {"id": "amount_cw_2022_capstone", "scope_type": "SELECTION", "scope_id": "selection_cw_2022_capstone", "amount_basis": "SELECTION_LP_COMMITMENT", "amount": {"kind": "EXACT", "decimal": "80000000000", "currency": "KRW", "raw_value": "각각 800억원과 700억원"}, "amount_status": "REPORTED", "metadata": {"position_in_pair": "first", "manager": "캡스톤자산운용"}, "evidence": {"source_ids": ["src_cw_2022_re_debt_result_edaily"]}},
+    {"id": "amount_cw_2022_koramco", "scope_type": "SELECTION", "scope_id": "selection_cw_2022_koramco", "amount_basis": "SELECTION_LP_COMMITMENT", "amount": {"kind": "EXACT", "decimal": "70000000000", "currency": "KRW", "raw_value": "각각 800억원과 700억원"}, "amount_status": "REPORTED", "metadata": {"position_in_pair": "second", "manager": "코람코자산운용"}, "evidence": {"source_ids": ["src_cw_2022_re_debt_result_edaily"]}},
+    {"id": "amount_cw_2022_total", "scope_type": "MANDATE", "scope_id": "mandate_cw_2022_re_debt", "amount_basis": "LP_COMMITMENT_TOTAL", "amount": {"kind": "EXACT", "decimal": "150000000000", "currency": "KRW", "raw_value": "총 1500억원"}, "amount_status": "REPORTED", "evidence": {"source_ids": ["src_cw_2022_re_debt_result_edaily"]}}
+  ],
+  "deployments": []
+}
