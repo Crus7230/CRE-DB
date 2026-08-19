@@ -22,7 +22,7 @@ export async function POST(request: Request) {
   }
 
   const token = createSessionToken(accessCode, sessionSecret);
-  const secure = process.env.NODE_ENV === "production" || Boolean(process.env.VERCEL);
+  const secure = new URL(request.url).protocol === "https:" || Boolean(process.env.VERCEL);
   const cookie = `${SESSION_COOKIE}=${token}; Path=/; Max-Age=${SESSION_MAX_AGE_SECONDS}; HttpOnly; SameSite=Lax${secure ? "; Secure" : ""}`;
   return Response.json({ ok: true }, { headers: { "Set-Cookie": cookie, "Cache-Control": "no-store" } });
 }
