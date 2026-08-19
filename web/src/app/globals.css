@@ -13,7 +13,21 @@
 
 * { box-sizing: border-box; }
 html { background: var(--canvas); color: var(--ink); }
-body { margin: 0; min-height: 100vh; background: var(--canvas); font-family: Arial, "Noto Sans KR", sans-serif; }
+body { margin: 0; min-height: 100vh; background: var(--canvas); color: var(--ink); font-family: Arial, "Noto Sans KR", sans-serif; }
+.login-shell { min-height: 100vh; display: grid; place-items: center; padding: 24px; background: #111820; }
+.login-panel { width: min(440px,100%); padding: 36px; background: #fff; border-top: 5px solid var(--accent); box-shadow: 0 18px 50px rgba(0,0,0,.28); }
+.login-brand { display: flex; align-items: center; justify-content: space-between; padding-bottom: 18px; margin-bottom: 34px; border-bottom: 1px solid var(--line); }
+.login-brand span { color: var(--accent); font-size: 22px; font-weight: 900; letter-spacing: -.04em; }
+.login-brand strong { font-size: 9px; letter-spacing: .18em; }
+.login-panel h1 { margin: 7px 0 10px; font-size: 29px; letter-spacing: -.04em; }
+.login-panel > p:not(.eyebrow) { margin: 0 0 26px; color: var(--muted); font-size: 12px; line-height: 1.7; }
+.login-panel form { display: grid; gap: 10px; }
+.login-panel label { font-size: 11px; font-weight: 800; }
+.login-panel input { width: 100%; padding: 13px; border: 1px solid var(--line); font: inherit; }
+.login-panel form button { padding: 13px; border: 0; background: var(--ink); color: #fff; font-weight: 800; cursor: pointer; }
+.login-panel form button:disabled { opacity: .55; cursor: wait; }
+.login-error { margin: 0; padding: 9px 11px; background: #fce8e6; color: var(--danger); font-size: 11px; font-weight: 700; }
+.login-panel > small { display: block; margin-top: 18px; color: var(--muted); font-size: 9px; }
 button, input, select { font: inherit; }
 button { color: inherit; }
 a { color: var(--accent); }
@@ -248,6 +262,8 @@ a { color: var(--accent); }
 .empty-relation { color: var(--muted); font-size: 11px; }
 
 @media (max-width: 900px) {
+  .login-shell { padding: 0; place-items: stretch; }
+  .login-panel { width: 100%; min-height: 100vh; padding: 28px 22px; box-shadow: none; }
   .topbar { padding: 0 18px; }
   .topbar-meta { display: none; }
   .workspace-nav { overflow-x: auto; grid-template-columns: repeat(4, minmax(145px,1fr)); }
