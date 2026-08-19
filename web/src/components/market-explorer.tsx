@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { CompanyWorkspace } from "@/components/company-workspace";
+import { DailyArticleWorkspace } from "@/components/daily-article-workspace";
 import { DocumentDetailDrawer } from "@/components/document-detail-drawer";
 import { EntityDetailDrawer } from "@/components/entity-detail-drawer";
 import { InstitutionalCapitalWorkspace } from "@/components/institutional-capital-workspace";
@@ -9,12 +10,13 @@ import { SaleProcessWorkspace } from "@/components/sale-process-workspace";
 import { TransactionCard } from "@/components/transaction-template";
 import type { CategoryIndexItem, CategoryIndexResponse, SearchKind, SearchResponse, SearchResult } from "@/lib/search-contract";
 
-type Workspace = "MARKET" | "COMPANIES" | "CAPITAL" | "SALES";
+type Workspace = "MARKET" | "DAILY" | "COMPANIES" | "CAPITAL" | "SALES";
 type MarketKind = Extract<SearchKind, "EVENT" | "DOCUMENT" | "ASSET">;
 
 
 const workspaceTabs: Array<{ key: Workspace; label: string; description: string }> = [
   { key: "MARKET", label: "시장·문서", description: "카테고리별 탐색" },
+  { key: "DAILY", label: "오늘의 시장기사", description: "게시일·출처·수집시각" },
   { key: "COMPANIES", label: "회사·임차", description: "시총·업종·관계" },
   { key: "CAPITAL", label: "기관자금", description: "Mandate·선정·집행" },
   { key: "SALES", label: "매각절차", description: "입찰·우협·종결" },
@@ -85,7 +87,7 @@ export function MarketExplorer() {
   }
 
   return <main className="app-shell">
-    <header className="topbar"><div className="brand"><span className="brand-mark">MI</span><div><strong>Market Intelligence</strong><small>Source-grounded real estate signals</small></div></div><div className="topbar-meta"><span className="live-dot"/>Supabase main · 2026-07-31</div></header>
+    <header className="topbar"><div className="brand"><span className="brand-mark">MI</span><div><strong>Market Intelligence</strong><small>Source-grounded real estate signals</small></div></div><div className="topbar-meta"><span className="live-dot"/>Supabase main · daily article sync</div></header>
     <nav className="workspace-nav" aria-label="주요 분석 영역">{workspaceTabs.map((tab) => <button type="button" key={tab.key} aria-pressed={workspace === tab.key} onClick={() => { setWorkspace(tab.key); if (tab.key !== "COMPANIES") setCompanyTarget(null); }}><strong>{tab.label}</strong><span>{tab.description}</span></button>)}</nav>
 
     {workspace === "MARKET" && <section className="market-workspace">
@@ -95,7 +97,6 @@ export function MarketExplorer() {
         <section className="market-content">
           <section className="detail-filters market-filter-panel" aria-label="상세 필터"><div><span className="step-index">02</span><p className="eyebrow">FILTER</p><h2>상세 필터</h2></div><label>시작일<input type="date" value={from} onChange={(event) => setFrom(event.target.value)}/></label><label>종료일<input type="date" value={to} max="2026-07-31" onChange={(event) => setTo(event.target.value)}/></label>{kind === "DOCUMENT" && <label className="toggle-filter"><input type="checkbox" checked={includeTransactionsUnder1000Eok} onChange={(event) => setIncludeTransactionsUnder1000Eok(event.target.checked)}/><span><strong>1,000억원 미만 실거래 포함</strong><small>기본 조회에서는 숨김</small></span></label>}<button type="button" className="reset-button" onClick={() => { setDraftQ(""); setQ(""); setFrom(""); setTo(""); setIncludeTransactionsUnder1000Eok(false); }}>초기화</button></section>
           <header className="results-heading"><div><p className="eyebrow">RESULT</p><h2>{selectedCategoryLabel}</h2><p>{q ? `“${q}” · ` : ""}{from || to ? `${from || "최초"}~${to || "현재"}` : "전체 기간"}</p></div><strong>{data?.total.toLocaleString("ko-KR") ?? 0}건</strong></header>
-          {kind === "DOCUMENT" && <section className="document-taxonomy"><p className="eyebrow">DOCUMENT TYPES</p><div>{categoryItems.map((item) => <button type="button" key={item.key} aria-pressed={category === item.key} onClick={() => setCategory(item.key)}><strong>{itemLabel(item, kind)}</strong><span>{item.itemCount.toLocaleString("ko-KR")}건</span></button>)}</div></section>}
           {loading && <div className="state-block"><span className="spinner"/><strong>{selectedCategoryLabel} 조회 중</strong></div>}
           {!loading && error && <div className="state-block error-state"><strong>조회 오류</strong><p>잠시 후 다시 시도해 주세요.</p></div>}
           {!loading && !error && data?.results.length === 0 && <div className="state-block"><strong>조건에 맞는 결과가 없습니다.</strong><p>category는 유지하고 상세 필터만 완화해 보세요.</p></div>}
@@ -104,6 +105,7 @@ export function MarketExplorer() {
       </div>
     </section>}
 
+    {workspace === "DAILY" && <DailyArticleWorkspace onOpenArticle={(documentId, title) => setSelected({ kind: "DOCUMENT", id: documentId, title, subtitle: null, summary: null, date: null, status: null, confidence: null, source: null, href: null, category: "RSS_ITEM", categoryLabel: "시장기사", metadata: { documentType: "RSS_ITEM" } })}/>}
     {workspace === "COMPANIES" && <CompanyWorkspace key={companyTarget ?? "company-workspace"} initialCompanyId={companyTarget}/>}
     {workspace === "CAPITAL" && <InstitutionalCapitalWorkspace/>}
     {workspace === "SALES" && <SaleProcessWorkspace/>}

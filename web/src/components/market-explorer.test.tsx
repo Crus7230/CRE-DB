@@ -23,6 +23,23 @@ const indexResponse = {
 
 const detailResponse = { kind: "EVENT", id: "evt-1", title: "용인 데이터센터 본PF 약정", subtitle: "PF · MAIN_PF_COMMITTED", status: "ACTIVE", overview: [{ label: "검증 수준", value: "VERIFIED" }], assets: [], events: [], organizations: [], documents: [] };
 
+const dailyResponse = {
+  selectedDate: "2026-08-19",
+  latestAvailableDate: "2026-08-19",
+  lastCollectedAt: "2026-08-19T07:30:00Z",
+  generatedAt: "2026-08-19T08:00:00Z",
+  total: 1,
+  articles: [{
+    id: "doc-news-1",
+    title: "서울 오피스 거래시장 회복 신호",
+    publisher: "테스트경제",
+    publishedAt: "2026-08-19T01:20:00Z",
+    collectedAt: "2026-08-19T07:30:00Z",
+    summary: "서울 오피스 거래시장 관련 기사 요약",
+    href: "https://example.com/news-1",
+  }],
+};
+
 afterEach(() => vi.restoreAllMocks());
 
 describe("MarketExplorer", () => {
@@ -30,7 +47,7 @@ describe("MarketExplorer", () => {
     const user = userEvent.setup();
     const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
       const url = String(input);
-      const payload = url.startsWith("/api/index") ? indexResponse : url.startsWith("/api/entities") ? detailResponse : response;
+      const payload = url.startsWith("/api/index") ? indexResponse : url.startsWith("/api/articles/daily") ? dailyResponse : url.startsWith("/api/entities") ? detailResponse : response;
       return new Response(JSON.stringify(payload), { status: 200, headers: { "Content-Type": "application/json" } });
     });
 
@@ -38,6 +55,7 @@ describe("MarketExplorer", () => {
     expect(await screen.findByRole("heading", { name: "시장 카테고리로 찾고, 근거문서로 검증" })).toBeInTheDocument();
     expect(screen.getByRole("complementary")).toHaveTextContent("CATEGORY");
     expect(screen.getByRole("region", { name: "상세 필터" })).toHaveTextContent("FILTER");
+    expect(screen.queryByText("DOCUMENT TYPES")).not.toBeInTheDocument();
     expect(await screen.findByText("용인 데이터센터 본PF 약정")).toBeInTheDocument();
 
     const input = screen.getByRole("textbox", { name: "통합 검색" });
@@ -52,5 +70,23 @@ describe("MarketExplorer", () => {
     await user.click(screen.getByRole("button", { name: /용인 데이터센터 본PF 약정/ }));
     expect(await screen.findByRole("dialog", { name: "이벤트 상세" })).toBeInTheDocument();
     expect(await screen.findByText("VERIFIED")).toBeInTheDocument();
+  });
+
+  it("opens a separate daily article workspace with publication and collection freshness", async () => {
+    const user = userEvent.setup();
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
+      const url = String(input);
+      const payload = url.startsWith("/api/articles/daily") ? dailyResponse : url.startsWith("/api/index") ? indexResponse : response;
+      return new Response(JSON.stringify(payload), { status: 200, headers: { "Content-Type": "application/json" } });
+    });
+
+    render(<MarketExplorer />);
+    await user.click(screen.getByRole("button", { name: /오늘의 시장기사/ }));
+
+    expect(await screen.findByRole("heading", { name: "매일 확인하는 부동산 시장기사" })).toBeInTheDocument();
+    expect(await screen.findByText("서울 오피스 거래시장 회복 신호")).toBeInTheDocument();
+    expect(screen.getByText("최근 수집").parentElement).toHaveTextContent("2026");
+    expect(screen.getByText("테스트경제")).toBeInTheDocument();
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining("/api/articles/daily?date="), expect.anything()));
   });
 });

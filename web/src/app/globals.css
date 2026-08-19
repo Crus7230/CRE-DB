@@ -42,7 +42,7 @@ a { color: var(--accent); }
 .topbar-meta { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; }
 .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px #d6ebe4; }
 
-.workspace-nav { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid var(--line); background: #fafbfa; }
+.workspace-nav { display: grid; grid-template-columns: repeat(5, 1fr); border-bottom: 1px solid var(--line); background: #fafbfa; }
 .workspace-nav button { min-height: 74px; padding: 14px 22px; border: 0; border-right: 1px solid var(--line); background: transparent; text-align: left; cursor: pointer; display: grid; gap: 4px; }
 .workspace-nav button:last-child { border-right: 0; }
 .workspace-nav button strong { font-size: 16px; }
@@ -107,6 +107,21 @@ a { color: var(--accent); }
 .projection-card p { margin: 0 0 8px; color: var(--muted); font-size: 12px; line-height: 1.5; }
 .projection-details { display: flex; flex-wrap: wrap; gap: 7px 16px; color: var(--muted); font-size: 11px; }
 .source-link { position: absolute; right: 4px; top: 24px; text-decoration: none; font-size: 11px; font-weight: 700; }
+
+.daily-date-control { min-width: 210px; display: grid; gap: 7px; color: var(--muted); font-size: 11px; font-weight: 800; }
+.daily-date-control input { height: 44px; padding: 0 12px; border: 1px solid var(--ink); background: #fff; color: var(--ink); }
+.daily-freshness { margin: 24px 34px 0; display: grid; grid-template-columns: repeat(4,1fr); border: 1px solid var(--line); }
+.daily-freshness > div { min-width: 0; min-height: 82px; padding: 15px; border-right: 1px solid var(--line); display: grid; align-content: center; gap: 6px; }
+.daily-freshness > div:last-child { border-right: 0; }
+.daily-freshness span { color: var(--muted); font-size: 10px; }
+.daily-freshness strong { font-size: 14px; overflow-wrap: anywhere; }
+.daily-article-list { margin: 20px 34px; display: grid; }
+.daily-article-card { position: relative; border-bottom: 1px solid var(--line); }
+.daily-article-card > button { width: 100%; padding: 20px 110px 20px 2px; border: 0; background: transparent; text-align: left; cursor: pointer; }
+.daily-article-card > button:hover h3 { color: var(--accent); }
+.daily-article-card h3 { margin: 10px 0 7px; font-size: 18px; letter-spacing: -.025em; }
+.daily-article-card p { margin: 0 0 10px; color: var(--muted); font-size: 12px; line-height: 1.6; }
+.daily-article-card small { color: var(--muted); font-size: 10px; }
 
 .domain-workspace { padding-bottom: 60px; }
 .hero-stat { min-width: 170px; padding: 16px; border-left: 3px solid var(--accent); background: var(--soft); display: grid; gap: 5px; }
@@ -266,7 +281,7 @@ a { color: var(--accent); }
   .login-panel { width: 100%; min-height: 100vh; padding: 28px 22px; box-shadow: none; }
   .topbar { padding: 0 18px; }
   .topbar-meta { display: none; }
-  .workspace-nav { overflow-x: auto; grid-template-columns: repeat(4, minmax(145px,1fr)); }
+  .workspace-nav { overflow-x: auto; grid-template-columns: repeat(5, minmax(145px,1fr)); }
   .market-hero, .workspace-hero { padding: 28px 20px; display: grid; }
   .hero-search { width: 100%; }
   .explore-layout { grid-template-columns: 1fr; min-width: 0; width: 100%; overflow: hidden; }
@@ -279,7 +294,10 @@ a { color: var(--accent); }
   .market-filter-panel { margin: 0; }
   .document-taxonomy > div { grid-template-columns: repeat(2,1fr); }
   .subtabs { margin-inline: 16px; overflow-x: auto; grid-template-columns: repeat(3,minmax(185px,1fr)); }
-  .company-table-wrap, .domain-card-list, .coverage-strip, .evidence-banner { margin-inline: 16px; }
+  .company-table-wrap, .domain-card-list, .coverage-strip, .evidence-banner, .daily-article-list, .daily-freshness { margin-inline: 16px; }
+  .daily-freshness { grid-template-columns: repeat(2,1fr); }
+  .daily-freshness > div { border-bottom: 1px solid var(--line); }
+  .daily-article-card > button { padding-right: 64px; }
   .evidence-banner { grid-template-columns: 1fr; }
   .coverage-strip, .sale-coverage { grid-template-columns: repeat(2,1fr); }
   .coverage-strip > div { border-bottom: 1px solid var(--line); }
