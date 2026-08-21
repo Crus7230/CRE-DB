@@ -11,6 +11,10 @@ function amountText(value: unknown, currency: unknown) {
   return `${Math.round(amount / 1e8).toLocaleString("ko-KR")}억원`;
 }
 
+function capitalNarrative(item: InstitutionalCapitalResponse["items"][number]): string {
+  return `${item.lpName}의 ${item.scope} 범위 ${item.mandateName}은 현재 ${item.status} 단계입니다. 전략 track ${item.trackCount}건, 공식 선정 ${item.selectionCount}건, 금액 근거 ${item.amountCount}건, 집행 연결 ${item.deploymentCount}건이 확인됩니다. 근거 수준은 ${item.evidenceStatus}입니다.`;
+}
+
 export function InstitutionalCapitalWorkspace() {
   const [data, setData] = useState<InstitutionalCapitalResponse | null>(null);
   const [error, setError] = useState(false);
@@ -33,6 +37,7 @@ export function InstitutionalCapitalWorkspace() {
     {!data && !error && <div className="state-block"><span className="spinner"/><strong>기관자금 근거 조립 중</strong></div>}
     {error && <div className="state-block error-state"><strong>기관자금 조회 오류</strong></div>}
     <div className="domain-card-list">{data?.items.map((item) => <details className="domain-card" key={item.mandateId}><summary><div><span className="status-pill">{item.status}</span><h3>{item.mandateName}</h3><p>{item.lpName} · {item.scope} · {item.announcedAt?.slice(0,10) ?? "발표일 미상"}</p></div><div className="card-counts"><span>track <b>{item.trackCount}</b></span><span>선정 <b>{item.selectionCount}</b></span><span>금액 <b>{item.amountCount}</b></span><span>문서 <b>{item.documents.length}</b></span></div></summary><div className="domain-card-body">
+      <section className="domain-narrative"><p className="eyebrow">STRUCTURED SUMMARY</p><h4>기관자금 핵심 설명</h4><p>{capitalNarrative(item)}</p></section>
       <section><h4>전략 Track·가이드라인</h4>{item.tracks.length ? item.tracks.map((track, index) => <article key={String(track.trackId ?? index)}><strong>{String(track.name ?? track.code ?? "Track")}</strong><p>{[track.strategy,track.geography,track.evidenceStatus].filter(Boolean).map(String).join(" · ")}</p>{Array.isArray(track.guidelines) && track.guidelines.length > 0 && <ul>{track.guidelines.map((guide, guideIndex) => <li key={guideIndex}>{String((guide as Record<string,unknown>).termType ?? "조건")}: {String((guide as Record<string,unknown>).rawText ?? "-")}</li>)}</ul>}</article>) : <p className="empty-copy">구조화된 track이 없습니다.</p>}</section>
       <section><h4>금액 Basis</h4>{item.amounts.length ? <div className="fact-table">{item.amounts.map((amount, index) => <div key={String(amount.amountId ?? index)}><span>{String(amount.basis ?? "OTHER")}</span><strong>{amountText(amount.amount, amount.currency)}</strong><small>{[amount.status,amount.comparator,amount.evidenceStatus].filter(Boolean).map(String).join(" · ")}</small></div>)}</div> : <p className="empty-copy">공개 금액 근거가 없습니다.</p>}</section>
       <section><h4>선정 운용사</h4>{item.selections.length ? item.selections.map((selection, index) => <article key={String(selection.selectionId ?? index)}><strong>{String(selection.managerName ?? "운용사")}</strong><p>{[selection.status,selection.selectedAt,selection.evidenceStatus].filter(Boolean).map(String).join(" · ")}</p></article>) : <p className="empty-copy">공식 선정 결과가 연결되지 않았습니다.</p>}</section>

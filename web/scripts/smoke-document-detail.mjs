@@ -1,5 +1,7 @@
-const base = "http://127.0.0.1:3001";
-async function get(path) { const r = await fetch(base + path); const x = await r.json(); if (!r.ok) throw new Error(`${path} ${r.status} ${JSON.stringify(x)}`); return x; }
+import { createAuthenticatedGet } from "./authenticated-get.mjs";
+
+const base = process.env.BASE_URL ?? "http://127.0.0.1:3001";
+const get = await createAuthenticatedGet(base);
 const rss = await get("/api/search?kind=DOCUMENT&category=RSS_ITEM&page=1&pageSize=1&q=&from=&to=");
 const dart = await get("/api/search?kind=DOCUMENT&category=DISCLOSURE&page=1&pageSize=1&q=&from=&to=");
 const rssDetail = await get(`/api/documents/${encodeURIComponent(rss.results[0].id)}`);

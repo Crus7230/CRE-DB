@@ -1,4 +1,5 @@
 import type { SqlExecutor } from "@/lib/server/market-search";
+import type { RecordClassification } from "@/lib/search-contract";
 
 export type DocumentDetail = {
   id: string;
@@ -10,12 +11,26 @@ export type DocumentDetail = {
   publishedAt: string | null;
   collectedAt: string | null;
   rightsStatus: string | null;
-  contentMode: "FULL_TEXT" | "SNIPPET" | "METADATA";
+  contentMode: "FULL_TEXT" | "SAFE_EXCERPT" | "SNIPPET" | "METADATA";
+  summaryMode: "BODY_EXTRACTIVE" | "MODEL" | "EVENT_EXTRACTION" | "SOURCE_SNIPPET" | "NONE";
+  summaryGeneratedAt: string | null;
+  summaryPipeline: string | null;
   summary: string | null;
+  safeExcerpt: string | null;
   snippet: string | null;
   storedText: string | null;
   eventSignals: Array<{ category: string; categoryLabel: string; title: string | null; summary: string | null; stage: string | null; eventDate: string | null; confidence: number | null; status: string }>;
   keywords: Array<{ type: string; label: string; value: string; confidence: number | null }>;
+  relatedEntities: Array<{
+    kind: "EVENT" | "ASSET" | "ORGANIZATION" | "PROJECT" | "LP_MANDATE" | "SALE_PROCESS";
+    id: string;
+    title: string;
+    relationBasis: "CANONICAL_EVENT" | "RESOLVED_MENTION" | "VERIFIED_CLAIM" | "SOURCE_CLAIM";
+    relationRole: string;
+    evidenceStatus: string;
+    confidence: number | null;
+  }>;
+  classifications: RecordClassification[];
   transaction: null | {
     dealDate: string | null; dealAmount: string | null; buildingAr: string | null; plottageAr: string | null;
     buildingUse: string | null; buildingType: string | null; buildYear: string | null; floor: string | null;
@@ -26,7 +41,9 @@ export type DocumentDetail = {
 };
 
 const documentDetailSql = `
-WITH latest AS (
+WITH runtime AS (
+  SELECT to_char(clock_timestamp() AT TIME ZONE 'UTC','YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') AS now_utc
+), latest AS (
   SELECT * FROM market_intelligence.document_versions
   WHERE document_id=$1
   ORDER BY version_no DESC, document_version_id DESC
@@ -37,17 +54,30 @@ SELECT jsonb_build_object(
   'title',dv.title,
   'publisher',sd.publisher_name,
   'documentType',sd.document_type,
-  'sourceUrl',CASE WHEN sd.document_type='API_RECORD' THEN dv.metadata_json::jsonb->>'source_endpoint' ELSE sd.canonical_url END,
+  'sourceUrl',CASE WHEN sd.document_type='API_RECORD' THEN dv.metadata_json::jsonb->>'source_endpoint' ELSE coalesce(en.resolved_url,sd.canonical_url) END,
   'author',dv.author_name,
   'publishedAt',dv.published_at,
   'collectedAt',dv.collected_at,
   'rightsStatus',dv.rights_status,
-  'contentMode',CASE WHEN length(trim(coalesce(dv.stored_text,'')))>0 THEN 'FULL_TEXT' WHEN length(trim(coalesce(dv.snippet_text,'')))>0 THEN 'SNIPPET' ELSE 'METADATA' END,
-  'summary',coalesce(ev.primary_summary,nullif(dv.snippet_text,'')),
+  'contentMode',CASE WHEN length(trim(coalesce(dv.stored_text,'')))>0 THEN 'FULL_TEXT' WHEN en.safe_excerpt IS NOT NULL THEN 'SAFE_EXCERPT' WHEN length(trim(coalesce(dv.snippet_text,'')))>0 THEN 'SNIPPET' ELSE 'METADATA' END,
+  'summaryMode',CASE
+    WHEN en.summary_text IS NOT NULL AND en.summary_method='MODEL' THEN 'MODEL'
+    WHEN en.summary_text IS NOT NULL THEN 'BODY_EXTRACTIVE'
+    WHEN ev.primary_summary IS NOT NULL THEN 'EVENT_EXTRACTION'
+    WHEN length(trim(coalesce(dv.snippet_text,'')))>0
+      AND regexp_replace(lower(dv.snippet_text),'[^[:alnum:]가-힣]','','g') <> regexp_replace(lower(coalesce(dv.title,'')),'[^[:alnum:]가-힣]','','g') THEN 'SOURCE_SNIPPET'
+    ELSE 'NONE' END,
+  'summaryGeneratedAt',en.generated_at,
+  'summaryPipeline',en.pipeline_version,
+  'summary',coalesce(en.summary_text,ev.primary_summary,
+    CASE WHEN regexp_replace(lower(coalesce(dv.snippet_text,'')),'[^[:alnum:]가-힣]','','g') <> regexp_replace(lower(coalesce(dv.title,'')),'[^[:alnum:]가-힣]','','g') THEN nullif(dv.snippet_text,'') END),
+  'safeExcerpt',en.safe_excerpt,
   'snippet',nullif(dv.snippet_text,''),
   'storedText',nullif(left(dv.stored_text,12000),''),
   'eventSignals',coalesce(ev.items,'[]'::jsonb),
   'keywords',coalesce(kw.items,'[]'::jsonb),
+  'relatedEntities',coalesce(rel.items,'[]'::jsonb),
+  'classifications',coalesce(cls.items,'[]'::jsonb),
   'transaction',CASE WHEN sd.document_type='API_RECORD' THEN jsonb_build_object(
     'dealDate',dv.metadata_json::jsonb->>'deal_date',
     'dealAmount',dv.metadata_json::jsonb->'api_record'->>'dealAmount',
@@ -75,6 +105,18 @@ SELECT jsonb_build_object(
 ) AS payload
 FROM market_intelligence.source_documents sd
 JOIN latest dv ON dv.document_id=sd.document_id
+LEFT JOIN LATERAL (
+  SELECT de.summary_text,de.safe_excerpt,de.resolved_url,de.summary_method,
+    de.generated_at,de.pipeline_version
+  FROM market_intelligence.document_enrichments de
+  WHERE de.document_version_id=dv.document_version_id
+    AND de.enrichment_kind='CONTENT_SUMMARY'
+    AND de.status_code='COMPLETED'
+    AND de.review_status<>'REJECTED'
+  ORDER BY CASE WHEN de.review_status='APPROVED' THEN 0 ELSE 1 END,
+    de.generated_at DESC,de.document_enrichment_id DESC
+  LIMIT 1
+) en ON true
 LEFT JOIN LATERAL (
   SELECT
     (array_agg(nullif(x.summary_raw,'') ORDER BY x.confidence DESC NULLS LAST) FILTER (WHERE nullif(x.summary_raw,'') IS NOT NULL))[1] AS primary_summary,
@@ -127,6 +169,68 @@ LEFT JOIN LATERAL (
     LIMIT 40
   ) x
 ) kw ON true
+LEFT JOIN LATERAL (
+  SELECT jsonb_agg(jsonb_build_object(
+    'schemeCode',s.scheme_code,'schemeLabel',s.scheme_name_ko,
+    'termCode',t.term_code,'termLabel',t.term_name_ko,
+    'parentCode',parent.term_code,'parentLabel',parent.term_name_ko,
+    'isPrimary',(rc.is_primary=1),'assignmentRole',rc.assignment_role,
+    'evidenceStatus',rc.evidence_status,'reviewStatus',rc.review_status,
+    'confidence',rc.confidence
+  ) ORDER BY s.scheme_code,rc.is_primary DESC,t.sort_order,t.term_code) AS items
+  FROM market_intelligence.record_classifications rc
+  JOIN market_intelligence.classification_schemes s
+    ON s.classification_scheme_id=rc.classification_scheme_id
+  JOIN market_intelligence.classification_terms t
+    ON t.classification_scheme_id=rc.classification_scheme_id
+   AND t.classification_term_id=rc.classification_term_id
+  LEFT JOIN market_intelligence.classification_terms parent
+    ON parent.classification_scheme_id=t.classification_scheme_id
+   AND parent.classification_term_id=t.parent_term_id
+  CROSS JOIN runtime rt
+  WHERE rc.target_kind='DOCUMENT' AND rc.target_id=sd.document_id
+    AND rc.review_status NOT IN ('REJECTED','SUPERSEDED')
+    AND (rc.valid_from IS NULL OR rc.valid_from<=rt.now_utc)
+    AND (rc.valid_to IS NULL OR rc.valid_to>rt.now_utc)
+    AND s.governance_status='ACTIVE' AND t.governance_status='ACTIVE'
+    AND (s.valid_from IS NULL OR s.valid_from<=rt.now_utc)
+    AND (s.valid_to IS NULL OR s.valid_to>rt.now_utc)
+    AND (t.valid_from IS NULL OR t.valid_from<=rt.now_utc)
+    AND (t.valid_to IS NULL OR t.valid_to>rt.now_utc)
+) cls ON true
+LEFT JOIN LATERAL (
+  SELECT jsonb_agg(jsonb_build_object(
+    'kind',x.entity_kind,'id',x.entity_id,'title',x.entity_title,
+    'relationBasis',x.relation_basis,'relationRole',x.relation_role,
+    'evidenceStatus',x.evidence_status,'confidence',x.confidence
+  ) ORDER BY x.entity_kind,x.entity_title) AS items
+  FROM (
+    SELECT DISTINCT ON (r.entity_kind,r.entity_id)
+      r.entity_kind,r.entity_id,
+      coalesce(e.canonical_title,a.canonical_name,o.canonical_name,p.canonical_name,
+               lm.mandate_name,sp.process_code,r.entity_id) AS entity_title,
+      r.relation_basis,r.relation_role,r.evidence_status,r.confidence
+    FROM market_intelligence.v_document_entity_relations r
+    LEFT JOIN market_intelligence.events e
+      ON r.entity_kind='EVENT' AND e.event_id=r.entity_id
+    LEFT JOIN market_intelligence.assets a
+      ON r.entity_kind='ASSET' AND a.asset_id=r.entity_id
+    LEFT JOIN market_intelligence.organizations o
+      ON r.entity_kind='ORGANIZATION' AND o.organization_id=r.entity_id
+    LEFT JOIN market_intelligence.projects p
+      ON r.entity_kind='PROJECT' AND p.project_id=r.entity_id
+    LEFT JOIN market_intelligence.lp_mandates lm
+      ON r.entity_kind='LP_MANDATE' AND lm.mandate_id=r.entity_id
+    LEFT JOIN market_intelligence.sale_processes sp
+      ON r.entity_kind='SALE_PROCESS' AND sp.sale_process_id=r.entity_id
+    WHERE r.document_version_id=dv.document_version_id
+    ORDER BY r.entity_kind,r.entity_id,
+      CASE r.relation_basis WHEN 'CANONICAL_EVENT' THEN 1 WHEN 'RESOLVED_MENTION' THEN 2
+           WHEN 'VERIFIED_CLAIM' THEN 3 ELSE 4 END,
+      r.confidence DESC NULLS LAST
+    LIMIT 100
+  ) x
+) rel ON true
 WHERE sd.document_id=$1
 `;
 

@@ -498,6 +498,7 @@ CREATE TABLE document_versions (
     author_name         TEXT,
     published_at        TEXT,
     modified_at         TEXT,
+
     collected_at        TEXT NOT NULL,
     language_code       TEXT NOT NULL DEFAULT 'ko',
     content_sha256      TEXT NOT NULL,
@@ -998,6 +999,7 @@ CREATE TABLE sale_processes (
     sale_process_id    TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
     event_id           TEXT NOT NULL UNIQUE REFERENCES events(event_id),
     process_code       TEXT NOT NULL UNIQUE,
+
     sale_method        TEXT NOT NULL CHECK (sale_method IN (
                          'COMPETITIVE_BID','PRIVATE_TREATY','PUBLIC_AUCTION',
                          'COURT_AUCTION','SHARE_SALE','OTHER'
@@ -1499,6 +1501,7 @@ CREATE UNIQUE INDEX uq_current_measurement_region
     ON measurement_fact_selections(region_id, measurement_definition_id, slot_key)
     WHERE region_id IS NOT NULL AND selection_status = 'CURRENT';
 
+
 CREATE TABLE measurement_derivations (
     measurement_derivation_id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
     output_measurement_fact_id TEXT NOT NULL UNIQUE REFERENCES measurement_facts(measurement_fact_id),
@@ -1998,6 +2001,7 @@ LEFT JOIN bid_submissions bs ON bs.participation_id=bp.participation_id;
 CREATE VIEW v_bid_funding AS
 SELECT fc.funding_component_id,
        fc.bid_submission_id,
+
        fc.funding_type,
        fc.provider_organization_id,
        provider.canonical_name AS provider_name,
@@ -2498,6 +2502,7 @@ CREATE TABLE industry_nodes (
     valid_to            TEXT,
     metadata_json       TEXT NOT NULL DEFAULT '{}' CHECK (json_valid(metadata_json)),
     UNIQUE(taxonomy_code,industry_code),
+
     CHECK (valid_to IS NULL OR valid_from IS NULL OR valid_to >= valid_from),
     CHECK (parent_industry_node_id IS NULL OR parent_industry_node_id <> industry_node_id)
 ) STRICT;
@@ -2757,9 +2762,418 @@ SELECT 'PROPERTY_EVENT_WITHOUT_PLACE','EVENT',e.event_id,e.canonical_title,NULL
    AND NOT EXISTS (SELECT 1 FROM event_assets ea WHERE ea.event_id=e.event_id)
    AND NOT EXISTS (SELECT 1 FROM event_projects ep WHERE ep.event_id=e.event_id);
 
+-- ============================================================================
+-- 15. Version-bound content enrichment (V2.8)
+-- ============================================================================
+
+CREATE TABLE document_enrichments (
+    document_enrichment_id TEXT PRIMARY KEY,
+    document_version_id TEXT NOT NULL REFERENCES document_versions(document_version_id) ON DELETE CASCADE,
+    enrichment_kind TEXT NOT NULL CHECK (enrichment_kind IN ('CONTENT_SUMMARY')),
+    pipeline_version TEXT NOT NULL,
+    source_content_sha256 TEXT,
+    resolved_url TEXT,
+    content_mode TEXT NOT NULL CHECK (content_mode IN ('FULL_TEXT','SAFE_EXCERPT','SNIPPET','METADATA')),
+    summary_method TEXT NOT NULL CHECK (summary_method IN ('EXTRACTIVE','MODEL','SOURCE','NONE')),
+    summary_text TEXT,
+    safe_excerpt TEXT,
+    parser_name TEXT,
+    parser_version TEXT,
+    fetched_at TEXT,
+    generated_at TEXT NOT NULL,
+    status_code TEXT NOT NULL CHECK (status_code IN ('COMPLETED','PARTIAL','FAILED')),
+    review_status TEXT NOT NULL DEFAULT 'UNREVIEWED' CHECK (review_status IN ('UNREVIEWED','APPROVED','REJECTED')),
+    error_code TEXT,
+    metadata_json TEXT NOT NULL DEFAULT '{}' CHECK (json_valid(metadata_json)),
+    UNIQUE(document_version_id, enrichment_kind, pipeline_version),
+    CHECK (status_code <> 'COMPLETED' OR summary_text IS NOT NULL),
+    CHECK (safe_excerpt IS NULL OR content_mode IN ('FULL_TEXT','SAFE_EXCERPT'))
+) STRICT;
+
+CREATE INDEX ix_document_enrichments_version_status
+    ON document_enrichments(document_version_id,status_code,review_status);
+
+-- Version-bound domain scope assessment. Raw documents remain evidence; only
+-- CRE_CONFIRMED disclosures enter the default market-document search surface.
+CREATE TABLE document_scope_assessments (
+    document_scope_assessment_id TEXT PRIMARY KEY,
+    document_version_id TEXT NOT NULL REFERENCES document_versions(document_version_id) ON DELETE CASCADE,
+    scope_code TEXT NOT NULL CHECK (scope_code IN ('CRE')),
+    classifier_version TEXT NOT NULL,
+    status_code TEXT NOT NULL CHECK (status_code IN (
+        'CRE_CONFIRMED','CRE_REVIEW','CRE_REVIEW_MIXED','CRE_REVIEW_PARSE_FAILED',
+        'OUT_OF_SCOPE_NON_CRE','OUT_OF_SCOPE_RESIDENTIAL'
+    )),
+    reason_codes_json TEXT NOT NULL DEFAULT '[]' CHECK (json_valid(reason_codes_json)),
+    evidence_json TEXT NOT NULL DEFAULT '{}' CHECK (json_valid(evidence_json)),
+    assessed_at TEXT NOT NULL,
+    UNIQUE(document_version_id, scope_code, classifier_version)
+) STRICT;
+
+CREATE INDEX ix_document_scope_assessments_scope_status
+    ON document_scope_assessments(scope_code,status_code,classifier_version,document_version_id);
+
+-- Version-bound CRE scope assessment for organization identity masters.
+CREATE TABLE organization_scope_assessments (
+    organization_scope_assessment_id TEXT PRIMARY KEY,
+    organization_id TEXT NOT NULL REFERENCES organizations(organization_id) ON DELETE CASCADE,
+    scope_code TEXT NOT NULL CHECK (scope_code='CRE'),
+    classifier_version TEXT NOT NULL,
+    status_code TEXT NOT NULL CHECK (status_code IN ('CRE_CONFIRMED','CRE_CONTEXT_ONLY','CRE_REVIEW')),
+    reason_codes_json TEXT NOT NULL DEFAULT '[]' CHECK (json_valid(reason_codes_json)),
+    evidence_json TEXT NOT NULL DEFAULT '{}' CHECK (json_valid(evidence_json)),
+    assessed_at TEXT NOT NULL,
+    UNIQUE(organization_id, scope_code, classifier_version)
+) STRICT;
+
+CREATE INDEX ix_organization_scope_assessments_scope_status
+    ON organization_scope_assessments(scope_code,status_code,classifier_version,organization_id);
+
+CREATE INDEX IF NOT EXISTS ix_extraction_runs_document_version
+ON extraction_runs(document_version_id);
+CREATE INDEX IF NOT EXISTS ix_mentions_extraction_run
+ON mentions(extraction_run_id);
+CREATE INDEX IF NOT EXISTS ix_mention_resolutions_selected
+ON mention_resolutions(mention_id,resolution_status,selected);
+CREATE INDEX IF NOT EXISTS ix_event_mentions_extraction_run
+ON event_mentions(extraction_run_id);
+CREATE INDEX IF NOT EXISTS ix_claims_event_verification
+ON claims(event_mention_id,verification_status,review_status);
+
+CREATE VIEW v_document_entity_relations AS
+WITH event_evidence AS (
+    SELECT DISTINCT dv.document_id,er.document_version_id,em.event_mention_id,
+           eml.event_id,eml.relation_code,em.confidence
+    FROM extraction_runs er
+    JOIN document_versions dv ON dv.document_version_id=er.document_version_id
+    JOIN event_mentions em ON em.extraction_run_id=er.extraction_run_id
+    JOIN event_mention_links eml ON eml.event_mention_id=em.event_mention_id
+    WHERE em.status_code<>'REJECTED'
+), relation_rows AS (
+    SELECT ee.document_id,ee.document_version_id,'EVENT' AS entity_kind,
+           ee.event_id AS entity_id,'CANONICAL_EVENT' AS relation_basis,
+           ee.relation_code AS relation_role,e.verification_level AS evidence_status,
+           ee.confidence,ee.event_id,NULL AS claim_id,NULL AS mention_id
+    FROM event_evidence ee JOIN events e ON e.event_id=ee.event_id
+    WHERE e.lifecycle_status NOT IN ('REJECTED','MERGED')
+    UNION ALL
+    SELECT ee.document_id,ee.document_version_id,'ASSET',ea.asset_id,'CANONICAL_EVENT',
+           ea.role_code,e.verification_level,coalesce(ea.confidence,ee.confidence),ee.event_id,
+           ea.supporting_claim_id,NULL
+    FROM event_evidence ee JOIN events e ON e.event_id=ee.event_id
+    JOIN event_assets ea ON ea.event_id=ee.event_id
+    WHERE e.lifecycle_status NOT IN ('REJECTED','MERGED')
+    UNION ALL
+    SELECT ee.document_id,ee.document_version_id,'ORGANIZATION',ep.organization_id,'CANONICAL_EVENT',
+           ep.role_code,e.verification_level,coalesce(ep.confidence,ee.confidence),ee.event_id,
+           ep.supporting_claim_id,NULL
+    FROM event_evidence ee JOIN events e ON e.event_id=ee.event_id
+    JOIN event_participants ep ON ep.event_id=ee.event_id
+    WHERE e.lifecycle_status NOT IN ('REJECTED','MERGED')
+    UNION ALL
+    SELECT ee.document_id,ee.document_version_id,'PROJECT',ep.project_id,'CANONICAL_EVENT',
+           ep.role_code,e.verification_level,coalesce(ep.confidence,ee.confidence),ee.event_id,
+           ep.supporting_claim_id,NULL
+    FROM event_evidence ee JOIN events e ON e.event_id=ee.event_id
+    JOIN event_projects ep ON ep.event_id=ee.event_id
+    WHERE e.lifecycle_status NOT IN ('REJECTED','MERGED')
+    UNION ALL
+    SELECT ee.document_id,ee.document_version_id,'SALE_PROCESS',sp.sale_process_id,'CANONICAL_EVENT',
+           'EVENT_PROCESS',sp.evidence_status,ee.confidence,ee.event_id,sp.source_claim_id,NULL
+    FROM event_evidence ee JOIN sale_processes sp ON sp.event_id=ee.event_id
+    WHERE sp.review_status<>'REJECTED'
+    UNION ALL
+    SELECT ee.document_id,ee.document_version_id,'LP_MANDATE',lm.mandate_id,'CANONICAL_EVENT',
+           'EVENT_MANDATE',lm.evidence_status,ee.confidence,ee.event_id,lm.source_claim_id,NULL
+    FROM event_evidence ee JOIN lp_mandates lm ON lm.event_id=ee.event_id
+    WHERE lm.review_status<>'REJECTED'
+    UNION ALL
+    SELECT dv.document_id,er.document_version_id,
+           CASE WHEN mr.asset_id IS NOT NULL THEN 'ASSET'
+                WHEN mr.project_id IS NOT NULL THEN 'PROJECT'
+                WHEN mr.organization_id IS NOT NULL THEN 'ORGANIZATION' END,
+           coalesce(mr.asset_id,mr.project_id,mr.organization_id),
+           'RESOLVED_MENTION',mr.method_code,'RESOLVED',mr.match_score,NULL,NULL,m.mention_id
+    FROM extraction_runs er
+    JOIN document_versions dv ON dv.document_version_id=er.document_version_id
+    JOIN mentions m ON m.extraction_run_id=er.extraction_run_id
+    JOIN mention_resolutions mr ON mr.mention_id=m.mention_id
+    WHERE mr.resolution_status='RESOLVED' AND mr.selected=1
+      AND m.review_status<>'REJECTED'
+      AND (mr.asset_id IS NOT NULL OR mr.project_id IS NOT NULL OR mr.organization_id IS NOT NULL)
+    UNION ALL
+    SELECT dv.document_id,er.document_version_id,
+           CASE WHEN c.object_asset_id IS NOT NULL THEN 'ASSET'
+                WHEN c.object_project_id IS NOT NULL THEN 'PROJECT'
+                WHEN c.object_organization_id IS NOT NULL THEN 'ORGANIZATION' END,
+           coalesce(c.object_asset_id,c.object_project_id,c.object_organization_id),
+           'VERIFIED_CLAIM',c.predicate_code,c.verification_status,c.confidence,NULL,c.claim_id,NULL
+    FROM claims c
+    JOIN event_mentions em ON em.event_mention_id=c.event_mention_id
+    JOIN extraction_runs er ON er.extraction_run_id=em.extraction_run_id
+    JOIN document_versions dv ON dv.document_version_id=er.document_version_id
+    WHERE c.verification_status='VERIFIED' AND c.review_status<>'REJECTED'
+      AND (c.object_asset_id IS NOT NULL OR c.object_project_id IS NOT NULL OR c.object_organization_id IS NOT NULL)
+    UNION ALL
+    SELECT dv.document_id,er.document_version_id,
+           CASE WHEN ca.asset_id IS NOT NULL THEN 'ASSET'
+                WHEN ca.project_id IS NOT NULL THEN 'PROJECT'
+                WHEN ca.organization_id IS NOT NULL THEN 'ORGANIZATION' END,
+           coalesce(ca.asset_id,ca.project_id,ca.organization_id),
+           'VERIFIED_CLAIM',ca.role_code,c.verification_status,
+           coalesce(ca.confidence,c.confidence),NULL,c.claim_id,NULL
+    FROM claims c
+    JOIN claim_arguments ca ON ca.claim_id=c.claim_id
+    JOIN event_mentions em ON em.event_mention_id=c.event_mention_id
+    JOIN extraction_runs er ON er.extraction_run_id=em.extraction_run_id
+    JOIN document_versions dv ON dv.document_version_id=er.document_version_id
+    WHERE c.verification_status='VERIFIED' AND c.review_status<>'REJECTED'
+      AND ca.argument_kind='ENTITY'
+      AND (ca.asset_id IS NOT NULL OR ca.project_id IS NOT NULL OR ca.organization_id IS NOT NULL)
+    UNION ALL
+    SELECT dv.document_id,er.document_version_id,'LP_MANDATE',lm.mandate_id,'SOURCE_CLAIM',
+           'MANDATE_SOURCE',lm.evidence_status,c.confidence,lm.event_id,c.claim_id,NULL
+    FROM lp_mandates lm
+    JOIN claims c ON c.claim_id=lm.source_claim_id
+    JOIN event_mentions em ON em.event_mention_id=c.event_mention_id
+    JOIN extraction_runs er ON er.extraction_run_id=em.extraction_run_id
+    JOIN document_versions dv ON dv.document_version_id=er.document_version_id
+    WHERE lm.review_status<>'REJECTED' AND c.review_status<>'REJECTED'
+    UNION ALL
+    SELECT dv.document_id,er.document_version_id,'SALE_PROCESS',sp.sale_process_id,'SOURCE_CLAIM',
+           'PROCESS_SOURCE',sp.evidence_status,c.confidence,sp.event_id,c.claim_id,NULL
+    FROM sale_processes sp
+    JOIN claims c ON c.claim_id=sp.source_claim_id
+    JOIN event_mentions em ON em.event_mention_id=c.event_mention_id
+    JOIN extraction_runs er ON er.extraction_run_id=em.extraction_run_id
+    JOIN document_versions dv ON dv.document_version_id=er.document_version_id
+    WHERE sp.review_status<>'REJECTED' AND c.review_status<>'REJECTED'
+)
+SELECT DISTINCT document_id,document_version_id,entity_kind,entity_id,relation_basis,
+       relation_role,evidence_status,confidence,event_id,claim_id,mention_id
+FROM relation_rows WHERE entity_kind IS NOT NULL AND entity_id IS NOT NULL;
+
+CREATE TABLE archive_snapshots (
+    archive_snapshot_id TEXT PRIMARY KEY,
+    created_at TEXT NOT NULL,
+    schema_version TEXT NOT NULL,
+    archive_format TEXT NOT NULL CHECK(archive_format IN ('SQLITE')),
+    archive_location TEXT NOT NULL,
+    archive_snapshot_sha256 TEXT NOT NULL CHECK(length(archive_snapshot_sha256)=64),
+    table_count INTEGER NOT NULL CHECK(table_count>=0),
+    row_count INTEGER NOT NULL CHECK(row_count>=0),
+    integrity_status TEXT NOT NULL CHECK(integrity_status IN ('VALIDATED','RETIRED')),
+    foreign_key_violations INTEGER NOT NULL DEFAULT 0 CHECK(foreign_key_violations>=0),
+    is_current INTEGER NOT NULL DEFAULT 0 CHECK(is_current IN (0,1)),
+    metadata_json TEXT NOT NULL DEFAULT '{}'
+);
+CREATE UNIQUE INDEX ux_archive_snapshots_current ON archive_snapshots(is_current) WHERE is_current=1;
+
+CREATE TABLE archived_serving_index (
+    archive_index_id TEXT PRIMARY KEY,
+    archive_snapshot_id TEXT NOT NULL REFERENCES archive_snapshots(archive_snapshot_id) ON DELETE RESTRICT,
+    record_kind TEXT NOT NULL CHECK(record_kind IN ('DOCUMENT','EVENT','SALE_PROCESS','LP_MANDATE','MACRO_OBSERVATION')),
+    record_id TEXT NOT NULL,
+    canonical_title TEXT NOT NULL,
+    lifecycle_status TEXT,
+    category_code TEXT,
+    event_date_start TEXT,
+    event_date_end TEXT,
+    publisher_name TEXT,
+    canonical_url TEXT,
+    summary_text TEXT,
+    source_document_id TEXT,
+    source_document_version_id TEXT,
+    archive_locator TEXT NOT NULL,
+    archive_snapshot_sha256 TEXT NOT NULL CHECK(length(archive_snapshot_sha256)=64),
+    indexed_at TEXT NOT NULL,
+    metadata_json TEXT NOT NULL DEFAULT '{}',
+    UNIQUE(record_kind, record_id)
+);
+CREATE INDEX ix_archived_serving_index_kind_status ON archived_serving_index(record_kind,lifecycle_status);
+CREATE INDEX ix_archived_serving_index_category_date ON archived_serving_index(category_code,event_date_start);
+CREATE INDEX ix_archived_serving_index_title ON archived_serving_index(canonical_title);
+
+-- ============================================================================
+-- 16. Governed classification taxonomy and evidence-aware assignments
+-- ============================================================================
+
+CREATE TABLE classification_schemes (
+    classification_scheme_id TEXT PRIMARY KEY,
+    scheme_code TEXT NOT NULL UNIQUE,
+    scheme_name_ko TEXT NOT NULL,
+    scheme_name_en TEXT,
+    description TEXT,
+    cardinality_code TEXT NOT NULL CHECK(cardinality_code IN ('SINGLE','MULTIPLE')),
+    is_hierarchical INTEGER NOT NULL DEFAULT 0 CHECK(is_hierarchical IN (0,1)),
+    target_kinds_json TEXT NOT NULL DEFAULT '[]' CHECK(json_valid(target_kinds_json)),
+    vocabulary_version TEXT NOT NULL,
+    governance_status TEXT NOT NULL DEFAULT 'ACTIVE' CHECK(governance_status IN ('DRAFT','ACTIVE','DEPRECATED')),
+    valid_from TEXT,
+    valid_to TEXT,
+    metadata_json TEXT NOT NULL DEFAULT '{}' CHECK(json_valid(metadata_json)),
+    created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
+    CHECK(valid_to IS NULL OR valid_from IS NULL OR valid_to>=valid_from)
+) STRICT;
+
+CREATE TABLE classification_terms (
+    classification_term_id TEXT PRIMARY KEY,
+    classification_scheme_id TEXT NOT NULL REFERENCES classification_schemes(classification_scheme_id) ON DELETE RESTRICT,
+    term_code TEXT NOT NULL,
+    term_name_ko TEXT NOT NULL,
+    term_name_en TEXT,
+    parent_term_id TEXT,
+    description TEXT,
+    synonyms_json TEXT NOT NULL DEFAULT '[]' CHECK(json_valid(synonyms_json)),
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    is_assignable INTEGER NOT NULL DEFAULT 1 CHECK(is_assignable IN (0,1)),
+    governance_status TEXT NOT NULL DEFAULT 'ACTIVE' CHECK(governance_status IN ('DRAFT','ACTIVE','DEPRECATED')),
+    valid_from TEXT,
+    valid_to TEXT,
+    metadata_json TEXT NOT NULL DEFAULT '{}' CHECK(json_valid(metadata_json)),
+    created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
+    UNIQUE(classification_scheme_id,term_code),
+    UNIQUE(classification_scheme_id,classification_term_id),
+    FOREIGN KEY(classification_scheme_id,parent_term_id)
+      REFERENCES classification_terms(classification_scheme_id,classification_term_id) ON DELETE RESTRICT,
+    CHECK(parent_term_id IS NULL OR parent_term_id<>classification_term_id),
+    CHECK(valid_to IS NULL OR valid_from IS NULL OR valid_to>=valid_from)
+) STRICT;
+
+CREATE TABLE record_classifications (
+    record_classification_id TEXT PRIMARY KEY,
+    target_kind TEXT NOT NULL CHECK(target_kind IN (
+      'DOCUMENT','DOCUMENT_VERSION','EVENT','ASSET','ORGANIZATION','PROJECT',
+      'LP_MANDATE','SALE_PROCESS','MACRO_SERIES','MACRO_OBSERVATION'
+    )),
+    target_id TEXT NOT NULL,
+    classification_scheme_id TEXT NOT NULL,
+    classification_term_id TEXT NOT NULL,
+    assignment_role TEXT NOT NULL CHECK(assignment_role IN (
+      'DIRECT','DERIVED','RELATED','MANUAL','LEGACY_BACKFILL'
+    )),
+    is_primary INTEGER NOT NULL DEFAULT 0 CHECK(is_primary IN (0,1)),
+    confidence REAL CHECK(confidence IS NULL OR confidence BETWEEN 0 AND 1),
+    classifier_version TEXT NOT NULL,
+    evidence_status TEXT NOT NULL CHECK(evidence_status IN (
+      'DIRECT_OFFICIAL','DERIVED_OFFICIAL','DIRECT_STRUCTURED','MEDIA_DIRECT',
+      'MANUAL_REVIEWED','INFERRED','UNVERIFIED'
+    )),
+    source_claim_id TEXT,
+    source_document_version_id TEXT,
+    evidence_locator TEXT,
+    derived_from_assignment_id TEXT REFERENCES record_classifications(record_classification_id) ON DELETE RESTRICT,
+    review_status TEXT NOT NULL DEFAULT 'UNREVIEWED' CHECK(review_status IN (
+      'UNREVIEWED','PENDING','APPROVED','REJECTED','SUPERSEDED'
+    )),
+    valid_from TEXT,
+    valid_to TEXT,
+    assigned_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
+    reviewed_at TEXT,
+    lineage_json TEXT NOT NULL DEFAULT '{}' CHECK(json_valid(lineage_json)),
+    metadata_json TEXT NOT NULL DEFAULT '{}' CHECK(json_valid(metadata_json)),
+    FOREIGN KEY(classification_scheme_id,classification_term_id)
+      REFERENCES classification_terms(classification_scheme_id,classification_term_id) ON DELETE RESTRICT,
+    UNIQUE(target_kind,target_id,classification_scheme_id,classification_term_id,assignment_role,classifier_version),
+    CHECK(valid_to IS NULL OR valid_from IS NULL OR valid_to>=valid_from),
+    CHECK(derived_from_assignment_id IS NULL OR assignment_role IN ('DERIVED','RELATED'))
+) STRICT;
+
+CREATE INDEX ix_classification_terms_parent
+ON classification_terms(classification_scheme_id,parent_term_id,sort_order);
+CREATE INDEX ix_record_classifications_target
+ON record_classifications(target_kind,target_id,review_status);
+CREATE INDEX ix_record_classifications_term_target
+ON record_classifications(classification_scheme_id,classification_term_id,target_kind);
+CREATE INDEX ix_record_classifications_classifier
+ON record_classifications(classifier_version,assignment_role,review_status);
+CREATE INDEX ix_record_classifications_evidence
+ON record_classifications(source_document_version_id,source_claim_id);
+CREATE UNIQUE INDEX ux_record_classifications_primary_current
+ON record_classifications(target_kind,target_id,classification_scheme_id)
+WHERE is_primary=1 AND valid_to IS NULL AND review_status IN ('UNREVIEWED','PENDING','APPROVED');
+
+INSERT INTO classification_schemes(
+  classification_scheme_id,scheme_code,scheme_name_ko,scheme_name_en,description,
+  cardinality_code,is_hierarchical,target_kinds_json,vocabulary_version
+) VALUES
+ ('scheme-market-category','MARKET_CATEGORY','시장 카테고리','Market category','시장 탐색의 상위 카테고리','MULTIPLE',1,'["DOCUMENT","EVENT","ASSET","PROJECT","LP_MANDATE","SALE_PROCESS"]','1.0.0'),
+ ('scheme-document-purpose','DOCUMENT_PURPOSE','문서 목적','Document purpose','문서가 제공하는 정보와 근거의 역할','MULTIPLE',1,'["DOCUMENT","DOCUMENT_VERSION"]','1.0.0'),
+ ('scheme-asset-class','ASSET_CLASS','자산 유형','Asset class','부동산 및 실물자산 유형','MULTIPLE',1,'["ASSET","DOCUMENT","EVENT","PROJECT"]','1.0.0'),
+ ('scheme-organization-type','ORGANIZATION_TYPE','기관 유형','Organization type','기관의 기능 및 법적·시장 역할','MULTIPLE',1,'["ORGANIZATION","DOCUMENT","EVENT"]','1.0.0'),
+ ('scheme-industry','INDUSTRY','산업 분류','Industry','기업 및 사건의 산업 분류','MULTIPLE',1,'["ORGANIZATION","DOCUMENT","EVENT"]','1.0.0'),
+ ('scheme-investment-strategy','INVESTMENT_STRATEGY','투자 전략','Investment strategy','기관자금 및 투자전략','MULTIPLE',1,'["LP_MANDATE","ORGANIZATION","EVENT"]','1.0.0'),
+ ('scheme-geography','GEOGRAPHY','지역 분류','Geography','국가·권역·행정구역 분류','MULTIPLE',1,'["DOCUMENT","EVENT","ASSET","ORGANIZATION","PROJECT","LP_MANDATE","SALE_PROCESS"]','1.0.0'),
+ ('scheme-evidence-grade','EVIDENCE_GRADE','근거 등급','Evidence grade','분류 및 사실의 근거 신뢰도','SINGLE',1,'["DOCUMENT","EVENT","ASSET","ORGANIZATION","PROJECT","LP_MANDATE","SALE_PROCESS","MACRO_SERIES","MACRO_OBSERVATION"]','1.0.0');
+
+INSERT INTO classification_terms(
+  classification_term_id,classification_scheme_id,term_code,term_name_ko,term_name_en,parent_term_id,sort_order,is_assignable
+) VALUES
+ ('term-market-transaction','scheme-market-category','TRANSACTION','거래','Transaction',NULL,10,0),
+ ('term-market-occupancy','scheme-market-category','OCCUPANCY','임대·점유','Occupancy',NULL,20,0),
+ ('term-market-development','scheme-market-category','DEVELOPMENT','개발·공급','Development',NULL,30,0),
+ ('term-market-capital','scheme-market-category','CAPITAL','자본·금융','Capital',NULL,40,0),
+ ('term-market-corporate','scheme-market-category','CORPORATE','기업활동','Corporate',NULL,50,0),
+ ('term-market-sale','scheme-market-category','SALE','매각','Sale','term-market-transaction',11,1),
+ ('term-market-acquisition','scheme-market-category','ACQUISITION','매입','Acquisition','term-market-transaction',12,1),
+ ('term-market-auction','scheme-market-category','AUCTION','경공매','Auction','term-market-transaction',13,1),
+ ('term-market-lease','scheme-market-category','LEASE','임대차','Lease','term-market-occupancy',21,1),
+ ('term-market-relocation','scheme-market-category','RELOCATION','이전','Relocation','term-market-occupancy',22,1),
+ ('term-market-vacancy','scheme-market-category','VACANCY','공실','Vacancy','term-market-occupancy',23,1),
+ ('term-market-supply','scheme-market-category','SUPPLY','공급','Supply','term-market-development',31,1),
+ ('term-market-permit','scheme-market-category','PERMIT','인허가','Permit','term-market-development',32,1),
+ ('term-market-completion','scheme-market-category','COMPLETION','준공','Completion','term-market-development',33,1),
+ ('term-market-pf','scheme-market-category','PF','프로젝트금융','Project finance','term-market-capital',41,1),
+ ('term-market-loan','scheme-market-category','LOAN','대출','Loan','term-market-capital',42,1),
+ ('term-market-equity','scheme-market-category','EQUITY_INVESTMENT','지분투자','Equity investment','term-market-capital',43,1),
+ ('term-market-fundraising','scheme-market-category','FUNDRAISING','자금모집','Fundraising','term-market-capital',44,1),
+ ('term-market-lp-mandate','scheme-market-category','LP_MANDATE','기관출자','LP mandate','term-market-capital',45,1),
+ ('term-market-corporate-action','scheme-market-category','CORPORATE_ACTION','기업행위','Corporate action','term-market-corporate',51,1),
+ ('term-doc-official','scheme-document-purpose','OFFICIAL_SOURCE','공식 원문','Official source',NULL,10,1),
+ ('term-doc-transaction','scheme-document-purpose','TRANSACTION_EVIDENCE','거래 근거','Transaction evidence',NULL,20,1),
+ ('term-doc-company','scheme-document-purpose','COMPANY_EVIDENCE','기업 근거','Company evidence',NULL,30,1),
+ ('term-doc-market','scheme-document-purpose','MARKET_INTELLIGENCE','시장 동향','Market intelligence',NULL,40,1),
+ ('term-doc-procedure','scheme-document-purpose','PROCEDURE_NOTICE','절차 공고','Procedure notice',NULL,50,1),
+ ('term-doc-research','scheme-document-purpose','RESEARCH','연구·분석','Research',NULL,60,1),
+ ('term-strategy-real-estate','scheme-investment-strategy','REAL_ESTATE','부동산','Real estate',NULL,10,1),
+ ('term-strategy-infrastructure','scheme-investment-strategy','INFRASTRUCTURE','인프라','Infrastructure',NULL,20,1),
+ ('term-strategy-private-equity','scheme-investment-strategy','PRIVATE_EQUITY','사모주식','Private equity',NULL,30,1),
+ ('term-strategy-private-debt','scheme-investment-strategy','PRIVATE_DEBT','사모대출','Private debt',NULL,40,1),
+ ('term-strategy-real-assets','scheme-investment-strategy','REAL_ASSETS','실물자산','Real assets',NULL,50,1),
+ ('term-strategy-multi-asset','scheme-investment-strategy','MULTI_ASSET','멀티에셋','Multi asset',NULL,60,1),
+ ('term-strategy-secondaries','scheme-investment-strategy','SECONDARIES','세컨더리','Secondaries',NULL,70,1),
+ ('term-evidence-official-direct','scheme-evidence-grade','OFFICIAL_DIRECT','공식 직접근거','Official direct',NULL,10,1),
+ ('term-evidence-official-derived','scheme-evidence-grade','OFFICIAL_DERIVED','공식 파생근거','Official derived',NULL,20,1),
+ ('term-evidence-media-direct','scheme-evidence-grade','MEDIA_DIRECT','언론 직접근거','Media direct',NULL,30,1),
+ ('term-evidence-inferred','scheme-evidence-grade','INFERRED','추론','Inferred',NULL,40,1),
+ ('term-evidence-unverified','scheme-evidence-grade','UNVERIFIED','미검증','Unverified',NULL,50,1);
+
+CREATE VIEW v_record_classification_summary AS
+SELECT r.target_kind,r.target_id,
+       max(CASE WHEN s.scheme_code='MARKET_CATEGORY' AND r.is_primary=1 THEN t.term_code END) AS primary_market_category_code,
+       max(CASE WHEN s.scheme_code='MARKET_CATEGORY' AND r.is_primary=1 THEN t.term_name_ko END) AS primary_market_category_label,
+       max(CASE WHEN s.scheme_code='DOCUMENT_PURPOSE' AND r.is_primary=1 THEN t.term_code END) AS primary_document_purpose_code,
+       max(CASE WHEN s.scheme_code='DOCUMENT_PURPOSE' AND r.is_primary=1 THEN t.term_name_ko END) AS primary_document_purpose_label,
+       max(CASE WHEN s.scheme_code='ASSET_CLASS' AND r.is_primary=1 THEN t.term_code END) AS primary_asset_class_code,
+       max(CASE WHEN s.scheme_code='ASSET_CLASS' AND r.is_primary=1 THEN t.term_name_ko END) AS primary_asset_class_label,
+       max(CASE WHEN s.scheme_code='ORGANIZATION_TYPE' AND r.is_primary=1 THEN t.term_code END) AS primary_organization_type_code,
+       max(CASE WHEN s.scheme_code='ORGANIZATION_TYPE' AND r.is_primary=1 THEN t.term_name_ko END) AS primary_organization_type_label,
+       max(CASE WHEN s.scheme_code='INVESTMENT_STRATEGY' AND r.is_primary=1 THEN t.term_code END) AS primary_investment_strategy_code,
+       max(CASE WHEN s.scheme_code='EVIDENCE_GRADE' AND r.is_primary=1 THEN t.term_code END) AS primary_evidence_grade_code,
+       count(*) AS classification_count,
+       max(r.assigned_at) AS classifications_updated_at
+FROM record_classifications r
+JOIN classification_schemes s ON s.classification_scheme_id=r.classification_scheme_id
+JOIN classification_terms t ON t.classification_scheme_id=r.classification_scheme_id
+                           AND t.classification_term_id=r.classification_term_id
+WHERE r.review_status NOT IN ('REJECTED','SUPERSEDED')
+  AND (r.valid_from IS NULL OR r.valid_from<=strftime('%Y-%m-%dT%H:%M:%fZ','now'))
+  AND (r.valid_to IS NULL OR r.valid_to>strftime('%Y-%m-%dT%H:%M:%fZ','now'))
+GROUP BY r.target_kind,r.target_id;
+
 INSERT INTO schema_meta(schema_key, schema_value) VALUES
     ('schema_name', 'cre-market-intelligence-sqlite'),
-    ('schema_version', '2.7.0'),
+    ('schema_version', '3.3.0'),
     ('authority_model', 'source-document-to-mention-to-claim-to-event'),
     ('created_for', 'serverless-local-accumulation');
 

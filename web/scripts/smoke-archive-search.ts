@@ -1,0 +1,12 @@
+import fs from "node:fs";
+import postgres from "postgres";
+import { searchMarket, type SqlExecutor } from "../src/lib/server/market-search";
+const env=fs.readFileSync(String.raw`C:\10137_WorkSpace\env\.env.supabase.local`,"utf8");
+const line=env.split(/\r?\n/).find(x=>x.trim().startsWith("SUPABASE_DB_URL="));
+if(!line) throw new Error("missing URL");
+const url=line.split("=",2)[1].trim().replace(/^['"]|['"]$/g,"");
+const sql=postgres(url,{ssl:"require",max:1});
+const execute:SqlExecutor=async(text,values)=>({rows:(await sql.unsafe(text,[...values])) as unknown as Array<{payload:unknown}>});
+const response=await searchMarket(execute,{q:"",kind:"ALL",category:"",classificationScheme:"",from:null,to:null,page:1,pageSize:5,includeTransactionsUnder1000Eok:false});
+console.log(JSON.stringify({total:response.total,facets:response.facets,first:response.results[0]?.kind,archivedOnFirstPage:response.results.filter(x=>x.status==="ARCHIVED_LOCAL").length}));
+await sql.end();

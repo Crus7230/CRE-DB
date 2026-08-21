@@ -1,12 +1,16 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 import re
 import time
 from playwright.sync_api import sync_playwright
 
-BASE = "http://127.0.0.1:3001"
+BASE = os.environ.get("BASE_URL", "http://127.0.0.1:3001").rstrip("/")
+SMOKE_EMAIL = os.environ.get("DASHBOARD_SMOKE_EMAIL", "").strip().lower()
+if not SMOKE_EMAIL:
+    raise RuntimeError("DASHBOARD_SMOKE_EMAIL is required and must already be approved")
 OUT = Path(__file__).resolve().parents[2] / "artifacts" / "dashboard-qa"
 OUT.mkdir(parents=True, exist_ok=True)
 
@@ -15,9 +19,17 @@ def wait_data(page):
     page.wait_for_load_state("networkidle", timeout=30_000)
 
 
+def authenticate(page):
+    page.goto(f"{BASE}/login", wait_until="domcontentloaded", timeout=60_000)
+    page.get_by_label("본인 이메일 주소").fill(SMOKE_EMAIL)
+    page.get_by_role("button", name="대시보드 열기").click()
+    page.wait_for_url(re.compile(r"/$"), timeout=30_000)
+    wait_data(page)
+
+
 def run_desktop(browser):
     page = browser.new_page(viewport={"width": 1440, "height": 1000}, device_scale_factor=1)
-    page.goto(BASE, wait_until="networkidle", timeout=60_000)
+    authenticate(page)
     page.get_by_role("heading", name="시장 카테고리로 찾고, 근거문서로 검증").wait_for()
     assert page.locator(".category-rail").is_visible()
     assert page.get_by_role("region", name="상세 필터").is_visible()
@@ -110,7 +122,7 @@ def run_desktop(browser):
 
 def run_mobile(browser):
     page = browser.new_page(viewport={"width": 390, "height": 844}, device_scale_factor=1)
-    page.goto(BASE, wait_until="networkidle", timeout=60_000)
+    authenticate(page)
     page.get_by_role("heading", name="시장 카테고리로 찾고, 근거문서로 검증").wait_for()
     metrics = page.evaluate("() => ({clientWidth: document.documentElement.clientWidth, scrollWidth: document.documentElement.scrollWidth})")
     page.screenshot(path=OUT / "06-market-mobile.png", full_page=True)

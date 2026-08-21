@@ -125,15 +125,17 @@ WITH target AS (
   FROM market_intelligence.document_versions
   ORDER BY document_id,version_no DESC,document_version_id DESC
 ), canonical_docs AS (
-  SELECT DISTINCT sd.document_id,ld.title,sd.document_type,ld.published_at,sd.publisher_name AS publisher,
-         sd.canonical_url AS href,'CANONICAL_EVENT'::text AS relation_basis
-  FROM market_intelligence.event_participants ep
-  JOIN market_intelligence.event_mention_links eml ON eml.event_id=ep.event_id
-  JOIN market_intelligence.event_mentions em ON em.event_mention_id=eml.event_mention_id
-  JOIN market_intelligence.extraction_runs er ON er.extraction_run_id=em.extraction_run_id
-  JOIN latest_documents ld ON ld.document_version_id=er.document_version_id
-  JOIN market_intelligence.source_documents sd ON sd.document_id=ld.document_id
-  WHERE ep.organization_id=$1
+  SELECT DISTINCT ON (sd.document_id)
+         sd.document_id,dv.title,sd.document_type,dv.published_at,sd.publisher_name AS publisher,
+         sd.canonical_url AS href,r.relation_basis
+  FROM market_intelligence.v_document_entity_relations r
+  JOIN market_intelligence.document_versions dv ON dv.document_version_id=r.document_version_id
+  JOIN market_intelligence.source_documents sd ON sd.document_id=dv.document_id
+  WHERE r.entity_kind='ORGANIZATION' AND r.entity_id=$1
+  ORDER BY sd.document_id,
+    CASE r.relation_basis WHEN 'CANONICAL_EVENT' THEN 1 WHEN 'RESOLVED_MENTION' THEN 2
+         WHEN 'VERIFIED_CLAIM' THEN 3 ELSE 4 END,
+    r.confidence DESC NULLS LAST,dv.version_no DESC
 ), signal_docs AS (
   SELECT sd.document_id,ld.title,sd.document_type,ld.published_at,sd.publisher_name AS publisher,
          sd.canonical_url AS href,'EXACT_NAME_SIGNAL'::text AS relation_basis

@@ -1,3 +1,15 @@
+export type DailyArticleTopic = {
+  key: string;
+  label: string;
+  status: "CONFIRMED" | "CANDIDATE";
+  provenance: "APPROVED_EVENT_MENTION" | "COLLECTION_QUERY";
+};
+
+export type DailyArticleClassification = {
+  code: string;
+  label: string;
+};
+
 export type DailyArticle = {
   id: string;
   title: string;
@@ -5,7 +17,13 @@ export type DailyArticle = {
   publishedAt: string;
   collectedAt: string;
   summary: string | null;
+  summaryMode: "BODY_EXTRACTIVE" | "MODEL" | "NONE";
+  summaryGeneratedAt: string | null;
   href: string | null;
+  /** Server-ranked; the first topic is the representative grouping topic. */
+  topics: DailyArticleTopic[];
+  documentPurpose?: DailyArticleClassification | null;
+  evidenceGrade?: DailyArticleClassification | null;
 };
 
 export type DailyArticlesResponse = {

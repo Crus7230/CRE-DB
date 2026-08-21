@@ -44,7 +44,7 @@ export function DailyArticleWorkspace({
 
   return <section className="daily-workspace domain-workspace">
     <header className="workspace-hero daily-hero">
-      <div><p className="eyebrow">DAILY MARKET ARTICLES</p><h2>매일 확인하는 부동산 시장기사</h2><p>일반 문서 검색과 분리해 게시일 기준 기사를 확인합니다. 원문·수집시각·출처를 함께 표시합니다.</p></div>
+      <div><p className="eyebrow">DAILY MARKET ARTICLES</p><h2>매일 확인하는 부동산 시장기사</h2><p>공개 원문이 확보된 기사는 본문 기반 요약으로 제공합니다. 원문·수집시각·요약 근거를 함께 표시합니다.</p></div>
       <label className="daily-date-control">기사 게시일<input aria-label="기사 게시일" type="date" max={today} value={selectedDate} onChange={(event) => setSelectedDate(event.target.value)}/></label>
     </header>
     <section className="daily-freshness" aria-label="기사 수집 최신성">
@@ -58,10 +58,10 @@ export function DailyArticleWorkspace({
     {!loading && !error && data?.articles.length === 0 && <div className="state-block"><strong>{selectedDate} 게시 기사가 없습니다.</strong><p>DB 최신 게시일은 {data.latestAvailableDate ?? "기록 없음"}입니다.</p></div>}
     {!loading && !error && <div className="daily-article-list">{data?.articles.map((article) => <article key={article.id} className="daily-article-card">
       <button type="button" onClick={() => onOpenArticle(article.id, article.title)}>
-        <div className="projection-meta"><span className="category-badge">시장기사</span><time>{formatDateTime(article.publishedAt)}</time><span>{article.publisher ?? "출처 미상"}</span></div>
+        <div className="projection-meta"><span className="category-badge">시장기사</span><span className={`summary-mode ${article.summaryMode.toLowerCase()}`}>{article.summaryMode === "MODEL" ? "생성 요약" : article.summaryMode === "BODY_EXTRACTIVE" ? "본문 요약" : "요약 없음"}</span><time>{formatDateTime(article.publishedAt)}</time><span>{article.publisher ?? "출처 미상"}</span></div>
         <h3>{article.title}</h3>
-        {article.summary && <p>{article.summary}</p>}
-        <small>수집 {formatDateTime(article.collectedAt)}</small>
+        {article.summary ? <p>{article.summary}</p> : <p className="empty-copy">공개 본문을 확보하지 못해 제목 외 요약을 표시하지 않습니다.</p>}
+        <small>수집 {formatDateTime(article.collectedAt)}{article.summaryGeneratedAt ? ` · 요약 ${formatDateTime(article.summaryGeneratedAt)}` : ""}</small>
       </button>
       {article.href && <a className="source-link" href={article.href} target="_blank" rel="noreferrer">원문</a>}
     </article>)}</div>}

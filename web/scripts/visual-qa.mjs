@@ -4,6 +4,8 @@ import path from "node:path";
 
 const outDir = path.resolve("../artifacts");
 const baseUrl = process.env.BASE_URL ?? "http://127.0.0.1:3001";
+const smokeEmail = process.env.DASHBOARD_SMOKE_EMAIL?.trim().toLowerCase();
+if (!smokeEmail) throw new Error("DASHBOARD_SMOKE_EMAIL is required and must already be approved");
 await fs.mkdir(outDir, { recursive: true });
 
 const browser = await chromium.launch({ headless: true });
@@ -12,6 +14,13 @@ const report = { baseUrl, desktop: {}, mobile: {}, consoleErrors: [], pageErrors
 function attachDiagnostics(page) {
   page.on("console", (message) => message.type() === "error" && report.consoleErrors.push(message.text()));
   page.on("pageerror", (error) => report.pageErrors.push(error.message));
+}
+
+async function authenticate(page) {
+  await page.goto(`${baseUrl}/login`, { waitUntil: "domcontentloaded" });
+  await page.getByLabel("본인 이메일 주소").fill(smokeEmail);
+  await page.getByRole("button", { name: "대시보드 열기" }).click();
+  await page.waitForURL((url) => url.pathname === "/", { timeout: 30000 });
 }
 
 async function waitForSearch(page) {
@@ -34,7 +43,7 @@ async function openIndexedCategory(page, groupName, key) {
 
 const desktop = await browser.newPage({ viewport: { width: 1536, height: 960 }, deviceScaleFactor: 1 });
 attachDiagnostics(desktop);
-await desktop.goto(baseUrl, { waitUntil: "domcontentloaded" });
+await authenticate(desktop);
 await waitForSearch(desktop);
 await openIndex(desktop);
 await desktop.screenshot({ path: path.join(outDir, "market-explorer-index-desktop.png"), fullPage: false });
@@ -60,7 +69,7 @@ await desktop.screenshot({ path: path.join(outDir, "market-explorer-detail-deskt
 
 const mobile = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1 });
 attachDiagnostics(mobile);
-await mobile.goto(baseUrl, { waitUntil: "domcontentloaded" });
+await authenticate(mobile);
 await waitForSearch(mobile);
 await openIndex(mobile);
 await mobile.screenshot({ path: path.join(outDir, "market-explorer-index-mobile.png"), fullPage: false });

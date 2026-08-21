@@ -1,5 +1,7 @@
-const base = "http://127.0.0.1:3001";
-async function get(path) { const r = await fetch(base + path); const x = await r.json(); if (!r.ok) throw new Error(`${path} ${r.status} ${JSON.stringify(x)}`); return x; }
+import { createAuthenticatedGet } from "./authenticated-get.mjs";
+
+const base = process.env.BASE_URL ?? "http://127.0.0.1:3001";
+const get = await createAuthenticatedGet(base);
 const high = await get("/api/search?kind=DOCUMENT&category=API_RECORD&page=1&pageSize=50&includeTransactionsUnder1000Eok=false");
 const all = await get("/api/search?kind=DOCUMENT&category=API_RECORD&page=1&pageSize=50&includeTransactionsUnder1000Eok=true");
 const amounts = high.results.map((item) => Number(String(item.metadata.apiRecord.dealAmount).replaceAll(",", "")));

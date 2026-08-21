@@ -3,6 +3,7 @@ import "server-only";
 import fs from "node:fs";
 import postgres from "postgres";
 import type { SqlExecutor } from "@/lib/server/market-search";
+import type { AuthSqlExecutor } from "@/lib/server/email-allowlist";
 
 const DEFAULT_AUTHORITY = String.raw`C:\10137_WorkSpace\env\.env.supabase.local`;
 
@@ -43,4 +44,12 @@ export const executeMarketSql: SqlExecutor = async (text, values) => {
     return transaction.unsafe(text, [...values]);
   });
   return { rows: rows as unknown as Array<{ payload: unknown }> };
+};
+
+export const executeAuthSql: AuthSqlExecutor = async (text, values) => {
+  const rows = await client().begin("read only", async (transaction) => {
+    await transaction.unsafe("SET LOCAL statement_timeout = 5000");
+    return transaction.unsafe(text, [...values]);
+  });
+  return { rows: rows as unknown as Array<Record<string, unknown>> };
 };

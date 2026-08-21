@@ -43,7 +43,7 @@ export type RelatedDocument = {
   publishedAt: string | null;
   publisher: string | null;
   href: string | null;
-  relationBasis: "CANONICAL_EVENT" | "EXACT_NAME_SIGNAL" | "SOURCE_CLAIM";
+  relationBasis: "CANONICAL_EVENT" | "RESOLVED_MENTION" | "VERIFIED_CLAIM" | "EXACT_NAME_SIGNAL" | "SOURCE_CLAIM";
 };
 
 export type CompanyDetailResponse = {
