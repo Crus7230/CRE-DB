@@ -8,6 +8,28 @@ export type CompanyListRequest = {
   limit: number;
 };
 
+export type LocationEvidenceType = "RELOCATION" | "STAY" | "NEW_LEASE" | "EXPANSION";
+export type LocationWordingStage = "CONFIRMED_WORDING" | "IN_PROGRESS_WORDING" | "EXPLORING_WORDING" | "REVIEW_REQUIRED";
+
+export type LocationEvidence = {
+  documentId: string;
+  evidenceType: LocationEvidenceType;
+  wordingStage: LocationWordingStage;
+  evidenceLabel: string;
+  title: string;
+  matchedPhrase: string | null;
+  evidenceExcerpt: string | null;
+  evidenceReason: string;
+  sourceCategory: "LEASE" | "CORPORATE_RELOCATION";
+  classificationBasis: "MANAGED_TAXONOMY" | "LEGACY_DISCOVERY";
+  classificationReviewStatus: string | null;
+  publishedAt: string | null;
+  publisher: string | null;
+  href: string | null;
+  mentionStatus: string | null;
+  confidence: number | null;
+};
+
 export type CompanyListItem = {
   organizationId: string;
   name: string;
@@ -19,7 +41,9 @@ export type CompanyListItem = {
   confirmedOccupancyCount: number;
   canonicalEventCount: number;
   relatedAssetCount: number;
-  leaseDocumentSignalCount: number;
+  locationEvidenceDocumentCount: number;
+  locationEvidencePublisherCount: number;
+  primaryLocationEvidence: LocationEvidence | null;
 };
 
 export type CompanyListResponse = {
@@ -29,11 +53,12 @@ export type CompanyListResponse = {
   industries: Array<{ name: string; count: number }>;
   coverage: {
     verifiedOccupancies: number;
-    companiesWithLeaseDocumentSignals: number;
+    companiesWithLocationEvidence: number;
+    managedLocationDocuments: number;
     signalNote: string;
   };
   generatedAt: string;
-  database: "supabase-postgresql";
+  database: "turso-libsql";
 };
 
 export type RelatedDocument = {
@@ -43,7 +68,72 @@ export type RelatedDocument = {
   publishedAt: string | null;
   publisher: string | null;
   href: string | null;
-  relationBasis: "CANONICAL_EVENT" | "RESOLVED_MENTION" | "VERIFIED_CLAIM" | "EXACT_NAME_SIGNAL" | "SOURCE_CLAIM";
+  relationBasis:
+    | "CANONICAL_EVENT"
+    | "RESOLVED_MENTION"
+    | "VERIFIED_CLAIM"
+    | "EXACT_NAME_SIGNAL"
+    | "SOURCE_CLAIM"
+    | "OFFICIAL_SELECTION_EVIDENCE";
+};
+
+export type InstitutionalAssessmentVerdict =
+  | "OFFICIAL_SELECTION"
+  | "INFERRED_SELECTION"
+  | "BID_PARTICIPATION"
+  | "REVIEW_REQUIRED";
+
+export type InstitutionalAssessmentStepCode =
+  | "LP_SOURCE"
+  | "TRACK_MATCH"
+  | "FOLLOW_UP_ACTION"
+  | "DEPLOYMENT_MATCH"
+  | "MANAGER_MATCH"
+  | "DECISION";
+
+export type InstitutionalAssessmentStepStatus =
+  | "CONFIRMED"
+  | "SUPPORTED"
+  | "MISSING"
+  | "CONFLICT";
+
+export type InstitutionalEvidenceRole =
+  | "MANDATE_SOURCE"
+  | "OFFICIAL_RESULT"
+  | "REPORTED_SELECTION"
+  | "BID_EVIDENCE"
+  | "DEPLOYMENT_EVIDENCE";
+
+export type InstitutionalAssessmentEvidence = RelatedDocument & {
+  role: InstitutionalEvidenceRole;
+  roleLabel: string;
+};
+
+export type InstitutionalAssessmentStep = {
+  code: InstitutionalAssessmentStepCode;
+  label: string;
+  status: InstitutionalAssessmentStepStatus;
+  detail: string;
+  evidenceDocumentIds: string[];
+};
+
+export type InstitutionalSelectionAssessment = {
+  assessmentId: string;
+  managerOrganizationId: string | null;
+  managerName: string;
+  trackCode: string | null;
+  trackName: string | null;
+  verdict: InstitutionalAssessmentVerdict;
+  verdictLabel: string;
+  confidence: number | null;
+  confidenceBand: "HIGH" | "MEDIUM" | "LOW" | "NOT_APPLICABLE";
+  rationale: string;
+  actionLabel: string;
+  reportedAllocation: string | null;
+  allocationCurrency: string | null;
+  steps: InstitutionalAssessmentStep[];
+  evidence: InstitutionalAssessmentEvidence[];
+  missingChecks: string[];
 };
 
 export type CompanyDetailResponse = {
@@ -56,13 +146,14 @@ export type CompanyDetailResponse = {
     marketCap: string | null;
     overallRank: number | null;
   };
-  counts: { events: number; assets: number; documents: number; occupancies: number };
+  counts: { events: number; assets: number; documents: number; occupancies: number; locationEvidence: number };
   events: Array<Record<string, string | number | null>>;
   assets: Array<Record<string, string | number | null>>;
   documents: RelatedDocument[];
   occupancies: Array<Record<string, string | number | null>>;
+  locationEvidence: LocationEvidence[];
   generatedAt: string;
-  database: "supabase-postgresql";
+  database: "turso-libsql";
 };
 
 export type InstitutionalCapitalItem = {
@@ -79,17 +170,32 @@ export type InstitutionalCapitalItem = {
   amountCount: number;
   guidelineCount: number;
   deploymentCount: number;
+  officialSelectionCount: number;
+  inferredSelectionCount: number;
+  bidParticipationCount: number;
+  reviewRequiredCount: number;
   tracks: Array<Record<string, unknown>>;
   amounts: Array<Record<string, unknown>>;
   selections: Array<Record<string, unknown>>;
+  deployments: Array<Record<string, unknown>>;
+  assessments: InstitutionalSelectionAssessment[];
   documents: RelatedDocument[];
 };
 
 export type InstitutionalCapitalResponse = {
   items: InstitutionalCapitalItem[];
-  coverage: { mandates: number; selections: number; amounts: number; deployments: number };
+  coverage: {
+    mandates: number;
+    selections: number;
+    amounts: number;
+    deployments: number;
+    officialSelections: number;
+    inferredSelections: number;
+    bidParticipations: number;
+    reviewRequired: number;
+  };
   generatedAt: string;
-  database: "supabase-postgresql";
+  database: "turso-libsql";
 };
 
 export type SaleProcessItem = {
@@ -108,11 +214,45 @@ export type SaleProcessItem = {
   documents: RelatedDocument[];
 };
 
+export type SaleProcessResearchCandidate = {
+  candidateId: string;
+  processCode: string;
+  title: string;
+  assetType: string;
+  method: string;
+  status: string;
+  stageCode: string;
+  evidenceGrade: string;
+  confidence: number;
+  roles: Record<string, unknown>;
+  rounds: Array<Record<string, unknown>>;
+  milestones: Array<Record<string, unknown>>;
+  amounts: Array<Record<string, unknown>>;
+  financing: Array<Record<string, unknown>>;
+  sources: Array<{ date: string | null; url: string; span: string | null }>;
+};
+
 export type SaleProcessResponse = {
   items: SaleProcessItem[];
-  coverage: { processes: number; rounds: number; bidders: number; submissions: number; decisions: number; fundingComponents: number; milestones: number };
+  candidateProcesses: SaleProcessResearchCandidate[];
+  coverage: {
+    processes: number;
+    rounds: number;
+    bidders: number;
+    submissions: number;
+    decisions: number;
+    fundingComponents: number;
+    milestones: number;
+    signalYear: number;
+    candidateCutoffDate: string;
+    currentYearProcesses: number;
+    currentYearCandidateProcesses: number;
+    currentYearArticleSignals: number;
+    currentYearPriorityArticleSignals: number;
+    currentYearResolvedStageArticleSignals: number;
+  };
   generatedAt: string;
-  database: "supabase-postgresql";
+  database: "turso-libsql";
 };
 
 const companyViewSet = new Set<string>(companyViews);

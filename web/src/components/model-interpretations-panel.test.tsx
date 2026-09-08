@@ -1,0 +1,9 @@
+import { afterEach,describe,expect,it,vi } from "vitest";
+import { fireEvent,render,screen } from "@testing-library/react";
+import { ModelInterpretationsPanel } from "@/components/model-interpretations-panel";
+const p={modelVersion:"M1",embeddingVersion:"E1",promptVersion:"P1",promptHash:"a".repeat(64)};
+afterEach(()=>vi.unstubAllGlobals());
+describe("ModelInterpretationsPanel",()=>{
+ it("states that no model is configured",async()=>{vi.stubGlobal("fetch",vi.fn().mockResolvedValue({ok:true,json:async()=>({generatedAt:"2026",models:[],statusCounts:[],interpretations:[]})})); render(<ModelInterpretationsPanel onOpenDocument={()=>{}}/>); expect(await screen.findByText("모델 해석 미구성")).toBeInTheDocument();});
+ it("separates approved and drafts, displays provenance, and opens evidence",async()=>{const open=vi.fn(); const base={signalId:"s1",narrative:"n",generatedAt:"2026",inputHash:"b".repeat(64),outputHash:"c".repeat(64),model:{modelRegistryId:"m1",providerCode:"P",modelName:"M",statusCode:"ENABLED",...p},evidence:[{targetKind:"DOCUMENT",targetId:"d1",documentId:"d1",documentVersionId:"v1",title:"원문 A",sourceName:"Source A",publishedAt:"2026",canonicalUrl:"https://example.com"}]}; vi.stubGlobal("fetch",vi.fn().mockResolvedValue({ok:true,json:async()=>({generatedAt:"2026",models:[{modelRegistryId:"m1",providerCode:"P",modelName:"M",statusCode:"ENABLED",...p}],statusCounts:[],interpretations:[{...base,interpretationId:"i1",status:"APPROVED",headline:"승인 해석"},{...base,interpretationId:"i2",status:"DRAFT",headline:"초안 해석"}]})})); render(<ModelInterpretationsPanel onOpenDocument={open}/>); expect(await screen.findByText("승인된 모델 해석")).toBeInTheDocument(); expect(screen.getByText("검토 필요 모델 해석")).toBeInTheDocument(); expect(screen.getAllByText("M1 · E1 · P1").length).toBeGreaterThan(0); fireEvent.click(screen.getAllByRole("button",{name:/원문 A/})[0]); expect(open).toHaveBeenCalledWith("d1","원문 A");});
+});

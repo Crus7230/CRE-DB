@@ -8,10 +8,11 @@ STEM = "manager-by-manager-institutional-lp-fund-report-20260816"
 
 
 def test_manager_chapter_report_reconciles_programs_and_preserves_amount_semantics():
-    subprocess.run(
+    run = subprocess.run(
         [sys.executable, str(ROOT / "scripts" / "report_manager_lp_fund_chapters.py")],
-        cwd=ROOT, check=True, capture_output=True, text=True,
+        cwd=ROOT, check=False, capture_output=True, text=True,
     )
+    assert run.returncode == 0, run.stdout + run.stderr
     payload = json.loads((ROOT / "artifacts" / f"{STEM}.json").read_text(encoding="utf-8"))
     assert payload["manager_count"] == 8
     managers = {x["manager_name"]: x for x in payload["chapters"]}

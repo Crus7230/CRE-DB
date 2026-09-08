@@ -79,10 +79,12 @@ def official_program_sources(manifest):
 
 
 def main():
-    subprocess.run(
+    report_run = subprocess.run(
         [sys.executable, str(ROOT / "scripts" / "report_institutional_manager_capital.py")],
-        cwd=ROOT, check=True, capture_output=True, text=True,
+        cwd=ROOT, check=False, capture_output=True, text=True,
     )
+    if report_run.returncode:
+        raise RuntimeError(report_run.stdout + report_run.stderr)
     base_path = ROOT / "artifacts" / f"{BASE_STEM}.json"
     base = json.loads(base_path.read_text(encoding="utf-8"))
     manifests = manifest_index()

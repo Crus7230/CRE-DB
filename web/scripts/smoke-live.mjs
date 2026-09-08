@@ -28,6 +28,9 @@ const company = await get(`/api/companies/${encodeURIComponent(companies.items[0
 const tenantSignals = await get("/api/companies?view=TENANT_SIGNALS&industry=&q=&limit=5");
 const capital = await get("/api/institutional-capital");
 const sales = await get("/api/sale-processes");
+const keywords=await get("/api/operations/keywords");
+const insights=await get("/api/operations/insights");
+const modelInterpretations=await get("/api/operations/model-interpretations");
 
 const report = {
   database: companies.database,
@@ -50,6 +53,7 @@ const report = {
   },
   institutionalCapital: capital.coverage,
   saleProcesses: sales.coverage,
+  analytics:{keywords:keywords.items?.length??0,insights:insights.items?.length??0,modelInterpretations:modelInterpretations.items?.length??0},
 };
 if (report.indexGroups < 3 || report.julyDocuments < 1 || capital.items.length < 1 || sales.items.length < 1) throw new Error(`coverage assertion failed: ${JSON.stringify(report)}`);
 console.log(JSON.stringify(report, null, 2));

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseSearchParams } from "@/lib/search-contract";
+import { hasInvalidSearchDateRange, koreanIsoDate, parseSearchParams } from "@/lib/search-contract";
 
 describe("parseSearchParams", () => {
   it("normalizes a valid market search request", () => {
@@ -57,5 +57,15 @@ describe("parseSearchParams", () => {
       classificationScheme: "MARKET_CATEGORY",
     }));
     expect(parsed.classificationScheme).toBe("MARKET_CATEGORY");
+  });
+
+  it("detects an inverted date range without rejecting open-ended ranges", () => {
+    expect(hasInvalidSearchDateRange("2026-08-25", "2026-01-01")).toBe(true);
+    expect(hasInvalidSearchDateRange("2026-01-01", "2026-08-25")).toBe(false);
+    expect(hasInvalidSearchDateRange("2026-01-01", "")).toBe(false);
+  });
+
+  it("formats the current day in Korea for the YTD shortcut", () => {
+    expect(koreanIsoDate(new Date("2025-12-31T15:30:00Z"))).toBe("2026-01-01");
   });
 });

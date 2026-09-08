@@ -1,128 +1,175 @@
-# Supabase main / SQLite sub 운영계약
+# Local full archive / Supabase active serving 운영계약
 
 ## 1. 역할
 
 | 계층 | 위치 | 역할 | 평시 write |
 |---|---|---|---|
-| Main | Supabase PostgreSQL `market_intelligence` | 권위 원장, canonical·raw·claim·review·relationship ledger | 허용 |
-| Sub | `data/market.db` | main에서 만든 검증 snapshot, 로컬 조회·분석·복구 후보 | 금지 |
-| Backup | `backups/*.db` | SQLite backup API 시점 보존본 | 금지 |
+| Full archive | `data/market.db` | 전체 이력·원문·비활성 상세·lineage의 로컬 권위 저장소 | 검증된 merge만 허용 |
+| Immutable snapshot | `backups/archive-snapshots/*.db` | retire 전 복원 기준, SHA-256 고정본 | 금지 |
+| Active serving | Supabase `market_intelligence` | 웹앱용 active 상세와 compact historical index | 수집·review·serving write 허용 |
+| Compact history | `archived_serving_index` | 비활성 항목의 검색용 최소 metadata와 archive locator | archive staging에서만 허용 |
 
-`data/market.db`가 최신 main보다 앞서거나 다른 값을 가진 경우 그 차이는 자동 승격하지 않는다. main을 기준으로 sub를 다시 만든다.
+Supabase를 전체 이력 원장으로 간주하지 않는다. 비활성 상세를 Supabase에서 retire하더라도 로컬 full archive와 immutable snapshot에는 남아야 한다.
 
-## 2. 자격증명
+## 2. Active 정책
+
+기간 cutoff는 사용하지 않는다. 상태를 기준으로 한다.
+
+- 문서: `CRE_REVIEW` 및 active 관계 closure
+- 이벤트: `ACTIVE`
+- 기관자금 mandate: `DISCOVERED`, `TRACKING`, `REVIEW`, `OPEN`, `ACTIVE`, `ALLOCATED`, `SELECTED`
+- 매각절차: `DISCOVERED`, `TRACKING`, `REVIEW`, `OPEN`, `ACTIVE`, `MARKETING`, `BIDDING`, `PREFERRED_BIDDER`, `DUE_DILIGENCE`, `CONTRACTED`
+- 수집: active job별 최신 run과 진행 중 run
+- review: `PENDING`, `IN_PROGRESS`
+
+canonical dependency 또는 열린 review가 있는 상세 row는 leaf retire 대상으로 보지 않는다.
+
+## 3. 자격증명
 
 - 중앙 파일: `C:\10137_WorkSpace\env\.env.supabase.local`
 - 필수 변수: `SUPABASE_DB_URL`, `SUPABASE_DB_SCHEMA`
-- `SUPABASE_DB_URL`은 Session pooler URI를 사용한다.
-- 비밀번호·URL·secret key를 프로젝트, artifact, 로그, Git에 복사하지 않는다.
+- secret을 프로젝트·artifact·로그·Git에 복사하지 않는다.
 
-연결 확인:
+## 4. Full archive 갱신
 
-```bash
-uv run --with 'psycopg[binary]' python scripts/probe_supabase_postgres.py
-```
-
-## 3. 초기 이관
+Supabase active row를 기존 full archive에 **삭제 없이 upsert**한다.
 
 ```bash
-python scripts/migrate_sqlite_to_supabase.py dry-run
-uv run --with 'psycopg[binary]' python scripts/migrate_sqlite_to_supabase.py migrate
+uv run --with 'psycopg[binary]' python scripts/merge_supabase_active_into_full_archive.py --activate
 ```
 
-안전장치:
+검증 조건:
 
-1. live SQLite는 직접 전송하지 않고 backup API snapshot을 만든다.
-2. target schema가 존재하면 기본적으로 중단한다.
-3. `--replace`는 불완전 schema를 검토하고 재생성할 때만 사용한다.
-4. PostgreSQL `public` schema와 기존 Supabase 객체는 수정하지 않는다.
-5. FTS5 내부 table은 복사하지 않고 PostgreSQL 검색 view로 재구성한다.
-6. 완료 artifact: `artifacts/supabase-initial-migration-result.json`
-
-base-table COPY가 모두 커밋된 뒤 constraint/view 단계만 실패했다면 원본 snapshot과 target row count를 먼저 대조하고 다음으로 재개한다.
-
-```bash
-uv run --with 'psycopg[binary]' python scripts/migrate_sqlite_to_supabase.py finalize
-```
-
-`finalize`는 table별 row count가 다르면 중단하며 재전송을 임의로 진행하지 않는다.
-
-## 4. Local sub 갱신
-
-후보 생성만 수행:
-
-```bash
-uv run --with 'psycopg[binary]' python scripts/refresh_sqlite_sub_from_supabase.py
-```
-
-후보는 `data/market.sub.candidate.db`에 생성된다. 다음 검증이 모두 통과해야 한다.
-
-- PostgreSQL/SQLite table별 row count 일치
+- application table coverage 일치
+- 모든 table에 PK 존재
+- 기존 table row count 감소 없음
 - `PRAGMA integrity_check = ok`
 - `PRAGMA foreign_key_check = 0`
-- SQLite trigger·view·FTS 재구성
+- trigger와 FTS 재구성
+- 활성화 직전 기존 `market.db` backup 생성
 
-검증 후 원자 교체까지 수행:
+`refresh_sqlite_sub_from_supabase.py`는 전환 전 legacy 도구다. current validated archive snapshot이 존재하면 hard guard로 중단한다. 이 도구를 강제로 재사용하면 archive-only row가 소실될 수 있다.
+
+## 5. Retire 절차
+
+1. SQLite backup API로 full archive 후보 생성
+2. table coverage·row count·integrity·FK 검증
+3. SHA-256 계산
+4. `archive_snapshots`에 `VALIDATED` current snapshot 등록
+5. compact index dry-run 및 row 수 검토
+6. `archived_serving_index` staging
+7. search/index가 archive row를 읽고 live detail 호출을 차단하는지 실제 PostgreSQL smoke test
+8. in-flight collector가 없는지 확인
+9. 명시 승인 후 transaction retire
+10. read-back, `VACUUM FULL ANALYZE`, API regression test
+
+## 6. 검색 계약
+
+- compact row는 current + validated snapshot에 연결돼야 한다.
+- 같은 `record_kind/record_id`가 index에 있으면 compact index가 검색 결과를 승계한다.
+- `MACRO_OBSERVATION`은 현재 통합검색 계약에서 제외한다.
+- archived 결과는 `ARCHIVED_LOCAL`이며 live typed detail API를 호출하지 않는다.
+- drawer에는 원래 상태, 출처, 날짜, 요약, archive locator, snapshot SHA-256을 표시한다.
+
+## 7. 복원
+
+- 기준 snapshot ID와 SHA-256을 먼저 대조한다.
+- snapshot을 working copy로 복원하고 integrity/FK를 재검사한다.
+- archived locator의 table/PK가 실제 row를 가리키는지 확인한다.
+- 필요한 상세만 Supabase active schema에 재수화하고 전체 archive를 덮어쓰지 않는다.
+
+## 8. 금지사항
+
+- Supabase active subset으로 `market.db` 전체 교체
+- current validated snapshot 없이 hard delete
+- 기간만으로 active 여부 판정
+- canonical dependency·열린 review가 있는 row의 leaf 삭제
+- compact metadata를 기존 상세 계약인 것처럼 반환
+- checksum·row count 검증 없이 archive 완료 선언
+
+## 9. Analytics 3.5.0 적용
+
+대상 migration은 `3.4.0_keyword_analytics.sql` → `3.4.1_insight_signals.sql` → `3.5.0_model_interpretations.sql` 순서다. migration과 Local 90일 serving sync는 하나의 PostgreSQL transaction에서 실행한다.
+
+승인 전 rollback rehearsal:
 
 ```bash
-uv run --with 'psycopg[binary]' python scripts/refresh_sqlite_sub_from_supabase.py --activate
+uv run --with 'psycopg[binary]' python scripts/apply_analytics_v350_supabase.py \
+  --report artifacts/analytics-v350-supabase-rehearsal.json
 ```
 
-활성화 직전 기존 `data/market.db`는 SQLite backup API로 `backups/market-pre-sub-activation-*.db`에 보존한다. 결과는 `artifacts/supabase-to-sqlite-replica-result.json`에 기록한다.
+통과 조건:
 
-## 5. Write·충돌 정책
+- transaction 내부 schema `3.5.0`
+- rollback 후 persisted schema가 적용 전 version과 동일
+- staged row와 transaction 내부 target row 수 일치
+- credential·connection string을 report/log에 기록하지 않음
+- Local authority는 read-only 유지
 
-- 정상 write: Supabase main만 허용한다.
-- SQLite sub write: 자동 병합하지 않는다.
-- 동일 PK 충돌: Supabase main 우선.
-- correction: 기존 append-only 원문·version을 덮지 않고 main에서 새 version/revision을 만든다.
-- 삭제: 일반 hard delete를 sync 신호로 사용하지 않는다. lifecycle/status 또는 명시적 tombstone 정책을 사용한다.
-- SQLite에서 발견된 긴급 수정은 근거와 변경 내용을 별도 review task로 만들고 main에서 다시 적용한다.
-- legacy SQLite collector는 PostgreSQL writer adapter 적용 전 운영 경로에서 중지한다. 테스트 시에는 복제본/staging DB만 사용한다.
+**사용자 명시 승인 후에만** 적용한다.
 
-## 6. Watermark·감사
-
-전체 snapshot 방식의 watermark는 다음 3개를 함께 기록한다.
-
-1. main refresh 시작·완료 UTC
-2. table별 row count
-3. 생성 SQLite SHA-256
-
-증분 sync를 도입하기 전에는 `updated_at`만으로 삭제·정정을 추론하지 않는다. 증분 전환 시 revision sequence와 tombstone table을 먼저 추가한다.
-
-## 7. 장애·fallback
-
-### Supabase 일시 장애
-
-- SQLite sub를 read-only 조회에 사용한다.
-- 운영 수집 write는 큐잉하거나 중지한다.
-- SQLite를 자동 승격하지 않는다.
-
-### 명시적 SQLite 비상 승격
-
-다음 조건을 모두 충족해야 한다.
-
-1. 사용자 승인
-2. 승격 시각과 Supabase 마지막 성공 watermark 기록
-3. SQLite 별도 working copy 생성
-4. 복구 후 양쪽 diff·충돌 검토
-5. main 재적재 및 검증 후 SQLite를 다시 sub로 재생성
-
-### 이관 실패
-
-- PostgreSQL schema를 main으로 선언하지 않는다.
-- 기존 SQLite와 pre-migration backup을 보존한다.
-- 실패 schema를 inventory한 뒤에만 `--replace`로 재실행한다.
-
-## 8. 완료 기준
-
-```text
-PostgreSQL 인증·CREATE 권한 확인
-+ base table·row count 일치
-+ PK·unique·CHECK·FK 검증
-+ view·trigger·FTS 생성
-+ 대표 raw/version/review/relationship/LP 표본 대조
-+ Supabase read/write smoke test
-+ Supabase→SQLite candidate 재생성 및 무결성 확인
-+ 기존 SQLite 전용 운영 writer 차단 또는 adapter 전환
+```bash
+uv run --with 'psycopg[binary]' python scripts/apply_analytics_v350_supabase.py \
+  --apply --report artifacts/analytics-v350-supabase-apply.json
 ```
+
+적용 후 schema version·row count·index·Web authenticated API를 read-back한다. 그 다음에만 Vercel production을 배포하고 desktop/mobile smoke를 수행한다. 일일 Supabase sync marker는 production smoke 완료 후 별도 활성화한다.
+
+## 10. Analytics rollback
+
+migration은 additive이므로 Web 장애 시 우선 Vercel을 직전 deployment로 rollback하고 Supabase sync marker를 비활성화한다. 기존 3.3.0 Web은 신규 analytics table을 참조하지 않아 3.5.0 schema와 공존할 수 있다.
+
+- apply transaction 실패: script가 전체 rollback하므로 별도 schema 조작 금지
+- apply 성공 후 Web 장애: Vercel만 rollback하고 3.5.0 table은 보존
+- analytics 데이터 오류: sync 중단 후 Local backup·rehearsal report와 비교; raw/canonical table은 수정하지 않음
+- 신규 table drop 또는 schema version downgrade: 별도 snapshot과 사용자 승인 없이는 금지
+- 재적용: Local authority 검증 후 `--sync-only --apply` 사용
+
+## 11. 2026-08-31 운영 연결 정리
+
+이 절은 기존 스키마 3.5.0의 **일상 데이터 갱신** 계약이다. 신규 schema migration이나 Web/APK 배포를 수행하지 않는다.
+
+### 실제 실행 경로
+
+- 기사 수집: 기존 Hermes 예약(09:15·15:15·21:15 KST)을 유지한다.
+- 설치 위치의 `daily_cre_articles.py`는 `operations/hermes/daily_cre_articles_entrypoint.py`와 같은 작은 진입 스크립트다. 실제 로직은 저장소의 `operations/hermes/daily_cre_articles.py`에서만 관리한다. 변경 전 설치본은 `daily_cre_articles.pre-canonical-20260831.py.bak`으로 보존했다.
+- 기사 처리 순서: 수집 → 본문 보강 → CRE 범위판정·검토용 분류. 본문 일부 추출 실패가 분류를 막지 않으며 최종 로그에는 `PARTIAL`과 실패 건수를 남긴다. 수집/분류 프로세스 실패는 nonzero 종료한다.
+- 분석: 기존 Windows `\CRE DB\Daily Analytics Refresh`(매일 06:30 KST)의 VBS·CMD 경로를 유지한다. CMD는 `uv`의 psycopg 실행환경으로 `run_market_refresh_pipeline.py --apply --allow-live-db --sync-if-enabled`를 실행한다.
+
+### 분석 파이프라인
+
+1. 기존 `market.db.analytics.lock`을 전체 단계 동안 보유한다.
+2. Supabase의 읽기 전용 Repeatable Read 스냅샷을 기존 전체이력의 별도 후보 DB에 upsert한다. archive-only 행과 로컬 분석 10개 테이블은 보존한다.
+3. 양쪽 스키마 3.5.0, 테이블 구성, 원문 행 수, 수집 시점을 검증한다. RSS 자료가 36시간보다 오래됐거나 후보가 원본 스냅샷보다 뒤처지면 중단한다.
+4. 최신 후보에서 키워드·근거 신호를 계산한다. KST 실행일 기준 90일 창을 사용하며 기존 키워드 알고리즘의 UTC 일별 bucket 의미는 유지한다.
+5. SQLite integrity/FK 및 WAL checkpoint를 확인하고, PostgreSQL 전송을 먼저 rollback rehearsal한다.
+6. 교체 전 원본을 백업하고 검증된 후보를 활성화한다.
+7. `--sync-only`로 분석 테이블만 전송한다. 보안/스키마 DDL은 실행하지 않는다. PostgreSQL transaction advisory lock, 대상 PK·기간별 건수·근거 연결 검증을 거쳐 commit하고 최신 분석 실행기록을 다시 읽는다.
+
+사전 검증(운영 DB commit·원본 교체 없음):
+
+```powershell
+uv run --with 'psycopg[binary]' python scripts/run_market_refresh_pipeline.py --sync --report artifacts/market-refresh-rehearsal.json
+```
+
+승인된 일회성 갱신:
+
+```powershell
+uv run --with 'psycopg[binary]' python scripts/run_market_refresh_pipeline.py --apply --allow-live-db --sync --report artifacts/market-refresh-apply.json
+```
+
+운영 API 확인 후 `data/.supabase-analytics-sync-enabled`로 일일 전송을 활성화한다. 이 파일이 없으면 `LOCAL_ONLY_SYNC_DISABLED`로 기록하며 예약 실행은 종료코드 78을 반환한다. 로컬 분석만 성공한 상태를 전체 갱신 성공으로 표시하지 않는다.
+
+### 결과와 복구
+
+- 단계별 실행 로그: `logs/market-refresh-pipeline.jsonl`
+- 예약 실행 최신 보고서: `artifacts/market-refresh-latest.json`
+- `COMPLETED`: 최신자료 병합·분석·전송 검증까지 완료
+- `REHEARSED`: 별도 후보의 검증만 완료, 운영 반영 없음
+- `FAILED`: 실패 단계·예외 종류를 기록. 연결문자열과 비밀번호는 기록하지 않는다.
+- `ALREADY_RUNNING` / 75: 중복 실행을 차단한 정상 보류
+- `LOCAL_ONLY_SYNC_DISABLED` / 78: 로컬 갱신만 완료, Supabase 전송 비활성
+
+교체 전 실패하면 원본 DB는 그대로 유지된다. 활성화 후 전송 실패 시 최신 로컬 DB와 이전 Supabase 분석 결과를 보존하며 다음 실행에서 전송을 다시 시도한다. 실패·리허설 후보와 활성화 전 백업은 자동 삭제하지 않는다. 복구 시 해당 실행 보고서의 `activation.backup` 경로를 먼저 확인한다.
+
+주의: 신호 0건 자체는 실패가 아니다. 최신 실행시각·입력 문서 수·전송 검증 결과를 함께 보고, 근거 다양성 등 기존 신호 생성 조건을 임의로 완화하지 않는다. 미검토 문서를 확정 사건으로 자동 승격하지 않는다.

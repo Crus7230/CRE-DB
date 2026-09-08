@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { parseDailyArticleDate, todayInSeoul } from "@/lib/daily-articles-contract";
+import { parseDailyArticleDate, resolveDailyArticleDate, todayInSeoul } from "@/lib/daily-articles-contract";
 import { getDailyArticles, type DailyArticleSqlExecutor } from "@/lib/server/daily-articles";
 
 const payload = {
@@ -8,6 +8,7 @@ const payload = {
   lastCollectedAt: "2026-08-19T08:00:00Z",
   generatedAt: "2026-08-19T08:01:00Z",
   total: 0,
+  returned: 0,
   articles: [],
 };
 
@@ -16,39 +17,48 @@ describe("daily articles", () => {
     expect(todayInSeoul(new Date("2026-08-18T16:00:00Z"))).toBe("2026-08-19");
     expect(parseDailyArticleDate("2026-02-30", new Date("2026-08-18T16:00:00Z"))).toBe("2026-08-19");
     expect(parseDailyArticleDate("2026-08-18")).toBe("2026-08-18");
+    expect(resolveDailyArticleDate(null)).toBe("LATEST");
+    expect(resolveDailyArticleDate("2026-08-18")).toBe("2026-08-18");
   });
 
-  it("binds the selected date instead of interpolating it into SQL", async () => {
+  it("binds the date selector and resolves LATEST inside SQLite", async () => {
     const execute = vi.fn<DailyArticleSqlExecutor>(async () => ({ rows: [{ payload }] }));
-    await expect(getDailyArticles(execute, "2026-08-19")).resolves.toEqual(payload);
-    expect(execute).toHaveBeenCalledWith(expect.stringContaining("$1::date"), ["2026-08-19"]);
+    await expect(getDailyArticles(execute, "LATEST")).resolves.toEqual(payload);
+    expect(execute).toHaveBeenCalledWith(expect.stringContaining("CASE WHEN $1='LATEST'"), ["LATEST"]);
+    expect(execute.mock.calls[0]?.[0]).toContain("(SELECT selected_date FROM selected_day)");
   });
 
-  it("returns API-managed topics with classification provenance", async () => {
+  it("reads only the prevalidated article and category projections", async () => {
     const execute = vi.fn<DailyArticleSqlExecutor>(async () => ({ rows: [{ payload }] }));
     await getDailyArticles(execute, "2026-08-19");
 
     const sql = execute.mock.calls[0]?.[0] ?? "";
-    expect(sql).toContain("collection_job_categories");
-    expect(sql).toContain("em.status_code = 'APPROVED'");
-    expect(sql).toContain("'topics', topics");
-    expect(sql).toContain("'COLLECTION_QUERY'::text AS provenance");
-    expect(sql).toContain("er.document_version_id = lv.document_version_id");
-    expect(sql).toContain("rd.document_version_id = lv.document_version_id");
-    expect(sql).toContain("max(em.confidence) AS confidence_rank");
-    expect(sql).toContain("min(rd.result_rank) AS relevance_rank");
-    expect(sql).toContain("cr.status_code = 'COMPLETED'");
-    expect(sql).toContain("cjc.is_primary = 1");
-    expect(sql).toContain("ec.is_active = 1");
-    expect(sql).toContain("WHEN 'INVESTMENT' THEN 'EQUITY_INVESTMENT'");
-    expect(sql).toContain("WHEN 'NEW_SUPPLY' THEN 'SUPPLY'");
-    expect(sql).toContain("WHEN 'CORPORATE_RELOCATION' THEN 'RELOCATION'");
-    expect(sql).toContain("market_category_terms");
-    expect(sql).toContain("managed_term.term_name_ko");
+    expect(sql).toContain("serving_daily_article_dates");
+    expect(sql).toContain("serving_daily_articles");
+    expect(sql).toContain("serving_daily_article_topics");
+    expect(sql).toContain("ORDER BY topic_rank,term_code");
+    expect(sql).not.toMatch(/document_scope_assessments|record_classifications|document_versions|document_enrichments/);
     expect(sql).toContain("'documentPurpose',CASE");
     expect(sql).toContain("'evidenceGrade',CASE");
-    expect(sql).toContain("rc.valid_from IS NULL");
-    expect(sql).toContain("rc.valid_to IS NULL");
-    expect(sql).not.toContain("topic_version.document_id = lv.document_id");
+  });
+
+  it("counts all eligible rows before limiting the returned article list", async () => {
+    const execute = vi.fn<DailyArticleSqlExecutor>(async () => ({ rows: [{ payload }] }));
+    await getDailyArticles(execute, "2026-08-19");
+
+    const sql = execute.mock.calls[0]?.[0] ?? "";
+    expect(sql).toContain("dates.article_count");
+    expect(sql).toContain("'returned',(SELECT count(*) FROM selected_articles)");
+    expect(sql).toContain("SELECT * FROM selected_articles");
+    expect(sql).toContain("ORDER BY published_at DESC,document_id");
+    expect(sql).not.toContain(") ORDER BY published_at DESC,document_id");
+    expect(sql).not.toMatch(/market_intelligence\.|::|jsonb_|\bLATERAL\b|DISTINCT ON|clock_timestamp/i);
+  });
+
+  it("fails closed on a malformed serving payload", async () => {
+    const execute = vi.fn<DailyArticleSqlExecutor>(async () => ({
+      rows: [{ payload: { ...payload, articles: [{ id: "missing-required-fields" }] } }],
+    }));
+    await expect(getDailyArticles(execute, "LATEST")).rejects.toThrow("Invalid");
   });
 });

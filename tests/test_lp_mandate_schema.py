@@ -87,7 +87,7 @@ class LpMandateSchemaTest(unittest.TestCase):
         version = self.con.execute(
             "SELECT schema_value FROM schema_meta WHERE schema_key='schema_version'"
         ).fetchone()[0]
-        self.assertEqual("2.7.0", version)
+        self.assertEqual("3.5.0", version)
         stages = {
             row[0]
             for row in self.con.execute(

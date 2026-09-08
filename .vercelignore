@@ -1,0 +1,27 @@
+/.env*
+/acess code.txt
+/.github/
+/.hermes/
+/.tmp-turso-publish-venv/
+/.pytest_cache/
+/app/
+/cre-db-security-check
+/artifacts/
+/backups/
+/campaigns/
+/collector/
+/config/
+/data/
+/db/
+/docs/
+/fixtures/
+/logs/
+/operations/
+/reports/
+/rules/
+/scripts/
+/tests/
+/web/node_modules/
+/web/.next/
+/web/.env*
+/web/.vercel/

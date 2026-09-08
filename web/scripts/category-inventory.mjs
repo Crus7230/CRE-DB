@@ -1,23 +1,70 @@
-import fs from "node:fs";
-import postgres from "postgres";
+import { createTursoClient, normalizeRows } from "./libsql-client.mjs";
 
-const envPath = process.env.SUPABASE_ENV_FILE ?? String.raw`C:\10137_WorkSpace\env\.env.supabase.local`;
-const text = fs.readFileSync(envPath, "utf8");
-const line = text.split(/\r?\n/).find((row) => /^(?:export\s+)?SUPABASE_DB_URL\s*=/.test(row.trim()));
-if (!line) throw new Error("SUPABASE_DB_URL missing");
-const url = line.slice(line.indexOf("=") + 1).trim().replace(/^(['"])(.*)\1$/, "$2");
-const sql = postgres(url, { ssl: "require", max: 1 });
-const result = await sql.begin("read only", async (tx) => {
-  await tx`set local statement_timeout = '15s'`;
-  const [eventCategories, assetClasses, documentTypes, organizationTypes, lpStatuses, saleStatuses] = await Promise.all([
-    tx`select ec.code, ec.name_ko, count(distinct em.event_mention_id)::int mention_count, count(distinct e.event_id)::int event_count from market_intelligence.event_categories ec left join market_intelligence.event_mentions em on em.event_category_id=ec.event_category_id left join market_intelligence.events e on e.primary_category_id=ec.event_category_id group by ec.code,ec.name_ko order by ec.code`,
-    tx`select ac.code, ac.name_ko, count(a.asset_id)::int item_count from market_intelligence.asset_classes ac left join market_intelligence.assets a on a.asset_class_id=ac.asset_class_id group by ac.code,ac.name_ko order by ac.code`,
-    tx`select coalesce(document_type,'미분류') value, count(*)::int item_count from market_intelligence.source_documents group by document_type order by item_count desc`,
-    tx`select coalesce(organization_type,'미분류') value, count(*)::int item_count from market_intelligence.organizations group by organization_type order by item_count desc`,
-    tx`select coalesce(mandate_status,'미분류') value, count(*)::int item_count from market_intelligence.lp_mandates group by mandate_status order by item_count desc`,
-    tx`select coalesce(process_status,'미분류') value, count(*)::int item_count from market_intelligence.sale_processes group by process_status order by item_count desc`,
-  ]);
-  return { eventCategories, assetClasses, documentTypes, organizationTypes, lpStatuses, saleStatuses };
-});
-await sql.end();
-console.log(JSON.stringify(result, null, 2));
+const queries = [
+  `
+    SELECT
+      ec.code,
+      ec.name_ko,
+      count(DISTINCT em.event_mention_id) AS mention_count,
+      count(DISTINCT e.event_id) AS event_count
+    FROM event_categories AS ec
+    LEFT JOIN event_mentions AS em ON em.event_category_id = ec.event_category_id
+    LEFT JOIN events AS e ON e.primary_category_id = ec.event_category_id
+    GROUP BY ec.code, ec.name_ko
+    ORDER BY ec.code
+  `,
+  `
+    SELECT ac.code, ac.name_ko, count(a.asset_id) AS item_count
+    FROM asset_classes AS ac
+    LEFT JOIN assets AS a ON a.asset_class_id = ac.asset_class_id
+    GROUP BY ac.code, ac.name_ko
+    ORDER BY ac.code
+  `,
+  `
+    SELECT coalesce(document_type, '미분류') AS value, count(*) AS item_count
+    FROM source_documents
+    GROUP BY document_type
+    ORDER BY item_count DESC
+  `,
+  `
+    SELECT coalesce(organization_type, '미분류') AS value, count(*) AS item_count
+    FROM organizations
+    GROUP BY organization_type
+    ORDER BY item_count DESC
+  `,
+  `
+    SELECT coalesce(mandate_status, '미분류') AS value, count(*) AS item_count
+    FROM lp_mandates
+    GROUP BY mandate_status
+    ORDER BY item_count DESC
+  `,
+  `
+    SELECT coalesce(process_status, '미분류') AS value, count(*) AS item_count
+    FROM sale_processes
+    GROUP BY process_status
+    ORDER BY item_count DESC
+  `,
+];
+
+const client = createTursoClient();
+try {
+  const [
+    eventCategories,
+    assetClasses,
+    documentTypes,
+    organizationTypes,
+    lpStatuses,
+    saleStatuses,
+  ] = await client.batch(queries, "read");
+
+  console.log(JSON.stringify({
+    eventCategories: normalizeRows(eventCategories.rows),
+    assetClasses: normalizeRows(assetClasses.rows),
+    documentTypes: normalizeRows(documentTypes.rows),
+    organizationTypes: normalizeRows(organizationTypes.rows),
+    lpStatuses: normalizeRows(lpStatuses.rows),
+    saleStatuses: normalizeRows(saleStatuses.rows),
+  }, null, 2));
+} finally {
+  client.close();
+}

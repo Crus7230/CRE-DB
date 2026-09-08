@@ -14,6 +14,7 @@ it("submits a normalized email and shows the generic access rejection", async ()
   expect(input).toHaveAttribute("type", "email");
   expect(input).toHaveAttribute("autocomplete", "email");
   await user.type(input, "  Person@Example.COM ");
+  expect(screen.queryByLabelText("팀 공용 접근코드")).not.toBeInTheDocument();
   await user.click(screen.getByRole("button", { name: "대시보드 열기" }));
 
   const request = fetchMock.mock.calls[0][1] as RequestInit;

@@ -402,6 +402,8 @@ INSERT INTO predicate_definitions(predicate_code, name_ko, subject_scope, value_
  ('LP_MANDATE_MANAGER_SELECTED','위탁운용사 선정','EVENT','ORGANIZATION_REF',NULL,1,'공개 절차에서 공식 확인된 운용사'),
  ('LP_MANDATE_REPORTED_SELECTED_MANAGER','보도된 유력 위탁운용사','EVENT','ORGANIZATION_REF',NULL,1,'공식 결과 미확인 상태에서 구체적 보도로 알려진 유력 운용사'),
  ('LP_MANDATE_REPORTED_MANAGER_ALLOCATION','보도된 선정사 배정금액','EVENT','MONEY','KRW',1,'공식 결과 미확인 상태에서 기사·리서치가 선정사별로 보도한 배정금액'),
+ ('LP_MANDATE_MANAGER_BID_PARTICIPANT','기관자금 입찰 참여 운용사','EVENT','ORGANIZATION_REF',NULL,1,'동일 LP mandate 자금으로 입찰·shortlist에 참여한 운용사. 선정 확정이 아님'),
+ ('LP_MANDATE_MANAGER_INFERRED_FROM_DEPLOYMENT','집행 근거 기반 위탁운용사 유추','EVENT','ORGANIZATION_REF',NULL,1,'동일 LP·track·vehicle·deal의 약정 또는 집행 근거로 유추한 운용사. 공식 선정과 별도'),
  ('EVENT_DATE','사건 발생일','EVENT','DATE',NULL,0,'실제 사건 발생일'),
  ('EFFECTIVE_DATE','효력발생일','EVENT','DATE',NULL,0,'법적·계약상 효력일'),
  ('EXPECTED_COMPLETION_DATE','준공예정일','PROJECT','DATE',NULL,1,'예정 준공일'),
@@ -459,6 +461,13 @@ INSERT INTO claim_role_definitions(role_code, name_ko, allowed_kind, description
  ('SOURCE_STATE','이전 상태','ANY','상태전이 이전 단계'),
  ('TARGET_STATE','변경 상태','ANY','상태전이 이후 단계'),
  ('MANDATE_TRACK','위탁운용 트랙','TEXT','유력 선정사 claim이 속한 mandate track code'),
+ ('MANDATE_CODE','위탁 프로그램 코드','TEXT','후속 claim이 연결되는 canonical mandate code'),
+ ('FOLLOW_UP_ACTION','후속 입찰·집행 행위','TEXT','APPLIED·SHORTLISTED·COMMITTED·EXECUTED 등 후속 행위'),
+ ('FUNDING_BASIS','기관자금 연결 기준','TEXT','LP_SOURCE_DEPLOYMENT 등 후속 행위에 사용된 자금의 출처 기준'),
+ ('LINKED_VEHICLE','연결 펀드·vehicle','ANY','기관자금과 입찰·집행을 연결하는 펀드·리츠·SPC'),
+ ('LINKED_DEAL','연결 거래·자산','ANY','기관자금이 입찰 또는 집행된 거래·자산·프로젝트'),
+ ('CONTRADICTION_NOTE','상충 근거','TEXT','다른 mandate·vintage·운용사 가능성 등 판정을 보류시키는 근거'),
+ ('INFERENCE_RULE_VERSION','추론 규칙 버전','TEXT','선정 유추를 산출한 결정론적 규칙 버전'),
  ('RESOLUTION_STATUS','검증 판정상태','TEXT','LIKELY·HIGHLY_LIKELY·CONTRADICTED 등 검증대기 상태'),
  ('INDEPENDENT_FAMILY_COUNT','독립 출처계열 수','NUMBER','전재 중복 제거 후 독립 source family 수'),
  ('OCCURRENCE_COUNT','원문·전재 발견 수','NUMBER','동일 source family를 포함한 전체 발견 문서 수'),
@@ -512,6 +521,28 @@ INSERT INTO predicate_relationship_rules(
     ('participant-role-buyer','PARTICIPANT_ROLE','BUYER','EVENT_PARTICIPANT','BUYER','VERIFIED'),
     ('participant-role-seller','PARTICIPANT_ROLE','SELLER','EVENT_PARTICIPANT','SELLER','VERIFIED'),
     ('business-domain-subject','BUSINESS_DOMAIN','SUBJECT_ORGANIZATION','BUSINESS_ACTIVITY',NULL,'VERIFIED');
+
+-- Contextual intelligence governed rule seed 1.0.0.
+INSERT INTO contextual_rule_sets(
+  rule_set_id,rule_set_code,version,status_code,approved_by,approved_at,metadata_json
+) VALUES(
+  'rule-set-contextual-v1','CRE_CONTEXTUAL_EVENT_FRAME','1.0.0','ACTIVE',
+  'SYSTEM_GOVERNED_SEED',strftime('%Y-%m-%dT%H:%M:%fZ','now'),
+  '{"description":"Context-combination candidate rules; never auto-approve"}'
+);
+
+INSERT INTO contextual_rules(
+  rule_id,rule_set_id,rule_code,event_domain,event_type,priority,minimum_score,definition_json,status_code
+) VALUES
+ ('rule-context-transaction','rule-set-contextual-v1','TRANSACTION_CONTEXT','TRANSACTION','TRANSACTION',10,2,'{"requires":["transaction_action"],"supports":["asset","party_role","process_stage"],"blocks":["negated_only"]}','ACTIVE'),
+ ('rule-context-manager','rule-set-contextual-v1','MANAGER_SELECTION_CONTEXT','MANAGER_SELECTION','MANAGER_SELECTION',20,2,'{"requires":["manager_selection_action"],"supports":["appointing_entity","manager_role","selection_stage"]}','ACTIVE'),
+ ('rule-context-policy','rule-set-contextual-v1','POLICY_CONTEXT','POLICY_REGULATION','POLICY_ACTION',30,2,'{"requires":["policy_actor","policy_action"],"supports":["effective_date","policy_target"]}','ACTIVE'),
+ ('rule-context-monetary','rule-set-contextual-v1','MONETARY_CONTEXT','MONETARY_POLICY','RATE_DECISION',40,2,'{"requires":["rate_subject","rate_action"],"supports":["effective_date","rate_value"]}','ACTIVE'),
+ ('rule-context-geopolitics','rule-set-contextual-v1','GEOPOLITICS_CONTEXT','GEOPOLITICS_TRADE','GEOPOLITICAL_ACTION',50,2,'{"requires":["geopolitical_action","actor_or_geography"],"supports":["affected_industry","impact_channel"]}','ACTIVE'),
+ ('rule-context-financing','rule-set-contextual-v1','FINANCING_CONTEXT','FINANCING_RESTRUCTURING','FINANCING_ACTION',60,2,'{"requires":["financing_action"],"supports":["borrower","lender","amount","maturity"]}','ACTIVE'),
+ ('rule-context-industry','rule-set-contextual-v1','INDUSTRY_CONTEXT','INDUSTRY_DEMAND','INDUSTRY_SHIFT',70,3,'{"requires":["industry","change_action","cre_target"],"supports":["transmission_channel"]}','ACTIVE'),
+ ('rule-context-trend','rule-set-contextual-v1','MARKET_TREND_CONTEXT','MARKET_TREND','MARKET_TREND',80,3,'{"requires":["market_metric","direction","period_or_comparison"],"supports":["region","asset_class"]}','ACTIVE'),
+ ('rule-context-place','rule-set-contextual-v1','ASSET_REGION_CONTEXT','ASSET_REGIONAL_CHANGE','ASSET_REGIONAL_CHANGE',90,3,'{"requires":["asset_or_region","change_action"],"supports":["tenant","supply","infrastructure"]}','ACTIVE');
 
 INSERT INTO schema_meta(schema_key, schema_value) VALUES
  ('seed_version','2.7.0'),

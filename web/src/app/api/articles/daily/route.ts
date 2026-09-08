@@ -1,21 +1,32 @@
-import { parseDailyArticleDate } from "@/lib/daily-articles-contract";
-import { executeMarketSql } from "@/lib/server/db";
-import { getDailyArticles } from "@/lib/server/daily-articles";
+import { resolveDailyArticleDate } from "@/lib/daily-articles-contract";
+import {
+  infrastructureUnavailableResponse,
+  jsonWithServerTiming,
+  safeErrorDescriptor,
+} from "@/lib/server/api-response";
+import { getCachedDailyArticles } from "@/lib/server/market-data-cache";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET(request: Request): Promise<Response> {
+  const startedAt = performance.now();
   try {
     const url = new URL(request.url);
-    const selectedDate = parseDailyArticleDate(url.searchParams.get("date"));
-    const payload = await getDailyArticles(executeMarketSql, selectedDate);
-    return Response.json(payload, { headers: { "Cache-Control": "private, max-age=60" } });
+    const selectedDate = resolveDailyArticleDate(url.searchParams.get("date"));
+    const payload = await getCachedDailyArticles(selectedDate);
+    return jsonWithServerTiming(
+      payload,
+      { headers: { "Cache-Control": "private, max-age=900" } },
+      "data",
+      startedAt,
+    );
   } catch (error) {
-    console.error("Daily article search failed", error instanceof Error ? error.message : "unknown error");
-    return Response.json(
-      { error: "오늘의 시장기사를 불러오지 못했습니다.", code: "DAILY_ARTICLES_UNAVAILABLE" },
-      { status: 503 },
+    console.error("Daily article search failed", safeErrorDescriptor(error));
+    return infrastructureUnavailableResponse(
+      "DAILY_ARTICLES_UNAVAILABLE",
+      startedAt,
+      { "Cache-Control": "no-store" },
     );
   }
 }

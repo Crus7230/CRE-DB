@@ -8,6 +8,8 @@ import unittest
 from unittest import mock
 from pathlib import Path
 
+from schema_fixture_utils import seed_before_contextual
+
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA = ROOT / "db" / "v2" / "schema.sql"
 SEED = ROOT / "db" / "v2" / "seed.sql"
@@ -22,7 +24,7 @@ def schema_26() -> str:
     text = SCHEMA.read_text(encoding="utf-8")
     prefix, rest = text.split(MARKER, 1)
     _, suffix = rest.split("INSERT INTO schema_meta", 1)
-    return prefix + "INSERT INTO schema_meta" + suffix.replace("'2.7.0'", "'2.6.0'", 1)
+    return prefix + "INSERT INTO schema_meta" + suffix.replace("'2.9.0'", "'2.6.0'", 1)
 
 
 class Migrate27Test(unittest.TestCase):
@@ -30,7 +32,7 @@ class Migrate27Test(unittest.TestCase):
         con = sqlite3.connect(path)
         con.execute("PRAGMA foreign_keys=ON")
         con.executescript(schema_26())
-        con.executescript(SEED.read_text(encoding="utf-8"))
+        con.executescript(seed_before_contextual(SEED))
         con.execute("DROP TABLE predicate_relationship_rules")
         con.execute("DELETE FROM claim_role_definitions WHERE role_code='SUBJECT_ORGANIZATION'")
         con.execute("UPDATE schema_meta SET schema_value='2.6.0' WHERE schema_key='schema_version'")

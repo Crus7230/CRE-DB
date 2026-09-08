@@ -22,6 +22,7 @@ venv/
 # Node / Next.js
 **/node_modules/
 **/.next/
+**/next-env.d.ts
 **/out/
 **/build/
 **/coverage/
@@ -68,3 +69,6 @@ pnpm-debug.log*
 Thumbs.db
 .idea/
 .vscode/
+
+.vercel
+.env*

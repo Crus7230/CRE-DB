@@ -143,9 +143,11 @@ def import_candidate(db_path: str | Path, candidate: dict[str, Any], *, allow_li
     con.execute("PRAGMA foreign_keys=ON")
     con.execute("PRAGMA busy_timeout=5000")
     version = con.execute("SELECT schema_value FROM schema_meta WHERE schema_key='schema_version'").fetchone()
-    if version is None or version[0] not in {"2.5.0", "2.6.0", "2.7.0"}:
+    if version is None or version[0] not in {"2.5.0", "2.6.0", "2.7.0", "2.8.0", "2.9.0", "3.0.0", "3.1.0", "3.2.0", "3.3.0", "3.4.0", "3.4.1", "3.5.0"}:
         con.close()
-        raise CandidateValidationError("database schema_version must be 2.5.0, 2.6.0 or 2.7.0")
+        raise CandidateValidationError(
+            "database schema_version must be a supported version from 2.5.0 through 3.5.0"
+        )
     if db_path.resolve() in LIVE_DB_PATHS and not allow_live:
         con.close()
         raise CandidateValidationError("live market.db import requires allow_live=True")

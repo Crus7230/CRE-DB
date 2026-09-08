@@ -305,9 +305,11 @@ def main() -> None:
                 "capital_trace_status": x["capital_trace_status"],
                 "verified_available_krw": None, "dry_powder_status": x["dry_powder_status"],
             })
-    with csv_path.open("w", newline="", encoding="utf-8-sig") as f:
+    csv_tmp = csv_path.with_suffix(csv_path.suffix + ".tmp")
+    with csv_tmp.open("w", newline="", encoding="utf-8-sig") as f:
         writer = csv.DictWriter(f, fieldnames=list(csv_rows[0]))
         writer.writeheader(); writer.writerows(csv_rows)
+    csv_tmp.replace(csv_path)
 
     domestic_official = [x for x in official if x["manager_class"] == "DOMESTIC_ASSET_MANAGER"]
     domestic_gp = [x for x in official if x["manager_class"] == "DOMESTIC_OTHER_GP"]

@@ -16,6 +16,8 @@ import uuid
 import xml.etree.ElementTree as ET
 
 from collector.transaction_scope import classify_molit_transaction_scope
+from collector.dart_cre_scope import CLASSIFIER_VERSION as DART_CRE_CLASSIFIER_VERSION
+from collector.dart_cre_scope import classify_dart_cre_scope
 
 
 @dataclass(frozen=True)
@@ -240,12 +242,20 @@ def ingest_partition(
     query_rendered: str,
     documents: list[DiscoveredDocument],
     runner_version: str,
+    cursor_metadata: dict | None = None,
+    job_version: int = 1,
+    cadence_code: str = "MANUAL",
 ) -> IngestResult:
+    if job_version < 1:
+        raise ValueError("job_version must be positive")
     con = sqlite3.connect(str(db_path))
     con.execute("PRAGMA foreign_keys = ON")
     con.execute("PRAGMA busy_timeout = 5000")
     now = _utc_now()
-    cursor_json = json.dumps({"window_start": window_start, "window_end": window_end}, sort_keys=True)
+    cursor = {"window_start": window_start, "window_end": window_end}
+    if cursor_metadata:
+        cursor.update(cursor_metadata)
+    cursor_json = json.dumps(cursor, sort_keys=True)
     try:
         con.execute("BEGIN IMMEDIATE")
         source = con.execute(
@@ -262,21 +272,23 @@ def ingest_partition(
             raise ValueError(f"unknown active category_code: {category_code}")
 
         job = con.execute(
-            "SELECT job_id FROM collection_jobs WHERE job_code = ? AND job_version = 1",
-            (job_code,),
+            "SELECT job_id FROM collection_jobs WHERE job_code = ? AND job_version = ?",
+            (job_code, job_version),
         ).fetchone()
         if job is None:
-            job_id = _stable_id("job", f"{job_code}:1")
+            job_id = _stable_id("job", f"{job_code}:{job_version}")
             con.execute(
                 """INSERT INTO collection_jobs(
                        job_id, job_code, job_version, job_kind, source_id,
                        query_template, cadence_code, config_json, valid_from, is_active
-                   ) VALUES (?, ?, 1, 'CATEGORY_SEARCH', ?, ?, 'MANUAL', ?, ?, 1)""",
+                   ) VALUES (?, ?, ?, 'CATEGORY_SEARCH', ?, ?, ?, ?, ?, 1)""",
                 (
                     job_id,
                     job_code,
+                    job_version,
                     source[0],
                     query_rendered,
+                    cadence_code,
                     json.dumps({
                         "campaign": (
                             re.match(r"^(BACKFILL_\d{4}(?:_H[12])?)", job_code).group(1)
@@ -395,6 +407,37 @@ def ingest_partition(
                     updated += 1
             else:
                 version_id = version[0]
+
+            if source_code == "OPENDART":
+                scope = classify_dart_cre_scope(document.title, document.stored_text)
+                assessment_id = _stable_id(
+                    "document-scope-assessment",
+                    f"{version_id}:CRE:{DART_CRE_CLASSIFIER_VERSION}",
+                )
+                evidence = {
+                    "reportKind": scope.report_kind,
+                    "reasonCodes": list(scope.reason_codes),
+                    "assetCategory": scope.asset_category,
+                    "assetText": scope.asset_text,
+                    "subjectText": scope.subject_text,
+                    "detailText": scope.detail_text,
+                }
+                con.execute(
+                    """INSERT INTO document_scope_assessments(
+                           document_scope_assessment_id,document_version_id,scope_code,
+                           classifier_version,status_code,reason_codes_json,evidence_json,assessed_at
+                       ) VALUES (?,?,'CRE',?,?,?,?,?)
+                       ON CONFLICT(document_version_id,scope_code,classifier_version) DO UPDATE SET
+                           status_code=excluded.status_code,
+                           reason_codes_json=excluded.reason_codes_json,
+                           evidence_json=excluded.evidence_json,
+                           assessed_at=excluded.assessed_at""",
+                    (
+                        assessment_id, version_id, DART_CRE_CLASSIFIER_VERSION, scope.status,
+                        json.dumps(list(scope.reason_codes), ensure_ascii=False),
+                        json.dumps(evidence, ensure_ascii=False, sort_keys=True), now,
+                    ),
+                )
 
             con.execute(
                 """INSERT OR IGNORE INTO run_documents(

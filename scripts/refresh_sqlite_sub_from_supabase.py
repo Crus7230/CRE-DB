@@ -1,5 +1,10 @@
 #!/usr/bin/env python
-"""Build a validated local SQLite sub replica from Supabase PostgreSQL main."""
+"""Legacy full refresh used before the local-full/Supabase-active cutover.
+
+After an archive snapshot is registered, use
+merge_supabase_active_into_full_archive.py. Overwriting from the active subset
+would erase archive-only rows and is therefore blocked.
+"""
 from __future__ import annotations
 
 import argparse
@@ -48,6 +53,32 @@ def base_tables(conn: sqlite3.Connection) -> list[str]:
     ]
 
 
+def validate_table_coverage(
+    sqlite_tables: set[str],
+    postgres_tables: set[str],
+) -> None:
+    """Reject templates that would silently omit Supabase application tables."""
+    missing = sorted(postgres_tables - sqlite_tables - {"_migration_meta"})
+    if missing:
+        raise RuntimeError(
+            "missing Supabase application tables in SQLite template: " + ", ".join(missing)
+        )
+
+
+def ensure_full_refresh_allowed(current_archive_snapshots: int) -> None:
+    if current_archive_snapshots:
+        raise RuntimeError(
+            "active serving cutover detected; use merge_supabase_active_into_full_archive.py"
+        )
+
+
+def ensure_replica_schema_allowed(schema: str) -> None:
+    if schema.strip().lower() == "app_security":
+        raise SystemExit(
+            "app_security contains access-control PII and must never be copied to SQLite"
+        )
+
+
 def backup_api(source: Path, target: Path) -> None:
     src = sqlite3.connect(f"file:{source.resolve().as_posix()}?mode=ro", uri=True)
     dst = sqlite3.connect(target)
@@ -69,6 +100,7 @@ def build_replica(template: Path, output: Path, env_path: Path) -> dict:
     if not dsn:
         raise SystemExit("SUPABASE_DB_URL is missing")
     schema = env.get("SUPABASE_DB_SCHEMA", "market_intelligence")
+    ensure_replica_schema_allowed(schema)
     output.parent.mkdir(parents=True, exist_ok=True)
     if output.exists():
         raise SystemExit(f"refusing to overwrite candidate: {output}")
@@ -81,6 +113,22 @@ def build_replica(template: Path, output: Path, env_path: Path) -> dict:
     tables = base_tables(sqlite_conn)
     counts: dict[str, int] = {}
     try:
+        with psycopg.connect(dsn, connect_timeout=20) as coverage_conn:
+            postgres_tables = {
+                row[0] for row in coverage_conn.execute(
+                    "SELECT table_name FROM information_schema.tables "
+                    "WHERE table_schema=%s AND table_type='BASE TABLE'",
+                    (schema,),
+                )
+            }
+            current_archive_snapshots = (
+                coverage_conn.execute(
+                    f"SELECT count(*) FROM {q(schema)}.archive_snapshots WHERE is_current=1"
+                ).fetchone()[0]
+                if "archive_snapshots" in postgres_tables else 0
+            )
+        ensure_full_refresh_allowed(current_archive_snapshots)
+        validate_table_coverage(set(tables), postgres_tables)
         sqlite_conn.execute("PRAGMA foreign_keys=OFF")
         for name, _sql in trigger_rows:
             sqlite_conn.execute(f"DROP TRIGGER {q(name)}")
@@ -168,13 +216,22 @@ def activate(candidate: Path, live: Path) -> dict:
     if live.exists():
         os.chmod(live, stat.S_IREAD | stat.S_IWRITE)
     # os.replace is atomic on the same volume. Candidate and live are both under data/ by default.
-    os.replace(candidate, live)
+    activation_method = "atomic_replace"
+    try:
+        os.replace(candidate, live)
+    except PermissionError:
+        # Windows may hold a read handle to the live SQLite file. SQLite's
+        # online backup API safely replaces its pages without requiring rename.
+        activation_method = "sqlite_backup_api"
+        backup_api(candidate, live)
+        candidate.unlink()
     # Enforce the sub contract at the filesystem boundary on Windows.
     os.chmod(live, stat.S_IREAD)
     return {
         "activated": True,
         "live": str(live.resolve()),
         "backup": str(backup.resolve()),
+        "activation_method": activation_method,
         "local_sub_read_only": not os.access(live, os.W_OK),
     }
 

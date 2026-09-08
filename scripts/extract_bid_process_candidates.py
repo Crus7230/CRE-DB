@@ -13,14 +13,29 @@ if str(ROOT) not in sys.path:
 from collector.sale_process_candidates import extract_and_queue_bid_process_candidates
 
 
-def main() -> None:
+DEFAULT_RUNNER_VERSIONS = (
+    "2020-2024-bid-process-v1",
+    "2025-bid-process-v1",
+    "2026.H1.1",
+    "2026.H1.1-weekly-recovery",
+    "2026.H2.1",
+    "2026.H2.1-weekly-recovery",
+)
+DEFAULT_OUTPUT = ROOT / "artifacts" / "bid-process-ytd-candidates.json"
+
+
+def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Queue review-only bid-process candidates for one or more collection runner versions")
     parser.add_argument("--db", type=Path, default=ROOT / "data" / "market.db")
     parser.add_argument("--runner-version", action="append", dest="runner_versions")
     parser.add_argument("--pipeline-version", default="BID_PROCESS_TITLE_SNIPPET_V4")
-    parser.add_argument("--output", type=Path, default=ROOT / "artifacts" / "bid-process-2020-2025-candidates.json")
-    args = parser.parse_args()
-    runner_versions = args.runner_versions or ["2020-2024-bid-process-v1", "2025-bid-process-v1"]
+    parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
+    return parser
+
+
+def main(argv: list[str] | None = None) -> None:
+    args = build_parser().parse_args(argv)
+    runner_versions = args.runner_versions or list(DEFAULT_RUNNER_VERSIONS)
 
     summaries: list[dict[str, object]] = []
     for runner_version in runner_versions:

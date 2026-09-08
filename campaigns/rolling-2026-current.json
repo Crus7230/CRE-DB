@@ -1,0 +1,27 @@
+{
+  "campaignCode": "ROLLING_2026_CURRENT",
+  "campaignVersion": "2026.ROLLING.2",
+  "year": 2026,
+  "country": "KR",
+  "partition": "DAY",
+  "dateSemantics": {
+    "primary": "DOCUMENT_PUBLISHED_AT_KST",
+    "secondary": ["EVENT_EFFECTIVE_DATE", "COLLECTED_AT"],
+    "note": "2026년 매각·임대·공급·인허가·PF·대출·투자 및 관리형 하위유형을 일 단위로 계속 조사한다."
+  },
+  "source": {
+    "code": "GOOGLE_NEWS_RSS",
+    "policy": "RSS_ONLY",
+    "store": ["title", "link", "publisher", "published_at", "rss_snippet"],
+    "exclude": ["article_full_text"]
+  },
+  "categories": {
+    "SALE": "(오피스 OR 빌딩 OR 사옥 OR 물류센터 OR 데이터센터 OR 호텔 OR 리조트 OR 상가 OR 쇼핑몰 OR 지식산업센터 OR 골프장 OR 개발부지) (매각 OR 매물 OR 매각자문 OR 매각주관사 OR 티저레터 OR 예비입찰 OR 본입찰 OR 우선협상대상자 OR 우협 OR 매매계약 OR 거래종결 OR 자산양도 OR 공매 OR 경매 OR 유찰 OR 재공매 OR 인수 OR 취득 OR 매입)",
+    "LEASE": "(오피스 OR 빌딩 OR 사옥 OR 물류센터 OR 데이터센터 OR 호텔 OR 상가 OR 쇼핑몰 OR 지식산업센터) (임대 OR 임차 OR 임대공고 OR 임차인모집 OR 임대차계약 OR 신규임차 OR 입주확정 OR 본사이전 OR 사옥이전 OR 재계약 OR 공실 OR 퇴거)",
+    "NEW_SUPPLY": "(오피스 OR 업무시설 OR 물류센터 OR 데이터센터 OR 호텔 OR 리조트 OR 쇼핑몰 OR 지식산업센터 OR 복합개발) (개발계획 OR 신축 OR 착공 OR 공사개시 OR 상량식 OR 준공 OR 완공 OR 사용승인 OR 개관 OR 개장 OR 입주개시)",
+    "PERMIT": "(오피스 OR 업무시설 OR 물류센터 OR 데이터센터 OR 호텔 OR 쇼핑몰 OR 복합개발 OR 개발사업) (건축허가 OR 건축신고 OR 착공신고 OR 사용승인 OR 용도변경 OR 건축위원회 OR 사업시행인가 OR 실시계획인가 OR 개발행위허가 OR 환경영향평가 OR 조건부승인 OR 변경고시)",
+    "PF": "(부동산PF OR 프로젝트파이낸싱 OR 브릿지론 OR 본PF) (사업장 OR 개발사업 OR 시행사 OR SPC OR 시공사 OR 대주단 OR 금융주선 OR 책임준공 OR 만기연장 OR 차환 OR 리파이낸싱 OR 재구조화 OR 기한이익상실 OR EOD OR 부실)",
+    "LOAN": "(오피스 OR 빌딩 OR 사옥 OR 물류센터 OR 데이터센터 OR 호텔 OR 쇼핑몰 OR 부동산) (담보대출 OR 선순위대출 OR 중순위대출 OR 후순위대출 OR 인수금융 OR 대출약정 OR 대출실행 OR 리파이낸싱 OR 차환 OR 만기연장 OR 셀다운 OR 채권매각 OR 담보권실행)",
+    "INVESTMENT": "(리츠 OR 부동산펀드 OR 블라인드펀드 OR 프로젝트펀드 OR 자산운용사 OR 기관투자자 OR 연기금 OR 공제회 OR 보험사) (자산편입 OR 취득 OR 양수 OR 현물출자 OR 펀드결성 OR 출자 OR 약정 OR 공동투자 OR 수익증권 OR 지분투자 OR JV OR 클로징 OR 자금모집)"
+  }
+}

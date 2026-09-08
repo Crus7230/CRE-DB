@@ -1,0 +1,3281 @@
+{
+  "source": {
+    "authority": "행정안전부 행정표준코드관리시스템",
+    "url": "https://www.code.go.kr/stdcode/regCodeL.do",
+    "downloadedAt": "2026-09-02",
+    "sourceSha256": "7b4b544a6302d26c4f4c89d2c1355beae82e958c786bad8cc8572db0d2e2eb33"
+  },
+  "filter": "서울특별시, 폐지여부=존재, 법정동 하위코드 != 00000",
+  "count": 467,
+  "rows": [
+    {
+      "legalDongCode": "1111010100",
+      "sigunguCd": "11110",
+      "bjdongCd": "10100",
+      "districtName": "종로구",
+      "legalDongName": "청운동"
+    },
+    {
+      "legalDongCode": "1111010200",
+      "sigunguCd": "11110",
+      "bjdongCd": "10200",
+      "districtName": "종로구",
+      "legalDongName": "신교동"
+    },
+    {
+      "legalDongCode": "1111010300",
+      "sigunguCd": "11110",
+      "bjdongCd": "10300",
+      "districtName": "종로구",
+      "legalDongName": "궁정동"
+    },
+    {
+      "legalDongCode": "1111010400",
+      "sigunguCd": "11110",
+      "bjdongCd": "10400",
+      "districtName": "종로구",
+      "legalDongName": "효자동"
+    },
+    {
+      "legalDongCode": "1111010500",
+      "sigunguCd": "11110",
+      "bjdongCd": "10500",
+      "districtName": "종로구",
+      "legalDongName": "창성동"
+    },
+    {
+      "legalDongCode": "1111010600",
+      "sigunguCd": "11110",
+      "bjdongCd": "10600",
+      "districtName": "종로구",
+      "legalDongName": "통의동"
+    },
+    {
+      "legalDongCode": "1111010700",
+      "sigunguCd": "11110",
+      "bjdongCd": "10700",
+      "districtName": "종로구",
+      "legalDongName": "적선동"
+    },
+    {
+      "legalDongCode": "1111010800",
+      "sigunguCd": "11110",
+      "bjdongCd": "10800",
+      "districtName": "종로구",
+      "legalDongName": "통인동"
+    },
+    {
+      "legalDongCode": "1111010900",
+      "sigunguCd": "11110",
+      "bjdongCd": "10900",
+      "districtName": "종로구",
+      "legalDongName": "누상동"
+    },
+    {
+      "legalDongCode": "1111011000",
+      "sigunguCd": "11110",
+      "bjdongCd": "11000",
+      "districtName": "종로구",
+      "legalDongName": "누하동"
+    },
+    {
+      "legalDongCode": "1111011100",
+      "sigunguCd": "11110",
+      "bjdongCd": "11100",
+      "districtName": "종로구",
+      "legalDongName": "옥인동"
+    },
+    {
+      "legalDongCode": "1111011200",
+      "sigunguCd": "11110",
+      "bjdongCd": "11200",
+      "districtName": "종로구",
+      "legalDongName": "체부동"
+    },
+    {
+      "legalDongCode": "1111011300",
+      "sigunguCd": "11110",
+      "bjdongCd": "11300",
+      "districtName": "종로구",
+      "legalDongName": "필운동"
+    },
+    {
+      "legalDongCode": "1111011400",
+      "sigunguCd": "11110",
+      "bjdongCd": "11400",
+      "districtName": "종로구",
+      "legalDongName": "내자동"
+    },
+    {
+      "legalDongCode": "1111011500",
+      "sigunguCd": "11110",
+      "bjdongCd": "11500",
+      "districtName": "종로구",
+      "legalDongName": "사직동"
+    },
+    {
+      "legalDongCode": "1111011600",
+      "sigunguCd": "11110",
+      "bjdongCd": "11600",
+      "districtName": "종로구",
+      "legalDongName": "도렴동"
+    },
+    {
+      "legalDongCode": "1111011700",
+      "sigunguCd": "11110",
+      "bjdongCd": "11700",
+      "districtName": "종로구",
+      "legalDongName": "당주동"
+    },
+    {
+      "legalDongCode": "1111011800",
+      "sigunguCd": "11110",
+      "bjdongCd": "11800",
+      "districtName": "종로구",
+      "legalDongName": "내수동"
+    },
+    {
+      "legalDongCode": "1111011900",
+      "sigunguCd": "11110",
+      "bjdongCd": "11900",
+      "districtName": "종로구",
+      "legalDongName": "세종로"
+    },
+    {
+      "legalDongCode": "1111012000",
+      "sigunguCd": "11110",
+      "bjdongCd": "12000",
+      "districtName": "종로구",
+      "legalDongName": "신문로1가"
+    },
+    {
+      "legalDongCode": "1111012100",
+      "sigunguCd": "11110",
+      "bjdongCd": "12100",
+      "districtName": "종로구",
+      "legalDongName": "신문로2가"
+    },
+    {
+      "legalDongCode": "1111012200",
+      "sigunguCd": "11110",
+      "bjdongCd": "12200",
+      "districtName": "종로구",
+      "legalDongName": "청진동"
+    },
+    {
+      "legalDongCode": "1111012300",
+      "sigunguCd": "11110",
+      "bjdongCd": "12300",
+      "districtName": "종로구",
+      "legalDongName": "서린동"
+    },
+    {
+      "legalDongCode": "1111012400",
+      "sigunguCd": "11110",
+      "bjdongCd": "12400",
+      "districtName": "종로구",
+      "legalDongName": "수송동"
+    },
+    {
+      "legalDongCode": "1111012500",
+      "sigunguCd": "11110",
+      "bjdongCd": "12500",
+      "districtName": "종로구",
+      "legalDongName": "중학동"
+    },
+    {
+      "legalDongCode": "1111012600",
+      "sigunguCd": "11110",
+      "bjdongCd": "12600",
+      "districtName": "종로구",
+      "legalDongName": "종로1가"
+    },
+    {
+      "legalDongCode": "1111012700",
+      "sigunguCd": "11110",
+      "bjdongCd": "12700",
+      "districtName": "종로구",
+      "legalDongName": "공평동"
+    },
+    {
+      "legalDongCode": "1111012800",
+      "sigunguCd": "11110",
+      "bjdongCd": "12800",
+      "districtName": "종로구",
+      "legalDongName": "관훈동"
+    },
+    {
+      "legalDongCode": "1111012900",
+      "sigunguCd": "11110",
+      "bjdongCd": "12900",
+      "districtName": "종로구",
+      "legalDongName": "견지동"
+    },
+    {
+      "legalDongCode": "1111013000",
+      "sigunguCd": "11110",
+      "bjdongCd": "13000",
+      "districtName": "종로구",
+      "legalDongName": "와룡동"
+    },
+    {
+      "legalDongCode": "1111013100",
+      "sigunguCd": "11110",
+      "bjdongCd": "13100",
+      "districtName": "종로구",
+      "legalDongName": "권농동"
+    },
+    {
+      "legalDongCode": "1111013200",
+      "sigunguCd": "11110",
+      "bjdongCd": "13200",
+      "districtName": "종로구",
+      "legalDongName": "운니동"
+    },
+    {
+      "legalDongCode": "1111013300",
+      "sigunguCd": "11110",
+      "bjdongCd": "13300",
+      "districtName": "종로구",
+      "legalDongName": "익선동"
+    },
+    {
+      "legalDongCode": "1111013400",
+      "sigunguCd": "11110",
+      "bjdongCd": "13400",
+      "districtName": "종로구",
+      "legalDongName": "경운동"
+    },
+    {
+      "legalDongCode": "1111013500",
+      "sigunguCd": "11110",
+      "bjdongCd": "13500",
+      "districtName": "종로구",
+      "legalDongName": "관철동"
+    },
+    {
+      "legalDongCode": "1111013600",
+      "sigunguCd": "11110",
+      "bjdongCd": "13600",
+      "districtName": "종로구",
+      "legalDongName": "인사동"
+    },
+    {
+      "legalDongCode": "1111013700",
+      "sigunguCd": "11110",
+      "bjdongCd": "13700",
+      "districtName": "종로구",
+      "legalDongName": "낙원동"
+    },
+    {
+      "legalDongCode": "1111013800",
+      "sigunguCd": "11110",
+      "bjdongCd": "13800",
+      "districtName": "종로구",
+      "legalDongName": "종로2가"
+    },
+    {
+      "legalDongCode": "1111013900",
+      "sigunguCd": "11110",
+      "bjdongCd": "13900",
+      "districtName": "종로구",
+      "legalDongName": "팔판동"
+    },
+    {
+      "legalDongCode": "1111014000",
+      "sigunguCd": "11110",
+      "bjdongCd": "14000",
+      "districtName": "종로구",
+      "legalDongName": "삼청동"
+    },
+    {
+      "legalDongCode": "1111014100",
+      "sigunguCd": "11110",
+      "bjdongCd": "14100",
+      "districtName": "종로구",
+      "legalDongName": "안국동"
+    },
+    {
+      "legalDongCode": "1111014200",
+      "sigunguCd": "11110",
+      "bjdongCd": "14200",
+      "districtName": "종로구",
+      "legalDongName": "소격동"
+    },
+    {
+      "legalDongCode": "1111014300",
+      "sigunguCd": "11110",
+      "bjdongCd": "14300",
+      "districtName": "종로구",
+      "legalDongName": "화동"
+    },
+    {
+      "legalDongCode": "1111014400",
+      "sigunguCd": "11110",
+      "bjdongCd": "14400",
+      "districtName": "종로구",
+      "legalDongName": "사간동"
+    },
+    {
+      "legalDongCode": "1111014500",
+      "sigunguCd": "11110",
+      "bjdongCd": "14500",
+      "districtName": "종로구",
+      "legalDongName": "송현동"
+    },
+    {
+      "legalDongCode": "1111014600",
+      "sigunguCd": "11110",
+      "bjdongCd": "14600",
+      "districtName": "종로구",
+      "legalDongName": "가회동"
+    },
+    {
+      "legalDongCode": "1111014700",
+      "sigunguCd": "11110",
+      "bjdongCd": "14700",
+      "districtName": "종로구",
+      "legalDongName": "재동"
+    },
+    {
+      "legalDongCode": "1111014800",
+      "sigunguCd": "11110",
+      "bjdongCd": "14800",
+      "districtName": "종로구",
+      "legalDongName": "계동"
+    },
+    {
+      "legalDongCode": "1111014900",
+      "sigunguCd": "11110",
+      "bjdongCd": "14900",
+      "districtName": "종로구",
+      "legalDongName": "원서동"
+    },
+    {
+      "legalDongCode": "1111015000",
+      "sigunguCd": "11110",
+      "bjdongCd": "15000",
+      "districtName": "종로구",
+      "legalDongName": "훈정동"
+    },
+    {
+      "legalDongCode": "1111015100",
+      "sigunguCd": "11110",
+      "bjdongCd": "15100",
+      "districtName": "종로구",
+      "legalDongName": "묘동"
+    },
+    {
+      "legalDongCode": "1111015200",
+      "sigunguCd": "11110",
+      "bjdongCd": "15200",
+      "districtName": "종로구",
+      "legalDongName": "봉익동"
+    },
+    {
+      "legalDongCode": "1111015300",
+      "sigunguCd": "11110",
+      "bjdongCd": "15300",
+      "districtName": "종로구",
+      "legalDongName": "돈의동"
+    },
+    {
+      "legalDongCode": "1111015400",
+      "sigunguCd": "11110",
+      "bjdongCd": "15400",
+      "districtName": "종로구",
+      "legalDongName": "장사동"
+    },
+    {
+      "legalDongCode": "1111015500",
+      "sigunguCd": "11110",
+      "bjdongCd": "15500",
+      "districtName": "종로구",
+      "legalDongName": "관수동"
+    },
+    {
+      "legalDongCode": "1111015600",
+      "sigunguCd": "11110",
+      "bjdongCd": "15600",
+      "districtName": "종로구",
+      "legalDongName": "종로3가"
+    },
+    {
+      "legalDongCode": "1111015700",
+      "sigunguCd": "11110",
+      "bjdongCd": "15700",
+      "districtName": "종로구",
+      "legalDongName": "인의동"
+    },
+    {
+      "legalDongCode": "1111015800",
+      "sigunguCd": "11110",
+      "bjdongCd": "15800",
+      "districtName": "종로구",
+      "legalDongName": "예지동"
+    },
+    {
+      "legalDongCode": "1111015900",
+      "sigunguCd": "11110",
+      "bjdongCd": "15900",
+      "districtName": "종로구",
+      "legalDongName": "원남동"
+    },
+    {
+      "legalDongCode": "1111016000",
+      "sigunguCd": "11110",
+      "bjdongCd": "16000",
+      "districtName": "종로구",
+      "legalDongName": "연지동"
+    },
+    {
+      "legalDongCode": "1111016100",
+      "sigunguCd": "11110",
+      "bjdongCd": "16100",
+      "districtName": "종로구",
+      "legalDongName": "종로4가"
+    },
+    {
+      "legalDongCode": "1111016200",
+      "sigunguCd": "11110",
+      "bjdongCd": "16200",
+      "districtName": "종로구",
+      "legalDongName": "효제동"
+    },
+    {
+      "legalDongCode": "1111016300",
+      "sigunguCd": "11110",
+      "bjdongCd": "16300",
+      "districtName": "종로구",
+      "legalDongName": "종로5가"
+    },
+    {
+      "legalDongCode": "1111016400",
+      "sigunguCd": "11110",
+      "bjdongCd": "16400",
+      "districtName": "종로구",
+      "legalDongName": "종로6가"
+    },
+    {
+      "legalDongCode": "1111016500",
+      "sigunguCd": "11110",
+      "bjdongCd": "16500",
+      "districtName": "종로구",
+      "legalDongName": "이화동"
+    },
+    {
+      "legalDongCode": "1111016600",
+      "sigunguCd": "11110",
+      "bjdongCd": "16600",
+      "districtName": "종로구",
+      "legalDongName": "연건동"
+    },
+    {
+      "legalDongCode": "1111016700",
+      "sigunguCd": "11110",
+      "bjdongCd": "16700",
+      "districtName": "종로구",
+      "legalDongName": "충신동"
+    },
+    {
+      "legalDongCode": "1111016800",
+      "sigunguCd": "11110",
+      "bjdongCd": "16800",
+      "districtName": "종로구",
+      "legalDongName": "동숭동"
+    },
+    {
+      "legalDongCode": "1111016900",
+      "sigunguCd": "11110",
+      "bjdongCd": "16900",
+      "districtName": "종로구",
+      "legalDongName": "혜화동"
+    },
+    {
+      "legalDongCode": "1111017000",
+      "sigunguCd": "11110",
+      "bjdongCd": "17000",
+      "districtName": "종로구",
+      "legalDongName": "명륜1가"
+    },
+    {
+      "legalDongCode": "1111017100",
+      "sigunguCd": "11110",
+      "bjdongCd": "17100",
+      "districtName": "종로구",
+      "legalDongName": "명륜2가"
+    },
+    {
+      "legalDongCode": "1111017200",
+      "sigunguCd": "11110",
+      "bjdongCd": "17200",
+      "districtName": "종로구",
+      "legalDongName": "명륜4가"
+    },
+    {
+      "legalDongCode": "1111017300",
+      "sigunguCd": "11110",
+      "bjdongCd": "17300",
+      "districtName": "종로구",
+      "legalDongName": "명륜3가"
+    },
+    {
+      "legalDongCode": "1111017400",
+      "sigunguCd": "11110",
+      "bjdongCd": "17400",
+      "districtName": "종로구",
+      "legalDongName": "창신동"
+    },
+    {
+      "legalDongCode": "1111017500",
+      "sigunguCd": "11110",
+      "bjdongCd": "17500",
+      "districtName": "종로구",
+      "legalDongName": "숭인동"
+    },
+    {
+      "legalDongCode": "1111017600",
+      "sigunguCd": "11110",
+      "bjdongCd": "17600",
+      "districtName": "종로구",
+      "legalDongName": "교남동"
+    },
+    {
+      "legalDongCode": "1111017700",
+      "sigunguCd": "11110",
+      "bjdongCd": "17700",
+      "districtName": "종로구",
+      "legalDongName": "평동"
+    },
+    {
+      "legalDongCode": "1111017800",
+      "sigunguCd": "11110",
+      "bjdongCd": "17800",
+      "districtName": "종로구",
+      "legalDongName": "송월동"
+    },
+    {
+      "legalDongCode": "1111017900",
+      "sigunguCd": "11110",
+      "bjdongCd": "17900",
+      "districtName": "종로구",
+      "legalDongName": "홍파동"
+    },
+    {
+      "legalDongCode": "1111018000",
+      "sigunguCd": "11110",
+      "bjdongCd": "18000",
+      "districtName": "종로구",
+      "legalDongName": "교북동"
+    },
+    {
+      "legalDongCode": "1111018100",
+      "sigunguCd": "11110",
+      "bjdongCd": "18100",
+      "districtName": "종로구",
+      "legalDongName": "행촌동"
+    },
+    {
+      "legalDongCode": "1111018200",
+      "sigunguCd": "11110",
+      "bjdongCd": "18200",
+      "districtName": "종로구",
+      "legalDongName": "구기동"
+    },
+    {
+      "legalDongCode": "1111018300",
+      "sigunguCd": "11110",
+      "bjdongCd": "18300",
+      "districtName": "종로구",
+      "legalDongName": "평창동"
+    },
+    {
+      "legalDongCode": "1111018400",
+      "sigunguCd": "11110",
+      "bjdongCd": "18400",
+      "districtName": "종로구",
+      "legalDongName": "부암동"
+    },
+    {
+      "legalDongCode": "1111018500",
+      "sigunguCd": "11110",
+      "bjdongCd": "18500",
+      "districtName": "종로구",
+      "legalDongName": "홍지동"
+    },
+    {
+      "legalDongCode": "1111018600",
+      "sigunguCd": "11110",
+      "bjdongCd": "18600",
+      "districtName": "종로구",
+      "legalDongName": "신영동"
+    },
+    {
+      "legalDongCode": "1111018700",
+      "sigunguCd": "11110",
+      "bjdongCd": "18700",
+      "districtName": "종로구",
+      "legalDongName": "무악동"
+    },
+    {
+      "legalDongCode": "1114010100",
+      "sigunguCd": "11140",
+      "bjdongCd": "10100",
+      "districtName": "중구",
+      "legalDongName": "무교동"
+    },
+    {
+      "legalDongCode": "1114010200",
+      "sigunguCd": "11140",
+      "bjdongCd": "10200",
+      "districtName": "중구",
+      "legalDongName": "다동"
+    },
+    {
+      "legalDongCode": "1114010300",
+      "sigunguCd": "11140",
+      "bjdongCd": "10300",
+      "districtName": "중구",
+      "legalDongName": "태평로1가"
+    },
+    {
+      "legalDongCode": "1114010400",
+      "sigunguCd": "11140",
+      "bjdongCd": "10400",
+      "districtName": "중구",
+      "legalDongName": "을지로1가"
+    },
+    {
+      "legalDongCode": "1114010500",
+      "sigunguCd": "11140",
+      "bjdongCd": "10500",
+      "districtName": "중구",
+      "legalDongName": "을지로2가"
+    },
+    {
+      "legalDongCode": "1114010600",
+      "sigunguCd": "11140",
+      "bjdongCd": "10600",
+      "districtName": "중구",
+      "legalDongName": "남대문로1가"
+    },
+    {
+      "legalDongCode": "1114010700",
+      "sigunguCd": "11140",
+      "bjdongCd": "10700",
+      "districtName": "중구",
+      "legalDongName": "삼각동"
+    },
+    {
+      "legalDongCode": "1114010800",
+      "sigunguCd": "11140",
+      "bjdongCd": "10800",
+      "districtName": "중구",
+      "legalDongName": "수하동"
+    },
+    {
+      "legalDongCode": "1114010900",
+      "sigunguCd": "11140",
+      "bjdongCd": "10900",
+      "districtName": "중구",
+      "legalDongName": "장교동"
+    },
+    {
+      "legalDongCode": "1114011000",
+      "sigunguCd": "11140",
+      "bjdongCd": "11000",
+      "districtName": "중구",
+      "legalDongName": "수표동"
+    },
+    {
+      "legalDongCode": "1114011100",
+      "sigunguCd": "11140",
+      "bjdongCd": "11100",
+      "districtName": "중구",
+      "legalDongName": "소공동"
+    },
+    {
+      "legalDongCode": "1114011200",
+      "sigunguCd": "11140",
+      "bjdongCd": "11200",
+      "districtName": "중구",
+      "legalDongName": "남창동"
+    },
+    {
+      "legalDongCode": "1114011300",
+      "sigunguCd": "11140",
+      "bjdongCd": "11300",
+      "districtName": "중구",
+      "legalDongName": "북창동"
+    },
+    {
+      "legalDongCode": "1114011400",
+      "sigunguCd": "11140",
+      "bjdongCd": "11400",
+      "districtName": "중구",
+      "legalDongName": "태평로2가"
+    },
+    {
+      "legalDongCode": "1114011500",
+      "sigunguCd": "11140",
+      "bjdongCd": "11500",
+      "districtName": "중구",
+      "legalDongName": "남대문로2가"
+    },
+    {
+      "legalDongCode": "1114011600",
+      "sigunguCd": "11140",
+      "bjdongCd": "11600",
+      "districtName": "중구",
+      "legalDongName": "남대문로3가"
+    },
+    {
+      "legalDongCode": "1114011700",
+      "sigunguCd": "11140",
+      "bjdongCd": "11700",
+      "districtName": "중구",
+      "legalDongName": "남대문로4가"
+    },
+    {
+      "legalDongCode": "1114011800",
+      "sigunguCd": "11140",
+      "bjdongCd": "11800",
+      "districtName": "중구",
+      "legalDongName": "남대문로5가"
+    },
+    {
+      "legalDongCode": "1114011900",
+      "sigunguCd": "11140",
+      "bjdongCd": "11900",
+      "districtName": "중구",
+      "legalDongName": "봉래동1가"
+    },
+    {
+      "legalDongCode": "1114012000",
+      "sigunguCd": "11140",
+      "bjdongCd": "12000",
+      "districtName": "중구",
+      "legalDongName": "봉래동2가"
+    },
+    {
+      "legalDongCode": "1114012100",
+      "sigunguCd": "11140",
+      "bjdongCd": "12100",
+      "districtName": "중구",
+      "legalDongName": "회현동1가"
+    },
+    {
+      "legalDongCode": "1114012200",
+      "sigunguCd": "11140",
+      "bjdongCd": "12200",
+      "districtName": "중구",
+      "legalDongName": "회현동2가"
+    },
+    {
+      "legalDongCode": "1114012300",
+      "sigunguCd": "11140",
+      "bjdongCd": "12300",
+      "districtName": "중구",
+      "legalDongName": "회현동3가"
+    },
+    {
+      "legalDongCode": "1114012400",
+      "sigunguCd": "11140",
+      "bjdongCd": "12400",
+      "districtName": "중구",
+      "legalDongName": "충무로1가"
+    },
+    {
+      "legalDongCode": "1114012500",
+      "sigunguCd": "11140",
+      "bjdongCd": "12500",
+      "districtName": "중구",
+      "legalDongName": "충무로2가"
+    },
+    {
+      "legalDongCode": "1114012600",
+      "sigunguCd": "11140",
+      "bjdongCd": "12600",
+      "districtName": "중구",
+      "legalDongName": "명동1가"
+    },
+    {
+      "legalDongCode": "1114012700",
+      "sigunguCd": "11140",
+      "bjdongCd": "12700",
+      "districtName": "중구",
+      "legalDongName": "명동2가"
+    },
+    {
+      "legalDongCode": "1114012800",
+      "sigunguCd": "11140",
+      "bjdongCd": "12800",
+      "districtName": "중구",
+      "legalDongName": "남산동1가"
+    },
+    {
+      "legalDongCode": "1114012900",
+      "sigunguCd": "11140",
+      "bjdongCd": "12900",
+      "districtName": "중구",
+      "legalDongName": "남산동2가"
+    },
+    {
+      "legalDongCode": "1114013000",
+      "sigunguCd": "11140",
+      "bjdongCd": "13000",
+      "districtName": "중구",
+      "legalDongName": "남산동3가"
+    },
+    {
+      "legalDongCode": "1114013100",
+      "sigunguCd": "11140",
+      "bjdongCd": "13100",
+      "districtName": "중구",
+      "legalDongName": "저동1가"
+    },
+    {
+      "legalDongCode": "1114013200",
+      "sigunguCd": "11140",
+      "bjdongCd": "13200",
+      "districtName": "중구",
+      "legalDongName": "충무로4가"
+    },
+    {
+      "legalDongCode": "1114013300",
+      "sigunguCd": "11140",
+      "bjdongCd": "13300",
+      "districtName": "중구",
+      "legalDongName": "충무로5가"
+    },
+    {
+      "legalDongCode": "1114013400",
+      "sigunguCd": "11140",
+      "bjdongCd": "13400",
+      "districtName": "중구",
+      "legalDongName": "인현동2가"
+    },
+    {
+      "legalDongCode": "1114013500",
+      "sigunguCd": "11140",
+      "bjdongCd": "13500",
+      "districtName": "중구",
+      "legalDongName": "예관동"
+    },
+    {
+      "legalDongCode": "1114013600",
+      "sigunguCd": "11140",
+      "bjdongCd": "13600",
+      "districtName": "중구",
+      "legalDongName": "묵정동"
+    },
+    {
+      "legalDongCode": "1114013700",
+      "sigunguCd": "11140",
+      "bjdongCd": "13700",
+      "districtName": "중구",
+      "legalDongName": "필동1가"
+    },
+    {
+      "legalDongCode": "1114013800",
+      "sigunguCd": "11140",
+      "bjdongCd": "13800",
+      "districtName": "중구",
+      "legalDongName": "필동2가"
+    },
+    {
+      "legalDongCode": "1114013900",
+      "sigunguCd": "11140",
+      "bjdongCd": "13900",
+      "districtName": "중구",
+      "legalDongName": "필동3가"
+    },
+    {
+      "legalDongCode": "1114014000",
+      "sigunguCd": "11140",
+      "bjdongCd": "14000",
+      "districtName": "중구",
+      "legalDongName": "남학동"
+    },
+    {
+      "legalDongCode": "1114014100",
+      "sigunguCd": "11140",
+      "bjdongCd": "14100",
+      "districtName": "중구",
+      "legalDongName": "주자동"
+    },
+    {
+      "legalDongCode": "1114014200",
+      "sigunguCd": "11140",
+      "bjdongCd": "14200",
+      "districtName": "중구",
+      "legalDongName": "예장동"
+    },
+    {
+      "legalDongCode": "1114014300",
+      "sigunguCd": "11140",
+      "bjdongCd": "14300",
+      "districtName": "중구",
+      "legalDongName": "장충동1가"
+    },
+    {
+      "legalDongCode": "1114014400",
+      "sigunguCd": "11140",
+      "bjdongCd": "14400",
+      "districtName": "중구",
+      "legalDongName": "장충동2가"
+    },
+    {
+      "legalDongCode": "1114014500",
+      "sigunguCd": "11140",
+      "bjdongCd": "14500",
+      "districtName": "중구",
+      "legalDongName": "광희동1가"
+    },
+    {
+      "legalDongCode": "1114014600",
+      "sigunguCd": "11140",
+      "bjdongCd": "14600",
+      "districtName": "중구",
+      "legalDongName": "광희동2가"
+    },
+    {
+      "legalDongCode": "1114014700",
+      "sigunguCd": "11140",
+      "bjdongCd": "14700",
+      "districtName": "중구",
+      "legalDongName": "쌍림동"
+    },
+    {
+      "legalDongCode": "1114014800",
+      "sigunguCd": "11140",
+      "bjdongCd": "14800",
+      "districtName": "중구",
+      "legalDongName": "을지로6가"
+    },
+    {
+      "legalDongCode": "1114014900",
+      "sigunguCd": "11140",
+      "bjdongCd": "14900",
+      "districtName": "중구",
+      "legalDongName": "을지로7가"
+    },
+    {
+      "legalDongCode": "1114015000",
+      "sigunguCd": "11140",
+      "bjdongCd": "15000",
+      "districtName": "중구",
+      "legalDongName": "을지로4가"
+    },
+    {
+      "legalDongCode": "1114015100",
+      "sigunguCd": "11140",
+      "bjdongCd": "15100",
+      "districtName": "중구",
+      "legalDongName": "을지로5가"
+    },
+    {
+      "legalDongCode": "1114015200",
+      "sigunguCd": "11140",
+      "bjdongCd": "15200",
+      "districtName": "중구",
+      "legalDongName": "주교동"
+    },
+    {
+      "legalDongCode": "1114015300",
+      "sigunguCd": "11140",
+      "bjdongCd": "15300",
+      "districtName": "중구",
+      "legalDongName": "방산동"
+    },
+    {
+      "legalDongCode": "1114015400",
+      "sigunguCd": "11140",
+      "bjdongCd": "15400",
+      "districtName": "중구",
+      "legalDongName": "오장동"
+    },
+    {
+      "legalDongCode": "1114015500",
+      "sigunguCd": "11140",
+      "bjdongCd": "15500",
+      "districtName": "중구",
+      "legalDongName": "을지로3가"
+    },
+    {
+      "legalDongCode": "1114015600",
+      "sigunguCd": "11140",
+      "bjdongCd": "15600",
+      "districtName": "중구",
+      "legalDongName": "입정동"
+    },
+    {
+      "legalDongCode": "1114015700",
+      "sigunguCd": "11140",
+      "bjdongCd": "15700",
+      "districtName": "중구",
+      "legalDongName": "산림동"
+    },
+    {
+      "legalDongCode": "1114015800",
+      "sigunguCd": "11140",
+      "bjdongCd": "15800",
+      "districtName": "중구",
+      "legalDongName": "충무로3가"
+    },
+    {
+      "legalDongCode": "1114015900",
+      "sigunguCd": "11140",
+      "bjdongCd": "15900",
+      "districtName": "중구",
+      "legalDongName": "초동"
+    },
+    {
+      "legalDongCode": "1114016000",
+      "sigunguCd": "11140",
+      "bjdongCd": "16000",
+      "districtName": "중구",
+      "legalDongName": "인현동1가"
+    },
+    {
+      "legalDongCode": "1114016100",
+      "sigunguCd": "11140",
+      "bjdongCd": "16100",
+      "districtName": "중구",
+      "legalDongName": "저동2가"
+    },
+    {
+      "legalDongCode": "1114016200",
+      "sigunguCd": "11140",
+      "bjdongCd": "16200",
+      "districtName": "중구",
+      "legalDongName": "신당동"
+    },
+    {
+      "legalDongCode": "1114016300",
+      "sigunguCd": "11140",
+      "bjdongCd": "16300",
+      "districtName": "중구",
+      "legalDongName": "흥인동"
+    },
+    {
+      "legalDongCode": "1114016400",
+      "sigunguCd": "11140",
+      "bjdongCd": "16400",
+      "districtName": "중구",
+      "legalDongName": "무학동"
+    },
+    {
+      "legalDongCode": "1114016500",
+      "sigunguCd": "11140",
+      "bjdongCd": "16500",
+      "districtName": "중구",
+      "legalDongName": "황학동"
+    },
+    {
+      "legalDongCode": "1114016600",
+      "sigunguCd": "11140",
+      "bjdongCd": "16600",
+      "districtName": "중구",
+      "legalDongName": "서소문동"
+    },
+    {
+      "legalDongCode": "1114016700",
+      "sigunguCd": "11140",
+      "bjdongCd": "16700",
+      "districtName": "중구",
+      "legalDongName": "정동"
+    },
+    {
+      "legalDongCode": "1114016800",
+      "sigunguCd": "11140",
+      "bjdongCd": "16800",
+      "districtName": "중구",
+      "legalDongName": "순화동"
+    },
+    {
+      "legalDongCode": "1114016900",
+      "sigunguCd": "11140",
+      "bjdongCd": "16900",
+      "districtName": "중구",
+      "legalDongName": "의주로1가"
+    },
+    {
+      "legalDongCode": "1114017000",
+      "sigunguCd": "11140",
+      "bjdongCd": "17000",
+      "districtName": "중구",
+      "legalDongName": "충정로1가"
+    },
+    {
+      "legalDongCode": "1114017100",
+      "sigunguCd": "11140",
+      "bjdongCd": "17100",
+      "districtName": "중구",
+      "legalDongName": "중림동"
+    },
+    {
+      "legalDongCode": "1114017200",
+      "sigunguCd": "11140",
+      "bjdongCd": "17200",
+      "districtName": "중구",
+      "legalDongName": "의주로2가"
+    },
+    {
+      "legalDongCode": "1114017300",
+      "sigunguCd": "11140",
+      "bjdongCd": "17300",
+      "districtName": "중구",
+      "legalDongName": "만리동1가"
+    },
+    {
+      "legalDongCode": "1114017400",
+      "sigunguCd": "11140",
+      "bjdongCd": "17400",
+      "districtName": "중구",
+      "legalDongName": "만리동2가"
+    },
+    {
+      "legalDongCode": "1117010100",
+      "sigunguCd": "11170",
+      "bjdongCd": "10100",
+      "districtName": "용산구",
+      "legalDongName": "후암동"
+    },
+    {
+      "legalDongCode": "1117010200",
+      "sigunguCd": "11170",
+      "bjdongCd": "10200",
+      "districtName": "용산구",
+      "legalDongName": "용산동2가"
+    },
+    {
+      "legalDongCode": "1117010300",
+      "sigunguCd": "11170",
+      "bjdongCd": "10300",
+      "districtName": "용산구",
+      "legalDongName": "용산동4가"
+    },
+    {
+      "legalDongCode": "1117010400",
+      "sigunguCd": "11170",
+      "bjdongCd": "10400",
+      "districtName": "용산구",
+      "legalDongName": "갈월동"
+    },
+    {
+      "legalDongCode": "1117010500",
+      "sigunguCd": "11170",
+      "bjdongCd": "10500",
+      "districtName": "용산구",
+      "legalDongName": "남영동"
+    },
+    {
+      "legalDongCode": "1117010600",
+      "sigunguCd": "11170",
+      "bjdongCd": "10600",
+      "districtName": "용산구",
+      "legalDongName": "용산동1가"
+    },
+    {
+      "legalDongCode": "1117010700",
+      "sigunguCd": "11170",
+      "bjdongCd": "10700",
+      "districtName": "용산구",
+      "legalDongName": "동자동"
+    },
+    {
+      "legalDongCode": "1117010800",
+      "sigunguCd": "11170",
+      "bjdongCd": "10800",
+      "districtName": "용산구",
+      "legalDongName": "서계동"
+    },
+    {
+      "legalDongCode": "1117010900",
+      "sigunguCd": "11170",
+      "bjdongCd": "10900",
+      "districtName": "용산구",
+      "legalDongName": "청파동1가"
+    },
+    {
+      "legalDongCode": "1117011000",
+      "sigunguCd": "11170",
+      "bjdongCd": "11000",
+      "districtName": "용산구",
+      "legalDongName": "청파동2가"
+    },
+    {
+      "legalDongCode": "1117011100",
+      "sigunguCd": "11170",
+      "bjdongCd": "11100",
+      "districtName": "용산구",
+      "legalDongName": "청파동3가"
+    },
+    {
+      "legalDongCode": "1117011200",
+      "sigunguCd": "11170",
+      "bjdongCd": "11200",
+      "districtName": "용산구",
+      "legalDongName": "원효로1가"
+    },
+    {
+      "legalDongCode": "1117011300",
+      "sigunguCd": "11170",
+      "bjdongCd": "11300",
+      "districtName": "용산구",
+      "legalDongName": "원효로2가"
+    },
+    {
+      "legalDongCode": "1117011400",
+      "sigunguCd": "11170",
+      "bjdongCd": "11400",
+      "districtName": "용산구",
+      "legalDongName": "신창동"
+    },
+    {
+      "legalDongCode": "1117011500",
+      "sigunguCd": "11170",
+      "bjdongCd": "11500",
+      "districtName": "용산구",
+      "legalDongName": "산천동"
+    },
+    {
+      "legalDongCode": "1117011600",
+      "sigunguCd": "11170",
+      "bjdongCd": "11600",
+      "districtName": "용산구",
+      "legalDongName": "청암동"
+    },
+    {
+      "legalDongCode": "1117011700",
+      "sigunguCd": "11170",
+      "bjdongCd": "11700",
+      "districtName": "용산구",
+      "legalDongName": "원효로3가"
+    },
+    {
+      "legalDongCode": "1117011800",
+      "sigunguCd": "11170",
+      "bjdongCd": "11800",
+      "districtName": "용산구",
+      "legalDongName": "원효로4가"
+    },
+    {
+      "legalDongCode": "1117011900",
+      "sigunguCd": "11170",
+      "bjdongCd": "11900",
+      "districtName": "용산구",
+      "legalDongName": "효창동"
+    },
+    {
+      "legalDongCode": "1117012000",
+      "sigunguCd": "11170",
+      "bjdongCd": "12000",
+      "districtName": "용산구",
+      "legalDongName": "도원동"
+    },
+    {
+      "legalDongCode": "1117012100",
+      "sigunguCd": "11170",
+      "bjdongCd": "12100",
+      "districtName": "용산구",
+      "legalDongName": "용문동"
+    },
+    {
+      "legalDongCode": "1117012200",
+      "sigunguCd": "11170",
+      "bjdongCd": "12200",
+      "districtName": "용산구",
+      "legalDongName": "문배동"
+    },
+    {
+      "legalDongCode": "1117012300",
+      "sigunguCd": "11170",
+      "bjdongCd": "12300",
+      "districtName": "용산구",
+      "legalDongName": "신계동"
+    },
+    {
+      "legalDongCode": "1117012400",
+      "sigunguCd": "11170",
+      "bjdongCd": "12400",
+      "districtName": "용산구",
+      "legalDongName": "한강로1가"
+    },
+    {
+      "legalDongCode": "1117012500",
+      "sigunguCd": "11170",
+      "bjdongCd": "12500",
+      "districtName": "용산구",
+      "legalDongName": "한강로2가"
+    },
+    {
+      "legalDongCode": "1117012600",
+      "sigunguCd": "11170",
+      "bjdongCd": "12600",
+      "districtName": "용산구",
+      "legalDongName": "용산동3가"
+    },
+    {
+      "legalDongCode": "1117012700",
+      "sigunguCd": "11170",
+      "bjdongCd": "12700",
+      "districtName": "용산구",
+      "legalDongName": "용산동5가"
+    },
+    {
+      "legalDongCode": "1117012800",
+      "sigunguCd": "11170",
+      "bjdongCd": "12800",
+      "districtName": "용산구",
+      "legalDongName": "한강로3가"
+    },
+    {
+      "legalDongCode": "1117012900",
+      "sigunguCd": "11170",
+      "bjdongCd": "12900",
+      "districtName": "용산구",
+      "legalDongName": "이촌동"
+    },
+    {
+      "legalDongCode": "1117013000",
+      "sigunguCd": "11170",
+      "bjdongCd": "13000",
+      "districtName": "용산구",
+      "legalDongName": "이태원동"
+    },
+    {
+      "legalDongCode": "1117013100",
+      "sigunguCd": "11170",
+      "bjdongCd": "13100",
+      "districtName": "용산구",
+      "legalDongName": "한남동"
+    },
+    {
+      "legalDongCode": "1117013200",
+      "sigunguCd": "11170",
+      "bjdongCd": "13200",
+      "districtName": "용산구",
+      "legalDongName": "동빙고동"
+    },
+    {
+      "legalDongCode": "1117013300",
+      "sigunguCd": "11170",
+      "bjdongCd": "13300",
+      "districtName": "용산구",
+      "legalDongName": "서빙고동"
+    },
+    {
+      "legalDongCode": "1117013400",
+      "sigunguCd": "11170",
+      "bjdongCd": "13400",
+      "districtName": "용산구",
+      "legalDongName": "주성동"
+    },
+    {
+      "legalDongCode": "1117013500",
+      "sigunguCd": "11170",
+      "bjdongCd": "13500",
+      "districtName": "용산구",
+      "legalDongName": "용산동6가"
+    },
+    {
+      "legalDongCode": "1117013600",
+      "sigunguCd": "11170",
+      "bjdongCd": "13600",
+      "districtName": "용산구",
+      "legalDongName": "보광동"
+    },
+    {
+      "legalDongCode": "1120010100",
+      "sigunguCd": "11200",
+      "bjdongCd": "10100",
+      "districtName": "성동구",
+      "legalDongName": "상왕십리동"
+    },
+    {
+      "legalDongCode": "1120010200",
+      "sigunguCd": "11200",
+      "bjdongCd": "10200",
+      "districtName": "성동구",
+      "legalDongName": "하왕십리동"
+    },
+    {
+      "legalDongCode": "1120010300",
+      "sigunguCd": "11200",
+      "bjdongCd": "10300",
+      "districtName": "성동구",
+      "legalDongName": "홍익동"
+    },
+    {
+      "legalDongCode": "1120010400",
+      "sigunguCd": "11200",
+      "bjdongCd": "10400",
+      "districtName": "성동구",
+      "legalDongName": "도선동"
+    },
+    {
+      "legalDongCode": "1120010500",
+      "sigunguCd": "11200",
+      "bjdongCd": "10500",
+      "districtName": "성동구",
+      "legalDongName": "마장동"
+    },
+    {
+      "legalDongCode": "1120010600",
+      "sigunguCd": "11200",
+      "bjdongCd": "10600",
+      "districtName": "성동구",
+      "legalDongName": "사근동"
+    },
+    {
+      "legalDongCode": "1120010700",
+      "sigunguCd": "11200",
+      "bjdongCd": "10700",
+      "districtName": "성동구",
+      "legalDongName": "행당동"
+    },
+    {
+      "legalDongCode": "1120010800",
+      "sigunguCd": "11200",
+      "bjdongCd": "10800",
+      "districtName": "성동구",
+      "legalDongName": "응봉동"
+    },
+    {
+      "legalDongCode": "1120010900",
+      "sigunguCd": "11200",
+      "bjdongCd": "10900",
+      "districtName": "성동구",
+      "legalDongName": "금호동1가"
+    },
+    {
+      "legalDongCode": "1120011000",
+      "sigunguCd": "11200",
+      "bjdongCd": "11000",
+      "districtName": "성동구",
+      "legalDongName": "금호동2가"
+    },
+    {
+      "legalDongCode": "1120011100",
+      "sigunguCd": "11200",
+      "bjdongCd": "11100",
+      "districtName": "성동구",
+      "legalDongName": "금호동3가"
+    },
+    {
+      "legalDongCode": "1120011200",
+      "sigunguCd": "11200",
+      "bjdongCd": "11200",
+      "districtName": "성동구",
+      "legalDongName": "금호동4가"
+    },
+    {
+      "legalDongCode": "1120011300",
+      "sigunguCd": "11200",
+      "bjdongCd": "11300",
+      "districtName": "성동구",
+      "legalDongName": "옥수동"
+    },
+    {
+      "legalDongCode": "1120011400",
+      "sigunguCd": "11200",
+      "bjdongCd": "11400",
+      "districtName": "성동구",
+      "legalDongName": "성수동1가"
+    },
+    {
+      "legalDongCode": "1120011500",
+      "sigunguCd": "11200",
+      "bjdongCd": "11500",
+      "districtName": "성동구",
+      "legalDongName": "성수동2가"
+    },
+    {
+      "legalDongCode": "1120011800",
+      "sigunguCd": "11200",
+      "bjdongCd": "11800",
+      "districtName": "성동구",
+      "legalDongName": "송정동"
+    },
+    {
+      "legalDongCode": "1120012200",
+      "sigunguCd": "11200",
+      "bjdongCd": "12200",
+      "districtName": "성동구",
+      "legalDongName": "용답동"
+    },
+    {
+      "legalDongCode": "1121510100",
+      "sigunguCd": "11215",
+      "bjdongCd": "10100",
+      "districtName": "광진구",
+      "legalDongName": "중곡동"
+    },
+    {
+      "legalDongCode": "1121510200",
+      "sigunguCd": "11215",
+      "bjdongCd": "10200",
+      "districtName": "광진구",
+      "legalDongName": "능동"
+    },
+    {
+      "legalDongCode": "1121510300",
+      "sigunguCd": "11215",
+      "bjdongCd": "10300",
+      "districtName": "광진구",
+      "legalDongName": "구의동"
+    },
+    {
+      "legalDongCode": "1121510400",
+      "sigunguCd": "11215",
+      "bjdongCd": "10400",
+      "districtName": "광진구",
+      "legalDongName": "광장동"
+    },
+    {
+      "legalDongCode": "1121510500",
+      "sigunguCd": "11215",
+      "bjdongCd": "10500",
+      "districtName": "광진구",
+      "legalDongName": "자양동"
+    },
+    {
+      "legalDongCode": "1121510700",
+      "sigunguCd": "11215",
+      "bjdongCd": "10700",
+      "districtName": "광진구",
+      "legalDongName": "화양동"
+    },
+    {
+      "legalDongCode": "1121510900",
+      "sigunguCd": "11215",
+      "bjdongCd": "10900",
+      "districtName": "광진구",
+      "legalDongName": "군자동"
+    },
+    {
+      "legalDongCode": "1123010100",
+      "sigunguCd": "11230",
+      "bjdongCd": "10100",
+      "districtName": "동대문구",
+      "legalDongName": "신설동"
+    },
+    {
+      "legalDongCode": "1123010200",
+      "sigunguCd": "11230",
+      "bjdongCd": "10200",
+      "districtName": "동대문구",
+      "legalDongName": "용두동"
+    },
+    {
+      "legalDongCode": "1123010300",
+      "sigunguCd": "11230",
+      "bjdongCd": "10300",
+      "districtName": "동대문구",
+      "legalDongName": "제기동"
+    },
+    {
+      "legalDongCode": "1123010400",
+      "sigunguCd": "11230",
+      "bjdongCd": "10400",
+      "districtName": "동대문구",
+      "legalDongName": "전농동"
+    },
+    {
+      "legalDongCode": "1123010500",
+      "sigunguCd": "11230",
+      "bjdongCd": "10500",
+      "districtName": "동대문구",
+      "legalDongName": "답십리동"
+    },
+    {
+      "legalDongCode": "1123010600",
+      "sigunguCd": "11230",
+      "bjdongCd": "10600",
+      "districtName": "동대문구",
+      "legalDongName": "장안동"
+    },
+    {
+      "legalDongCode": "1123010700",
+      "sigunguCd": "11230",
+      "bjdongCd": "10700",
+      "districtName": "동대문구",
+      "legalDongName": "청량리동"
+    },
+    {
+      "legalDongCode": "1123010800",
+      "sigunguCd": "11230",
+      "bjdongCd": "10800",
+      "districtName": "동대문구",
+      "legalDongName": "회기동"
+    },
+    {
+      "legalDongCode": "1123010900",
+      "sigunguCd": "11230",
+      "bjdongCd": "10900",
+      "districtName": "동대문구",
+      "legalDongName": "휘경동"
+    },
+    {
+      "legalDongCode": "1123011000",
+      "sigunguCd": "11230",
+      "bjdongCd": "11000",
+      "districtName": "동대문구",
+      "legalDongName": "이문동"
+    },
+    {
+      "legalDongCode": "1126010100",
+      "sigunguCd": "11260",
+      "bjdongCd": "10100",
+      "districtName": "중랑구",
+      "legalDongName": "면목동"
+    },
+    {
+      "legalDongCode": "1126010200",
+      "sigunguCd": "11260",
+      "bjdongCd": "10200",
+      "districtName": "중랑구",
+      "legalDongName": "상봉동"
+    },
+    {
+      "legalDongCode": "1126010300",
+      "sigunguCd": "11260",
+      "bjdongCd": "10300",
+      "districtName": "중랑구",
+      "legalDongName": "중화동"
+    },
+    {
+      "legalDongCode": "1126010400",
+      "sigunguCd": "11260",
+      "bjdongCd": "10400",
+      "districtName": "중랑구",
+      "legalDongName": "묵동"
+    },
+    {
+      "legalDongCode": "1126010500",
+      "sigunguCd": "11260",
+      "bjdongCd": "10500",
+      "districtName": "중랑구",
+      "legalDongName": "망우동"
+    },
+    {
+      "legalDongCode": "1126010600",
+      "sigunguCd": "11260",
+      "bjdongCd": "10600",
+      "districtName": "중랑구",
+      "legalDongName": "신내동"
+    },
+    {
+      "legalDongCode": "1129010100",
+      "sigunguCd": "11290",
+      "bjdongCd": "10100",
+      "districtName": "성북구",
+      "legalDongName": "성북동"
+    },
+    {
+      "legalDongCode": "1129010200",
+      "sigunguCd": "11290",
+      "bjdongCd": "10200",
+      "districtName": "성북구",
+      "legalDongName": "성북동1가"
+    },
+    {
+      "legalDongCode": "1129010300",
+      "sigunguCd": "11290",
+      "bjdongCd": "10300",
+      "districtName": "성북구",
+      "legalDongName": "돈암동"
+    },
+    {
+      "legalDongCode": "1129010400",
+      "sigunguCd": "11290",
+      "bjdongCd": "10400",
+      "districtName": "성북구",
+      "legalDongName": "동소문동1가"
+    },
+    {
+      "legalDongCode": "1129010500",
+      "sigunguCd": "11290",
+      "bjdongCd": "10500",
+      "districtName": "성북구",
+      "legalDongName": "동소문동2가"
+    },
+    {
+      "legalDongCode": "1129010600",
+      "sigunguCd": "11290",
+      "bjdongCd": "10600",
+      "districtName": "성북구",
+      "legalDongName": "동소문동3가"
+    },
+    {
+      "legalDongCode": "1129010700",
+      "sigunguCd": "11290",
+      "bjdongCd": "10700",
+      "districtName": "성북구",
+      "legalDongName": "동소문동4가"
+    },
+    {
+      "legalDongCode": "1129010800",
+      "sigunguCd": "11290",
+      "bjdongCd": "10800",
+      "districtName": "성북구",
+      "legalDongName": "동소문동5가"
+    },
+    {
+      "legalDongCode": "1129010900",
+      "sigunguCd": "11290",
+      "bjdongCd": "10900",
+      "districtName": "성북구",
+      "legalDongName": "동소문동6가"
+    },
+    {
+      "legalDongCode": "1129011000",
+      "sigunguCd": "11290",
+      "bjdongCd": "11000",
+      "districtName": "성북구",
+      "legalDongName": "동소문동7가"
+    },
+    {
+      "legalDongCode": "1129011100",
+      "sigunguCd": "11290",
+      "bjdongCd": "11100",
+      "districtName": "성북구",
+      "legalDongName": "삼선동1가"
+    },
+    {
+      "legalDongCode": "1129011200",
+      "sigunguCd": "11290",
+      "bjdongCd": "11200",
+      "districtName": "성북구",
+      "legalDongName": "삼선동2가"
+    },
+    {
+      "legalDongCode": "1129011300",
+      "sigunguCd": "11290",
+      "bjdongCd": "11300",
+      "districtName": "성북구",
+      "legalDongName": "삼선동3가"
+    },
+    {
+      "legalDongCode": "1129011400",
+      "sigunguCd": "11290",
+      "bjdongCd": "11400",
+      "districtName": "성북구",
+      "legalDongName": "삼선동4가"
+    },
+    {
+      "legalDongCode": "1129011500",
+      "sigunguCd": "11290",
+      "bjdongCd": "11500",
+      "districtName": "성북구",
+      "legalDongName": "삼선동5가"
+    },
+    {
+      "legalDongCode": "1129011600",
+      "sigunguCd": "11290",
+      "bjdongCd": "11600",
+      "districtName": "성북구",
+      "legalDongName": "동선동1가"
+    },
+    {
+      "legalDongCode": "1129011700",
+      "sigunguCd": "11290",
+      "bjdongCd": "11700",
+      "districtName": "성북구",
+      "legalDongName": "동선동2가"
+    },
+    {
+      "legalDongCode": "1129011800",
+      "sigunguCd": "11290",
+      "bjdongCd": "11800",
+      "districtName": "성북구",
+      "legalDongName": "동선동3가"
+    },
+    {
+      "legalDongCode": "1129011900",
+      "sigunguCd": "11290",
+      "bjdongCd": "11900",
+      "districtName": "성북구",
+      "legalDongName": "동선동4가"
+    },
+    {
+      "legalDongCode": "1129012000",
+      "sigunguCd": "11290",
+      "bjdongCd": "12000",
+      "districtName": "성북구",
+      "legalDongName": "동선동5가"
+    },
+    {
+      "legalDongCode": "1129012100",
+      "sigunguCd": "11290",
+      "bjdongCd": "12100",
+      "districtName": "성북구",
+      "legalDongName": "안암동1가"
+    },
+    {
+      "legalDongCode": "1129012200",
+      "sigunguCd": "11290",
+      "bjdongCd": "12200",
+      "districtName": "성북구",
+      "legalDongName": "안암동2가"
+    },
+    {
+      "legalDongCode": "1129012300",
+      "sigunguCd": "11290",
+      "bjdongCd": "12300",
+      "districtName": "성북구",
+      "legalDongName": "안암동3가"
+    },
+    {
+      "legalDongCode": "1129012400",
+      "sigunguCd": "11290",
+      "bjdongCd": "12400",
+      "districtName": "성북구",
+      "legalDongName": "안암동4가"
+    },
+    {
+      "legalDongCode": "1129012500",
+      "sigunguCd": "11290",
+      "bjdongCd": "12500",
+      "districtName": "성북구",
+      "legalDongName": "안암동5가"
+    },
+    {
+      "legalDongCode": "1129012600",
+      "sigunguCd": "11290",
+      "bjdongCd": "12600",
+      "districtName": "성북구",
+      "legalDongName": "보문동4가"
+    },
+    {
+      "legalDongCode": "1129012700",
+      "sigunguCd": "11290",
+      "bjdongCd": "12700",
+      "districtName": "성북구",
+      "legalDongName": "보문동5가"
+    },
+    {
+      "legalDongCode": "1129012800",
+      "sigunguCd": "11290",
+      "bjdongCd": "12800",
+      "districtName": "성북구",
+      "legalDongName": "보문동6가"
+    },
+    {
+      "legalDongCode": "1129012900",
+      "sigunguCd": "11290",
+      "bjdongCd": "12900",
+      "districtName": "성북구",
+      "legalDongName": "보문동7가"
+    },
+    {
+      "legalDongCode": "1129013000",
+      "sigunguCd": "11290",
+      "bjdongCd": "13000",
+      "districtName": "성북구",
+      "legalDongName": "보문동1가"
+    },
+    {
+      "legalDongCode": "1129013100",
+      "sigunguCd": "11290",
+      "bjdongCd": "13100",
+      "districtName": "성북구",
+      "legalDongName": "보문동2가"
+    },
+    {
+      "legalDongCode": "1129013200",
+      "sigunguCd": "11290",
+      "bjdongCd": "13200",
+      "districtName": "성북구",
+      "legalDongName": "보문동3가"
+    },
+    {
+      "legalDongCode": "1129013300",
+      "sigunguCd": "11290",
+      "bjdongCd": "13300",
+      "districtName": "성북구",
+      "legalDongName": "정릉동"
+    },
+    {
+      "legalDongCode": "1129013400",
+      "sigunguCd": "11290",
+      "bjdongCd": "13400",
+      "districtName": "성북구",
+      "legalDongName": "길음동"
+    },
+    {
+      "legalDongCode": "1129013500",
+      "sigunguCd": "11290",
+      "bjdongCd": "13500",
+      "districtName": "성북구",
+      "legalDongName": "종암동"
+    },
+    {
+      "legalDongCode": "1129013600",
+      "sigunguCd": "11290",
+      "bjdongCd": "13600",
+      "districtName": "성북구",
+      "legalDongName": "하월곡동"
+    },
+    {
+      "legalDongCode": "1129013700",
+      "sigunguCd": "11290",
+      "bjdongCd": "13700",
+      "districtName": "성북구",
+      "legalDongName": "상월곡동"
+    },
+    {
+      "legalDongCode": "1129013800",
+      "sigunguCd": "11290",
+      "bjdongCd": "13800",
+      "districtName": "성북구",
+      "legalDongName": "장위동"
+    },
+    {
+      "legalDongCode": "1129013900",
+      "sigunguCd": "11290",
+      "bjdongCd": "13900",
+      "districtName": "성북구",
+      "legalDongName": "석관동"
+    },
+    {
+      "legalDongCode": "1130510100",
+      "sigunguCd": "11305",
+      "bjdongCd": "10100",
+      "districtName": "강북구",
+      "legalDongName": "미아동"
+    },
+    {
+      "legalDongCode": "1130510200",
+      "sigunguCd": "11305",
+      "bjdongCd": "10200",
+      "districtName": "강북구",
+      "legalDongName": "번동"
+    },
+    {
+      "legalDongCode": "1130510300",
+      "sigunguCd": "11305",
+      "bjdongCd": "10300",
+      "districtName": "강북구",
+      "legalDongName": "수유동"
+    },
+    {
+      "legalDongCode": "1130510400",
+      "sigunguCd": "11305",
+      "bjdongCd": "10400",
+      "districtName": "강북구",
+      "legalDongName": "우이동"
+    },
+    {
+      "legalDongCode": "1132010500",
+      "sigunguCd": "11320",
+      "bjdongCd": "10500",
+      "districtName": "도봉구",
+      "legalDongName": "쌍문동"
+    },
+    {
+      "legalDongCode": "1132010600",
+      "sigunguCd": "11320",
+      "bjdongCd": "10600",
+      "districtName": "도봉구",
+      "legalDongName": "방학동"
+    },
+    {
+      "legalDongCode": "1132010700",
+      "sigunguCd": "11320",
+      "bjdongCd": "10700",
+      "districtName": "도봉구",
+      "legalDongName": "창동"
+    },
+    {
+      "legalDongCode": "1132010800",
+      "sigunguCd": "11320",
+      "bjdongCd": "10800",
+      "districtName": "도봉구",
+      "legalDongName": "도봉동"
+    },
+    {
+      "legalDongCode": "1135010200",
+      "sigunguCd": "11350",
+      "bjdongCd": "10200",
+      "districtName": "노원구",
+      "legalDongName": "월계동"
+    },
+    {
+      "legalDongCode": "1135010300",
+      "sigunguCd": "11350",
+      "bjdongCd": "10300",
+      "districtName": "노원구",
+      "legalDongName": "공릉동"
+    },
+    {
+      "legalDongCode": "1135010400",
+      "sigunguCd": "11350",
+      "bjdongCd": "10400",
+      "districtName": "노원구",
+      "legalDongName": "하계동"
+    },
+    {
+      "legalDongCode": "1135010500",
+      "sigunguCd": "11350",
+      "bjdongCd": "10500",
+      "districtName": "노원구",
+      "legalDongName": "상계동"
+    },
+    {
+      "legalDongCode": "1135010600",
+      "sigunguCd": "11350",
+      "bjdongCd": "10600",
+      "districtName": "노원구",
+      "legalDongName": "중계동"
+    },
+    {
+      "legalDongCode": "1138010100",
+      "sigunguCd": "11380",
+      "bjdongCd": "10100",
+      "districtName": "은평구",
+      "legalDongName": "수색동"
+    },
+    {
+      "legalDongCode": "1138010200",
+      "sigunguCd": "11380",
+      "bjdongCd": "10200",
+      "districtName": "은평구",
+      "legalDongName": "녹번동"
+    },
+    {
+      "legalDongCode": "1138010300",
+      "sigunguCd": "11380",
+      "bjdongCd": "10300",
+      "districtName": "은평구",
+      "legalDongName": "불광동"
+    },
+    {
+      "legalDongCode": "1138010400",
+      "sigunguCd": "11380",
+      "bjdongCd": "10400",
+      "districtName": "은평구",
+      "legalDongName": "갈현동"
+    },
+    {
+      "legalDongCode": "1138010500",
+      "sigunguCd": "11380",
+      "bjdongCd": "10500",
+      "districtName": "은평구",
+      "legalDongName": "구산동"
+    },
+    {
+      "legalDongCode": "1138010600",
+      "sigunguCd": "11380",
+      "bjdongCd": "10600",
+      "districtName": "은평구",
+      "legalDongName": "대조동"
+    },
+    {
+      "legalDongCode": "1138010700",
+      "sigunguCd": "11380",
+      "bjdongCd": "10700",
+      "districtName": "은평구",
+      "legalDongName": "응암동"
+    },
+    {
+      "legalDongCode": "1138010800",
+      "sigunguCd": "11380",
+      "bjdongCd": "10800",
+      "districtName": "은평구",
+      "legalDongName": "역촌동"
+    },
+    {
+      "legalDongCode": "1138010900",
+      "sigunguCd": "11380",
+      "bjdongCd": "10900",
+      "districtName": "은평구",
+      "legalDongName": "신사동"
+    },
+    {
+      "legalDongCode": "1138011000",
+      "sigunguCd": "11380",
+      "bjdongCd": "11000",
+      "districtName": "은평구",
+      "legalDongName": "증산동"
+    },
+    {
+      "legalDongCode": "1138011400",
+      "sigunguCd": "11380",
+      "bjdongCd": "11400",
+      "districtName": "은평구",
+      "legalDongName": "진관동"
+    },
+    {
+      "legalDongCode": "1141010100",
+      "sigunguCd": "11410",
+      "bjdongCd": "10100",
+      "districtName": "서대문구",
+      "legalDongName": "충정로2가"
+    },
+    {
+      "legalDongCode": "1141010200",
+      "sigunguCd": "11410",
+      "bjdongCd": "10200",
+      "districtName": "서대문구",
+      "legalDongName": "충정로3가"
+    },
+    {
+      "legalDongCode": "1141010300",
+      "sigunguCd": "11410",
+      "bjdongCd": "10300",
+      "districtName": "서대문구",
+      "legalDongName": "합동"
+    },
+    {
+      "legalDongCode": "1141010400",
+      "sigunguCd": "11410",
+      "bjdongCd": "10400",
+      "districtName": "서대문구",
+      "legalDongName": "미근동"
+    },
+    {
+      "legalDongCode": "1141010500",
+      "sigunguCd": "11410",
+      "bjdongCd": "10500",
+      "districtName": "서대문구",
+      "legalDongName": "냉천동"
+    },
+    {
+      "legalDongCode": "1141010600",
+      "sigunguCd": "11410",
+      "bjdongCd": "10600",
+      "districtName": "서대문구",
+      "legalDongName": "천연동"
+    },
+    {
+      "legalDongCode": "1141010700",
+      "sigunguCd": "11410",
+      "bjdongCd": "10700",
+      "districtName": "서대문구",
+      "legalDongName": "옥천동"
+    },
+    {
+      "legalDongCode": "1141010800",
+      "sigunguCd": "11410",
+      "bjdongCd": "10800",
+      "districtName": "서대문구",
+      "legalDongName": "영천동"
+    },
+    {
+      "legalDongCode": "1141010900",
+      "sigunguCd": "11410",
+      "bjdongCd": "10900",
+      "districtName": "서대문구",
+      "legalDongName": "현저동"
+    },
+    {
+      "legalDongCode": "1141011000",
+      "sigunguCd": "11410",
+      "bjdongCd": "11000",
+      "districtName": "서대문구",
+      "legalDongName": "북아현동"
+    },
+    {
+      "legalDongCode": "1141011100",
+      "sigunguCd": "11410",
+      "bjdongCd": "11100",
+      "districtName": "서대문구",
+      "legalDongName": "홍제동"
+    },
+    {
+      "legalDongCode": "1141011200",
+      "sigunguCd": "11410",
+      "bjdongCd": "11200",
+      "districtName": "서대문구",
+      "legalDongName": "대현동"
+    },
+    {
+      "legalDongCode": "1141011300",
+      "sigunguCd": "11410",
+      "bjdongCd": "11300",
+      "districtName": "서대문구",
+      "legalDongName": "대신동"
+    },
+    {
+      "legalDongCode": "1141011400",
+      "sigunguCd": "11410",
+      "bjdongCd": "11400",
+      "districtName": "서대문구",
+      "legalDongName": "신촌동"
+    },
+    {
+      "legalDongCode": "1141011500",
+      "sigunguCd": "11410",
+      "bjdongCd": "11500",
+      "districtName": "서대문구",
+      "legalDongName": "봉원동"
+    },
+    {
+      "legalDongCode": "1141011600",
+      "sigunguCd": "11410",
+      "bjdongCd": "11600",
+      "districtName": "서대문구",
+      "legalDongName": "창천동"
+    },
+    {
+      "legalDongCode": "1141011700",
+      "sigunguCd": "11410",
+      "bjdongCd": "11700",
+      "districtName": "서대문구",
+      "legalDongName": "연희동"
+    },
+    {
+      "legalDongCode": "1141011800",
+      "sigunguCd": "11410",
+      "bjdongCd": "11800",
+      "districtName": "서대문구",
+      "legalDongName": "홍은동"
+    },
+    {
+      "legalDongCode": "1141011900",
+      "sigunguCd": "11410",
+      "bjdongCd": "11900",
+      "districtName": "서대문구",
+      "legalDongName": "북가좌동"
+    },
+    {
+      "legalDongCode": "1141012000",
+      "sigunguCd": "11410",
+      "bjdongCd": "12000",
+      "districtName": "서대문구",
+      "legalDongName": "남가좌동"
+    },
+    {
+      "legalDongCode": "1144010100",
+      "sigunguCd": "11440",
+      "bjdongCd": "10100",
+      "districtName": "마포구",
+      "legalDongName": "아현동"
+    },
+    {
+      "legalDongCode": "1144010200",
+      "sigunguCd": "11440",
+      "bjdongCd": "10200",
+      "districtName": "마포구",
+      "legalDongName": "공덕동"
+    },
+    {
+      "legalDongCode": "1144010300",
+      "sigunguCd": "11440",
+      "bjdongCd": "10300",
+      "districtName": "마포구",
+      "legalDongName": "신공덕동"
+    },
+    {
+      "legalDongCode": "1144010400",
+      "sigunguCd": "11440",
+      "bjdongCd": "10400",
+      "districtName": "마포구",
+      "legalDongName": "도화동"
+    },
+    {
+      "legalDongCode": "1144010500",
+      "sigunguCd": "11440",
+      "bjdongCd": "10500",
+      "districtName": "마포구",
+      "legalDongName": "용강동"
+    },
+    {
+      "legalDongCode": "1144010600",
+      "sigunguCd": "11440",
+      "bjdongCd": "10600",
+      "districtName": "마포구",
+      "legalDongName": "토정동"
+    },
+    {
+      "legalDongCode": "1144010700",
+      "sigunguCd": "11440",
+      "bjdongCd": "10700",
+      "districtName": "마포구",
+      "legalDongName": "마포동"
+    },
+    {
+      "legalDongCode": "1144010800",
+      "sigunguCd": "11440",
+      "bjdongCd": "10800",
+      "districtName": "마포구",
+      "legalDongName": "대흥동"
+    },
+    {
+      "legalDongCode": "1144010900",
+      "sigunguCd": "11440",
+      "bjdongCd": "10900",
+      "districtName": "마포구",
+      "legalDongName": "염리동"
+    },
+    {
+      "legalDongCode": "1144011000",
+      "sigunguCd": "11440",
+      "bjdongCd": "11000",
+      "districtName": "마포구",
+      "legalDongName": "노고산동"
+    },
+    {
+      "legalDongCode": "1144011100",
+      "sigunguCd": "11440",
+      "bjdongCd": "11100",
+      "districtName": "마포구",
+      "legalDongName": "신수동"
+    },
+    {
+      "legalDongCode": "1144011200",
+      "sigunguCd": "11440",
+      "bjdongCd": "11200",
+      "districtName": "마포구",
+      "legalDongName": "현석동"
+    },
+    {
+      "legalDongCode": "1144011300",
+      "sigunguCd": "11440",
+      "bjdongCd": "11300",
+      "districtName": "마포구",
+      "legalDongName": "구수동"
+    },
+    {
+      "legalDongCode": "1144011400",
+      "sigunguCd": "11440",
+      "bjdongCd": "11400",
+      "districtName": "마포구",
+      "legalDongName": "창전동"
+    },
+    {
+      "legalDongCode": "1144011500",
+      "sigunguCd": "11440",
+      "bjdongCd": "11500",
+      "districtName": "마포구",
+      "legalDongName": "상수동"
+    },
+    {
+      "legalDongCode": "1144011600",
+      "sigunguCd": "11440",
+      "bjdongCd": "11600",
+      "districtName": "마포구",
+      "legalDongName": "하중동"
+    },
+    {
+      "legalDongCode": "1144011700",
+      "sigunguCd": "11440",
+      "bjdongCd": "11700",
+      "districtName": "마포구",
+      "legalDongName": "신정동"
+    },
+    {
+      "legalDongCode": "1144011800",
+      "sigunguCd": "11440",
+      "bjdongCd": "11800",
+      "districtName": "마포구",
+      "legalDongName": "당인동"
+    },
+    {
+      "legalDongCode": "1144012000",
+      "sigunguCd": "11440",
+      "bjdongCd": "12000",
+      "districtName": "마포구",
+      "legalDongName": "서교동"
+    },
+    {
+      "legalDongCode": "1144012100",
+      "sigunguCd": "11440",
+      "bjdongCd": "12100",
+      "districtName": "마포구",
+      "legalDongName": "동교동"
+    },
+    {
+      "legalDongCode": "1144012200",
+      "sigunguCd": "11440",
+      "bjdongCd": "12200",
+      "districtName": "마포구",
+      "legalDongName": "합정동"
+    },
+    {
+      "legalDongCode": "1144012300",
+      "sigunguCd": "11440",
+      "bjdongCd": "12300",
+      "districtName": "마포구",
+      "legalDongName": "망원동"
+    },
+    {
+      "legalDongCode": "1144012400",
+      "sigunguCd": "11440",
+      "bjdongCd": "12400",
+      "districtName": "마포구",
+      "legalDongName": "연남동"
+    },
+    {
+      "legalDongCode": "1144012500",
+      "sigunguCd": "11440",
+      "bjdongCd": "12500",
+      "districtName": "마포구",
+      "legalDongName": "성산동"
+    },
+    {
+      "legalDongCode": "1144012600",
+      "sigunguCd": "11440",
+      "bjdongCd": "12600",
+      "districtName": "마포구",
+      "legalDongName": "중동"
+    },
+    {
+      "legalDongCode": "1144012700",
+      "sigunguCd": "11440",
+      "bjdongCd": "12700",
+      "districtName": "마포구",
+      "legalDongName": "상암동"
+    },
+    {
+      "legalDongCode": "1147010100",
+      "sigunguCd": "11470",
+      "bjdongCd": "10100",
+      "districtName": "양천구",
+      "legalDongName": "신정동"
+    },
+    {
+      "legalDongCode": "1147010200",
+      "sigunguCd": "11470",
+      "bjdongCd": "10200",
+      "districtName": "양천구",
+      "legalDongName": "목동"
+    },
+    {
+      "legalDongCode": "1147010300",
+      "sigunguCd": "11470",
+      "bjdongCd": "10300",
+      "districtName": "양천구",
+      "legalDongName": "신월동"
+    },
+    {
+      "legalDongCode": "1150010100",
+      "sigunguCd": "11500",
+      "bjdongCd": "10100",
+      "districtName": "강서구",
+      "legalDongName": "염창동"
+    },
+    {
+      "legalDongCode": "1150010200",
+      "sigunguCd": "11500",
+      "bjdongCd": "10200",
+      "districtName": "강서구",
+      "legalDongName": "등촌동"
+    },
+    {
+      "legalDongCode": "1150010300",
+      "sigunguCd": "11500",
+      "bjdongCd": "10300",
+      "districtName": "강서구",
+      "legalDongName": "화곡동"
+    },
+    {
+      "legalDongCode": "1150010400",
+      "sigunguCd": "11500",
+      "bjdongCd": "10400",
+      "districtName": "강서구",
+      "legalDongName": "가양동"
+    },
+    {
+      "legalDongCode": "1150010500",
+      "sigunguCd": "11500",
+      "bjdongCd": "10500",
+      "districtName": "강서구",
+      "legalDongName": "마곡동"
+    },
+    {
+      "legalDongCode": "1150010600",
+      "sigunguCd": "11500",
+      "bjdongCd": "10600",
+      "districtName": "강서구",
+      "legalDongName": "내발산동"
+    },
+    {
+      "legalDongCode": "1150010700",
+      "sigunguCd": "11500",
+      "bjdongCd": "10700",
+      "districtName": "강서구",
+      "legalDongName": "외발산동"
+    },
+    {
+      "legalDongCode": "1150010800",
+      "sigunguCd": "11500",
+      "bjdongCd": "10800",
+      "districtName": "강서구",
+      "legalDongName": "공항동"
+    },
+    {
+      "legalDongCode": "1150010900",
+      "sigunguCd": "11500",
+      "bjdongCd": "10900",
+      "districtName": "강서구",
+      "legalDongName": "방화동"
+    },
+    {
+      "legalDongCode": "1150011000",
+      "sigunguCd": "11500",
+      "bjdongCd": "11000",
+      "districtName": "강서구",
+      "legalDongName": "개화동"
+    },
+    {
+      "legalDongCode": "1150011100",
+      "sigunguCd": "11500",
+      "bjdongCd": "11100",
+      "districtName": "강서구",
+      "legalDongName": "과해동"
+    },
+    {
+      "legalDongCode": "1150011200",
+      "sigunguCd": "11500",
+      "bjdongCd": "11200",
+      "districtName": "강서구",
+      "legalDongName": "오곡동"
+    },
+    {
+      "legalDongCode": "1150011300",
+      "sigunguCd": "11500",
+      "bjdongCd": "11300",
+      "districtName": "강서구",
+      "legalDongName": "오쇠동"
+    },
+    {
+      "legalDongCode": "1153010100",
+      "sigunguCd": "11530",
+      "bjdongCd": "10100",
+      "districtName": "구로구",
+      "legalDongName": "신도림동"
+    },
+    {
+      "legalDongCode": "1153010200",
+      "sigunguCd": "11530",
+      "bjdongCd": "10200",
+      "districtName": "구로구",
+      "legalDongName": "구로동"
+    },
+    {
+      "legalDongCode": "1153010300",
+      "sigunguCd": "11530",
+      "bjdongCd": "10300",
+      "districtName": "구로구",
+      "legalDongName": "가리봉동"
+    },
+    {
+      "legalDongCode": "1153010600",
+      "sigunguCd": "11530",
+      "bjdongCd": "10600",
+      "districtName": "구로구",
+      "legalDongName": "고척동"
+    },
+    {
+      "legalDongCode": "1153010700",
+      "sigunguCd": "11530",
+      "bjdongCd": "10700",
+      "districtName": "구로구",
+      "legalDongName": "개봉동"
+    },
+    {
+      "legalDongCode": "1153010800",
+      "sigunguCd": "11530",
+      "bjdongCd": "10800",
+      "districtName": "구로구",
+      "legalDongName": "오류동"
+    },
+    {
+      "legalDongCode": "1153010900",
+      "sigunguCd": "11530",
+      "bjdongCd": "10900",
+      "districtName": "구로구",
+      "legalDongName": "궁동"
+    },
+    {
+      "legalDongCode": "1153011000",
+      "sigunguCd": "11530",
+      "bjdongCd": "11000",
+      "districtName": "구로구",
+      "legalDongName": "온수동"
+    },
+    {
+      "legalDongCode": "1153011100",
+      "sigunguCd": "11530",
+      "bjdongCd": "11100",
+      "districtName": "구로구",
+      "legalDongName": "천왕동"
+    },
+    {
+      "legalDongCode": "1153011200",
+      "sigunguCd": "11530",
+      "bjdongCd": "11200",
+      "districtName": "구로구",
+      "legalDongName": "항동"
+    },
+    {
+      "legalDongCode": "1154510100",
+      "sigunguCd": "11545",
+      "bjdongCd": "10100",
+      "districtName": "금천구",
+      "legalDongName": "가산동"
+    },
+    {
+      "legalDongCode": "1154510200",
+      "sigunguCd": "11545",
+      "bjdongCd": "10200",
+      "districtName": "금천구",
+      "legalDongName": "독산동"
+    },
+    {
+      "legalDongCode": "1154510300",
+      "sigunguCd": "11545",
+      "bjdongCd": "10300",
+      "districtName": "금천구",
+      "legalDongName": "시흥동"
+    },
+    {
+      "legalDongCode": "1156010100",
+      "sigunguCd": "11560",
+      "bjdongCd": "10100",
+      "districtName": "영등포구",
+      "legalDongName": "영등포동"
+    },
+    {
+      "legalDongCode": "1156010200",
+      "sigunguCd": "11560",
+      "bjdongCd": "10200",
+      "districtName": "영등포구",
+      "legalDongName": "영등포동1가"
+    },
+    {
+      "legalDongCode": "1156010300",
+      "sigunguCd": "11560",
+      "bjdongCd": "10300",
+      "districtName": "영등포구",
+      "legalDongName": "영등포동2가"
+    },
+    {
+      "legalDongCode": "1156010400",
+      "sigunguCd": "11560",
+      "bjdongCd": "10400",
+      "districtName": "영등포구",
+      "legalDongName": "영등포동3가"
+    },
+    {
+      "legalDongCode": "1156010500",
+      "sigunguCd": "11560",
+      "bjdongCd": "10500",
+      "districtName": "영등포구",
+      "legalDongName": "영등포동4가"
+    },
+    {
+      "legalDongCode": "1156010600",
+      "sigunguCd": "11560",
+      "bjdongCd": "10600",
+      "districtName": "영등포구",
+      "legalDongName": "영등포동5가"
+    },
+    {
+      "legalDongCode": "1156010700",
+      "sigunguCd": "11560",
+      "bjdongCd": "10700",
+      "districtName": "영등포구",
+      "legalDongName": "영등포동6가"
+    },
+    {
+      "legalDongCode": "1156010800",
+      "sigunguCd": "11560",
+      "bjdongCd": "10800",
+      "districtName": "영등포구",
+      "legalDongName": "영등포동7가"
+    },
+    {
+      "legalDongCode": "1156010900",
+      "sigunguCd": "11560",
+      "bjdongCd": "10900",
+      "districtName": "영등포구",
+      "legalDongName": "영등포동8가"
+    },
+    {
+      "legalDongCode": "1156011000",
+      "sigunguCd": "11560",
+      "bjdongCd": "11000",
+      "districtName": "영등포구",
+      "legalDongName": "여의도동"
+    },
+    {
+      "legalDongCode": "1156011100",
+      "sigunguCd": "11560",
+      "bjdongCd": "11100",
+      "districtName": "영등포구",
+      "legalDongName": "당산동1가"
+    },
+    {
+      "legalDongCode": "1156011200",
+      "sigunguCd": "11560",
+      "bjdongCd": "11200",
+      "districtName": "영등포구",
+      "legalDongName": "당산동2가"
+    },
+    {
+      "legalDongCode": "1156011300",
+      "sigunguCd": "11560",
+      "bjdongCd": "11300",
+      "districtName": "영등포구",
+      "legalDongName": "당산동3가"
+    },
+    {
+      "legalDongCode": "1156011400",
+      "sigunguCd": "11560",
+      "bjdongCd": "11400",
+      "districtName": "영등포구",
+      "legalDongName": "당산동4가"
+    },
+    {
+      "legalDongCode": "1156011500",
+      "sigunguCd": "11560",
+      "bjdongCd": "11500",
+      "districtName": "영등포구",
+      "legalDongName": "당산동5가"
+    },
+    {
+      "legalDongCode": "1156011600",
+      "sigunguCd": "11560",
+      "bjdongCd": "11600",
+      "districtName": "영등포구",
+      "legalDongName": "당산동6가"
+    },
+    {
+      "legalDongCode": "1156011700",
+      "sigunguCd": "11560",
+      "bjdongCd": "11700",
+      "districtName": "영등포구",
+      "legalDongName": "당산동"
+    },
+    {
+      "legalDongCode": "1156011800",
+      "sigunguCd": "11560",
+      "bjdongCd": "11800",
+      "districtName": "영등포구",
+      "legalDongName": "도림동"
+    },
+    {
+      "legalDongCode": "1156011900",
+      "sigunguCd": "11560",
+      "bjdongCd": "11900",
+      "districtName": "영등포구",
+      "legalDongName": "문래동1가"
+    },
+    {
+      "legalDongCode": "1156012000",
+      "sigunguCd": "11560",
+      "bjdongCd": "12000",
+      "districtName": "영등포구",
+      "legalDongName": "문래동2가"
+    },
+    {
+      "legalDongCode": "1156012100",
+      "sigunguCd": "11560",
+      "bjdongCd": "12100",
+      "districtName": "영등포구",
+      "legalDongName": "문래동3가"
+    },
+    {
+      "legalDongCode": "1156012200",
+      "sigunguCd": "11560",
+      "bjdongCd": "12200",
+      "districtName": "영등포구",
+      "legalDongName": "문래동4가"
+    },
+    {
+      "legalDongCode": "1156012300",
+      "sigunguCd": "11560",
+      "bjdongCd": "12300",
+      "districtName": "영등포구",
+      "legalDongName": "문래동5가"
+    },
+    {
+      "legalDongCode": "1156012400",
+      "sigunguCd": "11560",
+      "bjdongCd": "12400",
+      "districtName": "영등포구",
+      "legalDongName": "문래동6가"
+    },
+    {
+      "legalDongCode": "1156012500",
+      "sigunguCd": "11560",
+      "bjdongCd": "12500",
+      "districtName": "영등포구",
+      "legalDongName": "양평동1가"
+    },
+    {
+      "legalDongCode": "1156012600",
+      "sigunguCd": "11560",
+      "bjdongCd": "12600",
+      "districtName": "영등포구",
+      "legalDongName": "양평동2가"
+    },
+    {
+      "legalDongCode": "1156012700",
+      "sigunguCd": "11560",
+      "bjdongCd": "12700",
+      "districtName": "영등포구",
+      "legalDongName": "양평동3가"
+    },
+    {
+      "legalDongCode": "1156012800",
+      "sigunguCd": "11560",
+      "bjdongCd": "12800",
+      "districtName": "영등포구",
+      "legalDongName": "양평동4가"
+    },
+    {
+      "legalDongCode": "1156012900",
+      "sigunguCd": "11560",
+      "bjdongCd": "12900",
+      "districtName": "영등포구",
+      "legalDongName": "양평동5가"
+    },
+    {
+      "legalDongCode": "1156013000",
+      "sigunguCd": "11560",
+      "bjdongCd": "13000",
+      "districtName": "영등포구",
+      "legalDongName": "양평동6가"
+    },
+    {
+      "legalDongCode": "1156013100",
+      "sigunguCd": "11560",
+      "bjdongCd": "13100",
+      "districtName": "영등포구",
+      "legalDongName": "양화동"
+    },
+    {
+      "legalDongCode": "1156013200",
+      "sigunguCd": "11560",
+      "bjdongCd": "13200",
+      "districtName": "영등포구",
+      "legalDongName": "신길동"
+    },
+    {
+      "legalDongCode": "1156013300",
+      "sigunguCd": "11560",
+      "bjdongCd": "13300",
+      "districtName": "영등포구",
+      "legalDongName": "대림동"
+    },
+    {
+      "legalDongCode": "1156013400",
+      "sigunguCd": "11560",
+      "bjdongCd": "13400",
+      "districtName": "영등포구",
+      "legalDongName": "양평동"
+    },
+    {
+      "legalDongCode": "1159010100",
+      "sigunguCd": "11590",
+      "bjdongCd": "10100",
+      "districtName": "동작구",
+      "legalDongName": "노량진동"
+    },
+    {
+      "legalDongCode": "1159010200",
+      "sigunguCd": "11590",
+      "bjdongCd": "10200",
+      "districtName": "동작구",
+      "legalDongName": "상도동"
+    },
+    {
+      "legalDongCode": "1159010300",
+      "sigunguCd": "11590",
+      "bjdongCd": "10300",
+      "districtName": "동작구",
+      "legalDongName": "상도1동"
+    },
+    {
+      "legalDongCode": "1159010400",
+      "sigunguCd": "11590",
+      "bjdongCd": "10400",
+      "districtName": "동작구",
+      "legalDongName": "본동"
+    },
+    {
+      "legalDongCode": "1159010500",
+      "sigunguCd": "11590",
+      "bjdongCd": "10500",
+      "districtName": "동작구",
+      "legalDongName": "흑석동"
+    },
+    {
+      "legalDongCode": "1159010600",
+      "sigunguCd": "11590",
+      "bjdongCd": "10600",
+      "districtName": "동작구",
+      "legalDongName": "동작동"
+    },
+    {
+      "legalDongCode": "1159010700",
+      "sigunguCd": "11590",
+      "bjdongCd": "10700",
+      "districtName": "동작구",
+      "legalDongName": "사당동"
+    },
+    {
+      "legalDongCode": "1159010800",
+      "sigunguCd": "11590",
+      "bjdongCd": "10800",
+      "districtName": "동작구",
+      "legalDongName": "대방동"
+    },
+    {
+      "legalDongCode": "1159010900",
+      "sigunguCd": "11590",
+      "bjdongCd": "10900",
+      "districtName": "동작구",
+      "legalDongName": "신대방동"
+    },
+    {
+      "legalDongCode": "1162010100",
+      "sigunguCd": "11620",
+      "bjdongCd": "10100",
+      "districtName": "관악구",
+      "legalDongName": "봉천동"
+    },
+    {
+      "legalDongCode": "1162010200",
+      "sigunguCd": "11620",
+      "bjdongCd": "10200",
+      "districtName": "관악구",
+      "legalDongName": "신림동"
+    },
+    {
+      "legalDongCode": "1162010300",
+      "sigunguCd": "11620",
+      "bjdongCd": "10300",
+      "districtName": "관악구",
+      "legalDongName": "남현동"
+    },
+    {
+      "legalDongCode": "1165010100",
+      "sigunguCd": "11650",
+      "bjdongCd": "10100",
+      "districtName": "서초구",
+      "legalDongName": "방배동"
+    },
+    {
+      "legalDongCode": "1165010200",
+      "sigunguCd": "11650",
+      "bjdongCd": "10200",
+      "districtName": "서초구",
+      "legalDongName": "양재동"
+    },
+    {
+      "legalDongCode": "1165010300",
+      "sigunguCd": "11650",
+      "bjdongCd": "10300",
+      "districtName": "서초구",
+      "legalDongName": "우면동"
+    },
+    {
+      "legalDongCode": "1165010400",
+      "sigunguCd": "11650",
+      "bjdongCd": "10400",
+      "districtName": "서초구",
+      "legalDongName": "원지동"
+    },
+    {
+      "legalDongCode": "1165010600",
+      "sigunguCd": "11650",
+      "bjdongCd": "10600",
+      "districtName": "서초구",
+      "legalDongName": "잠원동"
+    },
+    {
+      "legalDongCode": "1165010700",
+      "sigunguCd": "11650",
+      "bjdongCd": "10700",
+      "districtName": "서초구",
+      "legalDongName": "반포동"
+    },
+    {
+      "legalDongCode": "1165010800",
+      "sigunguCd": "11650",
+      "bjdongCd": "10800",
+      "districtName": "서초구",
+      "legalDongName": "서초동"
+    },
+    {
+      "legalDongCode": "1165010900",
+      "sigunguCd": "11650",
+      "bjdongCd": "10900",
+      "districtName": "서초구",
+      "legalDongName": "내곡동"
+    },
+    {
+      "legalDongCode": "1165011000",
+      "sigunguCd": "11650",
+      "bjdongCd": "11000",
+      "districtName": "서초구",
+      "legalDongName": "염곡동"
+    },
+    {
+      "legalDongCode": "1165011100",
+      "sigunguCd": "11650",
+      "bjdongCd": "11100",
+      "districtName": "서초구",
+      "legalDongName": "신원동"
+    },
+    {
+      "legalDongCode": "1168010100",
+      "sigunguCd": "11680",
+      "bjdongCd": "10100",
+      "districtName": "강남구",
+      "legalDongName": "역삼동"
+    },
+    {
+      "legalDongCode": "1168010300",
+      "sigunguCd": "11680",
+      "bjdongCd": "10300",
+      "districtName": "강남구",
+      "legalDongName": "개포동"
+    },
+    {
+      "legalDongCode": "1168010400",
+      "sigunguCd": "11680",
+      "bjdongCd": "10400",
+      "districtName": "강남구",
+      "legalDongName": "청담동"
+    },
+    {
+      "legalDongCode": "1168010500",
+      "sigunguCd": "11680",
+      "bjdongCd": "10500",
+      "districtName": "강남구",
+      "legalDongName": "삼성동"
+    },
+    {
+      "legalDongCode": "1168010600",
+      "sigunguCd": "11680",
+      "bjdongCd": "10600",
+      "districtName": "강남구",
+      "legalDongName": "대치동"
+    },
+    {
+      "legalDongCode": "1168010700",
+      "sigunguCd": "11680",
+      "bjdongCd": "10700",
+      "districtName": "강남구",
+      "legalDongName": "신사동"
+    },
+    {
+      "legalDongCode": "1168010800",
+      "sigunguCd": "11680",
+      "bjdongCd": "10800",
+      "districtName": "강남구",
+      "legalDongName": "논현동"
+    },
+    {
+      "legalDongCode": "1168011000",
+      "sigunguCd": "11680",
+      "bjdongCd": "11000",
+      "districtName": "강남구",
+      "legalDongName": "압구정동"
+    },
+    {
+      "legalDongCode": "1168011100",
+      "sigunguCd": "11680",
+      "bjdongCd": "11100",
+      "districtName": "강남구",
+      "legalDongName": "세곡동"
+    },
+    {
+      "legalDongCode": "1168011200",
+      "sigunguCd": "11680",
+      "bjdongCd": "11200",
+      "districtName": "강남구",
+      "legalDongName": "자곡동"
+    },
+    {
+      "legalDongCode": "1168011300",
+      "sigunguCd": "11680",
+      "bjdongCd": "11300",
+      "districtName": "강남구",
+      "legalDongName": "율현동"
+    },
+    {
+      "legalDongCode": "1168011400",
+      "sigunguCd": "11680",
+      "bjdongCd": "11400",
+      "districtName": "강남구",
+      "legalDongName": "일원동"
+    },
+    {
+      "legalDongCode": "1168011500",
+      "sigunguCd": "11680",
+      "bjdongCd": "11500",
+      "districtName": "강남구",
+      "legalDongName": "수서동"
+    },
+    {
+      "legalDongCode": "1168011800",
+      "sigunguCd": "11680",
+      "bjdongCd": "11800",
+      "districtName": "강남구",
+      "legalDongName": "도곡동"
+    },
+    {
+      "legalDongCode": "1171010100",
+      "sigunguCd": "11710",
+      "bjdongCd": "10100",
+      "districtName": "송파구",
+      "legalDongName": "잠실동"
+    },
+    {
+      "legalDongCode": "1171010200",
+      "sigunguCd": "11710",
+      "bjdongCd": "10200",
+      "districtName": "송파구",
+      "legalDongName": "신천동"
+    },
+    {
+      "legalDongCode": "1171010300",
+      "sigunguCd": "11710",
+      "bjdongCd": "10300",
+      "districtName": "송파구",
+      "legalDongName": "풍납동"
+    },
+    {
+      "legalDongCode": "1171010400",
+      "sigunguCd": "11710",
+      "bjdongCd": "10400",
+      "districtName": "송파구",
+      "legalDongName": "송파동"
+    },
+    {
+      "legalDongCode": "1171010500",
+      "sigunguCd": "11710",
+      "bjdongCd": "10500",
+      "districtName": "송파구",
+      "legalDongName": "석촌동"
+    },
+    {
+      "legalDongCode": "1171010600",
+      "sigunguCd": "11710",
+      "bjdongCd": "10600",
+      "districtName": "송파구",
+      "legalDongName": "삼전동"
+    },
+    {
+      "legalDongCode": "1171010700",
+      "sigunguCd": "11710",
+      "bjdongCd": "10700",
+      "districtName": "송파구",
+      "legalDongName": "가락동"
+    },
+    {
+      "legalDongCode": "1171010800",
+      "sigunguCd": "11710",
+      "bjdongCd": "10800",
+      "districtName": "송파구",
+      "legalDongName": "문정동"
+    },
+    {
+      "legalDongCode": "1171010900",
+      "sigunguCd": "11710",
+      "bjdongCd": "10900",
+      "districtName": "송파구",
+      "legalDongName": "장지동"
+    },
+    {
+      "legalDongCode": "1171011100",
+      "sigunguCd": "11710",
+      "bjdongCd": "11100",
+      "districtName": "송파구",
+      "legalDongName": "방이동"
+    },
+    {
+      "legalDongCode": "1171011200",
+      "sigunguCd": "11710",
+      "bjdongCd": "11200",
+      "districtName": "송파구",
+      "legalDongName": "오금동"
+    },
+    {
+      "legalDongCode": "1171011300",
+      "sigunguCd": "11710",
+      "bjdongCd": "11300",
+      "districtName": "송파구",
+      "legalDongName": "거여동"
+    },
+    {
+      "legalDongCode": "1171011400",
+      "sigunguCd": "11710",
+      "bjdongCd": "11400",
+      "districtName": "송파구",
+      "legalDongName": "마천동"
+    },
+    {
+      "legalDongCode": "1174010100",
+      "sigunguCd": "11740",
+      "bjdongCd": "10100",
+      "districtName": "강동구",
+      "legalDongName": "명일동"
+    },
+    {
+      "legalDongCode": "1174010200",
+      "sigunguCd": "11740",
+      "bjdongCd": "10200",
+      "districtName": "강동구",
+      "legalDongName": "고덕동"
+    },
+    {
+      "legalDongCode": "1174010300",
+      "sigunguCd": "11740",
+      "bjdongCd": "10300",
+      "districtName": "강동구",
+      "legalDongName": "상일동"
+    },
+    {
+      "legalDongCode": "1174010500",
+      "sigunguCd": "11740",
+      "bjdongCd": "10500",
+      "districtName": "강동구",
+      "legalDongName": "길동"
+    },
+    {
+      "legalDongCode": "1174010600",
+      "sigunguCd": "11740",
+      "bjdongCd": "10600",
+      "districtName": "강동구",
+      "legalDongName": "둔촌동"
+    },
+    {
+      "legalDongCode": "1174010700",
+      "sigunguCd": "11740",
+      "bjdongCd": "10700",
+      "districtName": "강동구",
+      "legalDongName": "암사동"
+    },
+    {
+      "legalDongCode": "1174010800",
+      "sigunguCd": "11740",
+      "bjdongCd": "10800",
+      "districtName": "강동구",
+      "legalDongName": "성내동"
+    },
+    {
+      "legalDongCode": "1174010900",
+      "sigunguCd": "11740",
+      "bjdongCd": "10900",
+      "districtName": "강동구",
+      "legalDongName": "천호동"
+    },
+    {
+      "legalDongCode": "1174011000",
+      "sigunguCd": "11740",
+      "bjdongCd": "11000",
+      "districtName": "강동구",
+      "legalDongName": "강일동"
+    }
+  ]
+}

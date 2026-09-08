@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "timezone": "Asia/Seoul",
+  "archive": "data/market.db",
+  "lock": "artifacts/source-aware-refresh.lock",
+  "state": "artifacts/source-aware-refresh-state.json",
+  "latestReport": "artifacts/source-aware-refresh-latest.json",
+  "eventLog": "logs/source-aware-refresh.jsonl",
+  "runReports": "artifacts/source-aware-refresh-runs",
+  "candidates": "artifacts/source-aware-refresh-candidates",
+  "backups": "backups/source-aware-refresh",
+  "retention": {
+    "backups": 3,
+    "failedCandidates": 2
+  },
+  "credentials": {
+    "publicSources": "C:/10137_WorkSpace/env/.env",
+    "tursoPersonal": "C:/10137_WorkSpace/env/.env.personal.txt"
+  },
+  "domains": {
+    "news": {
+      "slots": ["06:00", "09:00", "12:00", "15:00", "18:00", "21:00"],
+      "lookbackDays": 2,
+      "timeoutSeconds": 1200,
+      "datasetCode": "DAILY_ARTICLES"
+    },
+    "macro": {
+      "slots": ["08:00"],
+      "weekdays": [1, 2, 3, 4, 5],
+      "timeoutSeconds": 3600,
+      "datasetCode": "FINANCIAL_MACRO"
+    },
+    "molit": {
+      "slots": ["07:30"],
+      "weekdays": [3],
+      "correctionMonths": 3,
+      "timeoutSeconds": 14400,
+      "datasetCode": "MOLIT_TRANSACTIONS"
+    },
+    "permits": {
+      "slots": ["07:30"],
+      "weekdays": [6],
+      "snapshotKind": "FULL",
+      "timeoutSeconds": 21600,
+      "datasetCode": "SEOUL_BUILDING_PERMITS"
+    }
+  },
+  "publication": {
+    "provider": "turso",
+    "enabled": true,
+    "blockedUntil": "2026-10-01",
+    "blockedReason": "QUOTA_READS",
+    "bootstrapOnFirstPublish": true,
+    "batchRows": 100
+  }
+}

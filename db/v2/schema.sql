@@ -889,6 +889,17 @@ CREATE TABLE claim_evidence (
     PRIMARY KEY(claim_id, mention_id, evidence_role)
 ) STRICT;
 
+CREATE INDEX ix_claims_lp_manager_assessment
+    ON claims(predicate_code,review_status,verification_status)
+    WHERE predicate_code IN (
+      'LP_MANDATE_MANAGER_BID_PARTICIPANT',
+      'LP_MANDATE_MANAGER_INFERRED_FROM_DEPLOYMENT'
+    );
+
+CREATE INDEX ix_claim_arguments_mandate_assessment
+    ON claim_arguments(role_code,text_value,claim_id)
+    WHERE role_code IN ('MANDATE_CODE','MANDATE_TRACK','FOLLOW_UP_ACTION','FUNDING_BASIS');
+
 CREATE TABLE events (
     event_id            TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
     canonical_title     TEXT NOT NULL,
@@ -3171,10 +3182,449 @@ WHERE r.review_status NOT IN ('REJECTED','SUPERSEDED')
   AND (r.valid_to IS NULL OR r.valid_to>strftime('%Y-%m-%dT%H:%M:%fZ','now'))
 GROUP BY r.target_kind,r.target_id;
 
+CREATE TABLE analytics_refresh_runs (
+    analytics_refresh_run_id TEXT PRIMARY KEY,
+    pipeline_code TEXT NOT NULL,
+    status_code TEXT NOT NULL CHECK(status_code IN ('RUNNING','COMPLETED','FAILED','ROLLED_BACK')),
+    algorithm_version TEXT NOT NULL,
+    window_start TEXT,
+    window_end TEXT,
+    source_scope_code TEXT NOT NULL DEFAULT 'ALL',
+    input_count INTEGER NOT NULL DEFAULT 0,
+    output_count INTEGER NOT NULL DEFAULT 0,
+    started_at TEXT NOT NULL,
+    completed_at TEXT,
+    error_code TEXT,
+    metadata_json TEXT NOT NULL DEFAULT '{}' CHECK(json_valid(metadata_json))
+) STRICT;
+
+CREATE TABLE keyword_dictionary (
+    keyword_id TEXT PRIMARY KEY,
+    normalized_term TEXT NOT NULL,
+    display_term TEXT NOT NULL,
+    term_kind TEXT NOT NULL CHECK(term_kind IN ('TOKEN','PHRASE','ENTITY')),
+    status_code TEXT NOT NULL DEFAULT 'ACTIVE' CHECK(status_code IN ('ACTIVE','STOPWORD','DEPRECATED')),
+    is_collection_bias INTEGER NOT NULL DEFAULT 0 CHECK(is_collection_bias IN (0,1)),
+    algorithm_version TEXT NOT NULL,
+    metadata_json TEXT NOT NULL DEFAULT '{}' CHECK(json_valid(metadata_json)),
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    UNIQUE(normalized_term,algorithm_version)
+) STRICT;
+
+CREATE TABLE keyword_observations_daily (
+    keyword_observation_id TEXT PRIMARY KEY,
+    bucket_date TEXT NOT NULL,
+    keyword_id TEXT NOT NULL REFERENCES keyword_dictionary(keyword_id) ON DELETE RESTRICT,
+    source_scope_code TEXT NOT NULL DEFAULT 'ALL',
+    document_frequency INTEGER NOT NULL CHECK(document_frequency>=0),
+    mention_count INTEGER NOT NULL CHECK(mention_count>=document_frequency),
+    baseline_document_frequency REAL NOT NULL DEFAULT 0 CHECK(baseline_document_frequency>=0),
+    burst_score REAL NOT NULL DEFAULT 0,
+    computed_at TEXT NOT NULL,
+    window_start TEXT NOT NULL,
+    window_end TEXT NOT NULL,
+    algorithm_version TEXT NOT NULL,
+    source_scope_json TEXT NOT NULL DEFAULT '{}' CHECK(json_valid(source_scope_json) AND json_type(source_scope_json)='object'),
+    metadata_json TEXT NOT NULL DEFAULT '{}' CHECK(json_valid(metadata_json) AND json_type(metadata_json)='object')
+) STRICT;
+CREATE UNIQUE INDEX ux_keyword_observation_identity ON keyword_observations_daily(bucket_date,keyword_id,source_scope_code,algorithm_version);
+CREATE INDEX ix_keyword_observations_trend ON keyword_observations_daily(keyword_id,bucket_date,algorithm_version);
+CREATE INDEX ix_keyword_observations_burst ON keyword_observations_daily(bucket_date,burst_score DESC,document_frequency DESC);
+
+CREATE TABLE keyword_cooccurrences_daily (
+    keyword_cooccurrence_id TEXT PRIMARY KEY,
+    bucket_date TEXT NOT NULL,
+    keyword_left_id TEXT NOT NULL REFERENCES keyword_dictionary(keyword_id) ON DELETE RESTRICT,
+    keyword_right_id TEXT NOT NULL REFERENCES keyword_dictionary(keyword_id) ON DELETE RESTRICT,
+    source_scope_code TEXT NOT NULL DEFAULT 'ALL',
+    document_frequency INTEGER NOT NULL CHECK(document_frequency>0),
+    computed_at TEXT NOT NULL,
+    window_start TEXT NOT NULL,
+    window_end TEXT NOT NULL,
+    algorithm_version TEXT NOT NULL,
+    metadata_json TEXT NOT NULL DEFAULT '{}' CHECK(json_valid(metadata_json)),
+    CHECK(keyword_left_id<keyword_right_id)
+) STRICT;
+CREATE UNIQUE INDEX ux_keyword_cooccurrence_identity ON keyword_cooccurrences_daily(bucket_date,keyword_left_id,keyword_right_id,source_scope_code,algorithm_version);
+CREATE INDEX ix_keyword_cooccurrences_left ON keyword_cooccurrences_daily(keyword_left_id,bucket_date);
+CREATE INDEX ix_keyword_cooccurrences_right ON keyword_cooccurrences_daily(keyword_right_id,bucket_date);
+
+CREATE TABLE insight_signals (
+    insight_signal_id TEXT PRIMARY KEY,
+    signal_type TEXT NOT NULL CHECK(signal_type IN ('KEYWORD_BURST','COOCCURRENCE_SHIFT','VOLUME_ANOMALY')),
+    signal_date TEXT NOT NULL,
+    title TEXT NOT NULL,
+    summary_text TEXT NOT NULL,
+    review_status TEXT NOT NULL DEFAULT 'UNREVIEWED' CHECK(review_status IN ('UNREVIEWED','PENDING','APPROVED','REJECTED','SUPERSEDED')),
+    severity_code TEXT NOT NULL CHECK(severity_code IN ('LOW','MEDIUM','HIGH')),
+    keyword_id TEXT REFERENCES keyword_dictionary(keyword_id) ON DELETE RESTRICT,
+    strength_score REAL NOT NULL CHECK(strength_score BETWEEN 0 AND 1),
+    evidence_score REAL NOT NULL CHECK(evidence_score BETWEEN 0 AND 1),
+    source_diversity_score REAL NOT NULL CHECK(source_diversity_score BETWEEN 0 AND 1),
+    confidence_score REAL NOT NULL CHECK(confidence_score BETWEEN 0 AND 1),
+    algorithm_version TEXT NOT NULL,
+    computed_at TEXT NOT NULL,
+    window_start TEXT NOT NULL,
+    window_end TEXT NOT NULL,
+    metadata_json TEXT NOT NULL DEFAULT '{}' CHECK(json_valid(metadata_json) AND json_type(metadata_json)='object')
+) STRICT;
+CREATE UNIQUE INDEX ux_insight_signal_identity ON insight_signals(signal_type,signal_date,coalesce(keyword_id,'__NONE__'),algorithm_version);
+CREATE INDEX ix_insight_signals_review ON insight_signals(review_status,signal_date DESC,severity_code);
+CREATE INDEX ix_insight_signals_keyword ON insight_signals(keyword_id);
+
+CREATE TABLE insight_signal_evidence (
+    insight_signal_evidence_id TEXT PRIMARY KEY,
+    insight_signal_id TEXT NOT NULL REFERENCES insight_signals(insight_signal_id) ON DELETE CASCADE,
+    target_kind TEXT NOT NULL CHECK(target_kind IN ('DOCUMENT','DOCUMENT_VERSION','EVENT','CLAIM')),
+    target_id TEXT NOT NULL,
+    evidence_role TEXT NOT NULL CHECK(evidence_role IN ('TRIGGER','SUPPORTING','CONTRADICTING')),
+    source_document_version_id TEXT REFERENCES document_versions(document_version_id) ON DELETE RESTRICT,
+    evidence_rank INTEGER NOT NULL CHECK(evidence_rank>0),
+    evidence_locator TEXT,
+    metadata_json TEXT NOT NULL DEFAULT '{}' CHECK(json_valid(metadata_json) AND json_type(metadata_json)='object'),
+    created_at TEXT NOT NULL,
+    UNIQUE(insight_signal_id,target_kind,target_id,evidence_role)
+) STRICT;
+CREATE INDEX ix_insight_signal_evidence_signal ON insight_signal_evidence(insight_signal_id,evidence_rank);
+CREATE INDEX ix_insight_signal_evidence_version ON insight_signal_evidence(source_document_version_id);
+
+CREATE TABLE analytics_model_registry (
+    model_registry_id TEXT PRIMARY KEY,
+    task_code TEXT NOT NULL CHECK(task_code IN ('TOPIC_INTERPRETATION','SIGNAL_SUMMARY','EMBEDDING')),
+    provider_code TEXT NOT NULL CHECK(length(provider_code)>0),
+    model_name TEXT NOT NULL CHECK(length(model_name)>0),
+    model_version TEXT NOT NULL CHECK(length(model_version)>0),
+    embedding_version TEXT NOT NULL CHECK(length(embedding_version)>0),
+    prompt_version TEXT NOT NULL CHECK(length(prompt_version)>0),
+    prompt_hash TEXT NOT NULL CHECK(length(prompt_hash)=64),
+    status_code TEXT NOT NULL DEFAULT 'DISABLED' CHECK(status_code IN ('ENABLED','DISABLED','RETIRED')),
+    config_json TEXT NOT NULL DEFAULT '{}' CHECK(json_valid(config_json) AND json_type(config_json)='object'),
+    created_at TEXT NOT NULL,
+    retired_at TEXT,
+    UNIQUE(task_code,provider_code,model_name,model_version,embedding_version,prompt_version,prompt_hash)
+) STRICT;
+
+CREATE TABLE analytics_model_runs (
+    model_run_id TEXT PRIMARY KEY,
+    model_registry_id TEXT NOT NULL REFERENCES analytics_model_registry(model_registry_id) ON DELETE RESTRICT,
+    status_code TEXT NOT NULL CHECK(status_code IN ('QUEUED','RUNNING','COMPLETED','FAILED','CANCELLED')),
+    input_count INTEGER NOT NULL DEFAULT 0 CHECK(input_count>=0),
+    output_count INTEGER NOT NULL DEFAULT 0 CHECK(output_count>=0),
+    input_token_count INTEGER CHECK(input_token_count IS NULL OR input_token_count>=0),
+    output_token_count INTEGER CHECK(output_token_count IS NULL OR output_token_count>=0),
+    started_at TEXT NOT NULL,
+    completed_at TEXT,
+    error_code TEXT,
+    metadata_json TEXT NOT NULL DEFAULT '{}' CHECK(json_valid(metadata_json) AND json_type(metadata_json)='object')
+) STRICT;
+CREATE INDEX ix_analytics_model_runs_registry ON analytics_model_runs(model_registry_id,started_at DESC);
+
+CREATE TABLE insight_interpretations (
+    interpretation_id TEXT PRIMARY KEY,
+    insight_signal_id TEXT NOT NULL REFERENCES insight_signals(insight_signal_id) ON DELETE CASCADE,
+    model_registry_id TEXT NOT NULL REFERENCES analytics_model_registry(model_registry_id) ON DELETE RESTRICT,
+    model_run_id TEXT NOT NULL REFERENCES analytics_model_runs(model_run_id) ON DELETE RESTRICT,
+    interpretation_status TEXT NOT NULL DEFAULT 'DRAFT' CHECK(interpretation_status IN ('DRAFT','IN_REVIEW','APPROVED','REJECTED','SUPERSEDED')),
+    headline TEXT NOT NULL,
+    narrative_text TEXT NOT NULL,
+    topic_labels_json TEXT NOT NULL DEFAULT '[]' CHECK(json_valid(topic_labels_json) AND json_type(topic_labels_json)='array'),
+    input_hash TEXT NOT NULL CHECK(length(input_hash)=64),
+    output_hash TEXT NOT NULL CHECK(length(output_hash)=64),
+    generated_at TEXT NOT NULL,
+    reviewed_at TEXT,
+    reviewed_by TEXT,
+    metadata_json TEXT NOT NULL DEFAULT '{}' CHECK(json_valid(metadata_json) AND json_type(metadata_json)='object'),
+    UNIQUE(insight_signal_id,model_registry_id,input_hash,output_hash)
+) STRICT;
+CREATE INDEX ix_insight_interpretations_signal ON insight_interpretations(insight_signal_id,interpretation_status,generated_at DESC);
+CREATE INDEX ix_insight_interpretations_registry ON insight_interpretations(model_registry_id,generated_at DESC);
+CREATE INDEX ix_insight_interpretations_run ON insight_interpretations(model_run_id);
+
+CREATE TABLE insight_interpretation_evidence (
+    interpretation_evidence_id TEXT PRIMARY KEY,
+    interpretation_id TEXT NOT NULL REFERENCES insight_interpretations(interpretation_id) ON DELETE CASCADE,
+    insight_signal_evidence_id TEXT NOT NULL REFERENCES insight_signal_evidence(insight_signal_evidence_id) ON DELETE RESTRICT,
+    evidence_role TEXT NOT NULL CHECK(evidence_role IN ('GROUNDING','CONTEXT','CONTRADICTING')),
+    created_at TEXT NOT NULL,
+    UNIQUE(interpretation_id,insight_signal_evidence_id,evidence_role)
+) STRICT;
+CREATE INDEX ix_interpretation_evidence_interpretation ON insight_interpretation_evidence(interpretation_id);
+CREATE INDEX ix_interpretation_evidence_signal_evidence ON insight_interpretation_evidence(insight_signal_evidence_id);
+
+-- Contextual intelligence feature schema 1.0.0 (baseline).
+CREATE TABLE contextual_processing_campaigns (
+    campaign_id TEXT PRIMARY KEY,
+    campaign_code TEXT NOT NULL UNIQUE,
+    corpus_cutoff_at TEXT NOT NULL,
+    taxonomy_version TEXT NOT NULL,
+    rule_set_version TEXT NOT NULL,
+    model_version TEXT NOT NULL,
+    pipeline_version TEXT NOT NULL,
+    status_code TEXT NOT NULL CHECK(status_code IN ('DRAFT','RUNNING','COMPLETED','FAILED','SUPERSEDED')),
+    started_at TEXT,
+    completed_at TEXT,
+    created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
+    metadata_json TEXT NOT NULL DEFAULT '{}' CHECK(json_valid(metadata_json) AND json_type(metadata_json)='object'),
+    CHECK(completed_at IS NULL OR started_at IS NOT NULL)
+) STRICT;
+
+CREATE TABLE contextual_rule_sets (
+    rule_set_id TEXT PRIMARY KEY,
+    rule_set_code TEXT NOT NULL,
+    version TEXT NOT NULL,
+    status_code TEXT NOT NULL CHECK(status_code IN ('DRAFT','ACTIVE','DEPRECATED','SUPERSEDED')),
+    approved_by TEXT,
+    approved_at TEXT,
+    created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
+    metadata_json TEXT NOT NULL DEFAULT '{}' CHECK(json_valid(metadata_json) AND json_type(metadata_json)='object'),
+    UNIQUE(rule_set_code,version),
+    CHECK(status_code<>'ACTIVE' OR (approved_by IS NOT NULL AND approved_at IS NOT NULL))
+) STRICT;
+
+CREATE TABLE contextual_rules (
+    rule_id TEXT PRIMARY KEY,
+    rule_set_id TEXT NOT NULL REFERENCES contextual_rule_sets(rule_set_id) ON DELETE RESTRICT,
+    rule_code TEXT NOT NULL,
+    event_domain TEXT NOT NULL CHECK(event_domain IN (
+      'TRANSACTION','MANAGER_SELECTION','POLICY_REGULATION','MONETARY_POLICY',
+      'GEOPOLITICS_TRADE','FINANCING_RESTRUCTURING','INDUSTRY_DEMAND',
+      'MARKET_TREND','ASSET_REGIONAL_CHANGE'
+    )),
+    event_type TEXT NOT NULL,
+    priority INTEGER NOT NULL DEFAULT 100,
+    minimum_score REAL NOT NULL DEFAULT 1 CHECK(minimum_score>=0),
+    definition_json TEXT NOT NULL CHECK(json_valid(definition_json) AND json_type(definition_json)='object'),
+    status_code TEXT NOT NULL CHECK(status_code IN ('DRAFT','ACTIVE','DEPRECATED')),
+    created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
+    UNIQUE(rule_set_id,rule_code)
+) STRICT;
+
+CREATE TABLE contextual_document_runs (
+    contextual_run_id TEXT PRIMARY KEY,
+    campaign_id TEXT NOT NULL REFERENCES contextual_processing_campaigns(campaign_id) ON DELETE RESTRICT,
+    document_version_id TEXT NOT NULL REFERENCES document_versions(document_version_id) ON DELETE RESTRICT,
+    input_sha256 TEXT NOT NULL,
+    status_code TEXT NOT NULL CHECK(status_code IN (
+      'PENDING','RUNNING','COMPLETED','NO_CONTEXTUAL_EVENT','INSUFFICIENT_CONTENT',
+      'ENTITY_UNRESOLVED','FAILED','SUPERSEDED'
+    )),
+    candidate_count INTEGER NOT NULL DEFAULT 0 CHECK(candidate_count>=0),
+    approved_count INTEGER NOT NULL DEFAULT 0 CHECK(approved_count>=0 AND approved_count<=candidate_count),
+    error_code TEXT,
+    error_message TEXT,
+    started_at TEXT,
+    completed_at TEXT,
+    created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
+    metadata_json TEXT NOT NULL DEFAULT '{}' CHECK(json_valid(metadata_json) AND json_type(metadata_json)='object'),
+    UNIQUE(campaign_id,document_version_id),
+    CHECK(status_code NOT IN ('COMPLETED','NO_CONTEXTUAL_EVENT','INSUFFICIENT_CONTENT','ENTITY_UNRESOLVED','FAILED') OR completed_at IS NOT NULL)
+) STRICT;
+
+CREATE TABLE legacy_derived_records (
+    legacy_record_id TEXT PRIMARY KEY,
+    campaign_id TEXT NOT NULL REFERENCES contextual_processing_campaigns(campaign_id) ON DELETE RESTRICT,
+    target_kind TEXT NOT NULL CHECK(target_kind IN (
+      'EXTRACTION_RUN','RECORD_CLASSIFICATION','ANALYTICS_REFRESH_RUN',
+      'INSIGHT_SIGNAL','MODEL_INTERPRETATION'
+    )),
+    target_id TEXT NOT NULL,
+    source_table TEXT NOT NULL CHECK(source_table IN (
+      'extraction_runs','record_classifications','analytics_refresh_runs',
+      'insight_signals','insight_interpretations'
+    )),
+    producer_run_id TEXT,
+    original_status TEXT,
+    legacy_reason TEXT NOT NULL,
+    captured_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
+    metadata_json TEXT NOT NULL DEFAULT '{}' CHECK(json_valid(metadata_json) AND json_type(metadata_json)='object'),
+    UNIQUE(campaign_id,target_kind,target_id)
+) STRICT;
+
+CREATE TABLE contextual_event_frames (
+    frame_id TEXT PRIMARY KEY,
+    contextual_run_id TEXT NOT NULL REFERENCES contextual_document_runs(contextual_run_id) ON DELETE RESTRICT,
+    document_version_id TEXT NOT NULL REFERENCES document_versions(document_version_id) ON DELETE RESTRICT,
+    source_event_mention_id TEXT REFERENCES event_mentions(event_mention_id) ON DELETE RESTRICT,
+    canonical_event_id TEXT REFERENCES events(event_id) ON DELETE RESTRICT,
+    extraction_key TEXT NOT NULL,
+    event_domain TEXT NOT NULL CHECK(event_domain IN (
+      'TRANSACTION','MANAGER_SELECTION','POLICY_REGULATION','MONETARY_POLICY',
+      'GEOPOLITICS_TRADE','FINANCING_RESTRUCTURING','INDUSTRY_DEMAND',
+      'MARKET_TREND','ASSET_REGIONAL_CHANGE'
+    )),
+    event_type TEXT NOT NULL,
+    event_subtype TEXT,
+    stage_code TEXT,
+    process_type TEXT,
+    action_code TEXT,
+    title TEXT NOT NULL,
+    summary TEXT,
+    temporal_basis TEXT NOT NULL CHECK(temporal_basis IN (
+      'EVENT_DATE','ANNOUNCEMENT_DATE','EFFECTIVE_DATE','PUBLICATION_DATE',
+      'EXPECTED_DATE','PERIOD','UNKNOWN'
+    )),
+    event_date_start TEXT,
+    event_date_end TEXT,
+    modality_code TEXT NOT NULL CHECK(modality_code IN (
+      'FACTUAL','PLANNED','POSSIBLE','FORECAST','REPORTED','HISTORICAL','CONDITIONAL','UNKNOWN'
+    )),
+    polarity_code TEXT NOT NULL CHECK(polarity_code IN ('AFFIRMED','NEGATED','UNCERTAIN')),
+    source_grade TEXT NOT NULL CHECK(source_grade IN (
+      'OFFICIAL_DIRECT','OFFICIAL_DERIVED','STRUCTURED_DIRECT','MEDIA_DIRECT',
+      'MULTI_SOURCE_CORROBORATED','MODEL_INFERRED','UNVERIFIED'
+    )),
+    confidence REAL NOT NULL CHECK(confidence BETWEEN 0 AND 1),
+    review_status TEXT NOT NULL CHECK(review_status IN (
+      'CANDIDATE','REVIEW_READY','APPROVED','REJECTED','SUPERSEDED'
+    )),
+    extraction_method TEXT NOT NULL CHECK(extraction_method IN ('RULE','WEIGHTED_MODEL','HYBRID','HUMAN')),
+    rule_version TEXT NOT NULL,
+    model_version TEXT NOT NULL,
+    evidence_text TEXT NOT NULL,
+    evidence_start INTEGER,
+    evidence_end INTEGER,
+    evidence_locator TEXT,
+    approved_by TEXT,
+    approved_at TEXT,
+    created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
+    updated_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
+    metadata_json TEXT NOT NULL DEFAULT '{}' CHECK(json_valid(metadata_json) AND json_type(metadata_json)='object'),
+    UNIQUE(contextual_run_id,extraction_key),
+    CHECK(event_date_end IS NULL OR event_date_start IS NULL OR event_date_end>=event_date_start),
+    CHECK((evidence_start IS NULL AND evidence_end IS NULL) OR
+          (evidence_start IS NOT NULL AND evidence_end IS NOT NULL AND evidence_start>=0 AND evidence_end>evidence_start)),
+    CHECK(review_status<>'APPROVED' OR
+          (length(trim(evidence_text))>0 AND approved_by IS NOT NULL AND approved_at IS NOT NULL))
+) STRICT;
+
+CREATE TABLE contextual_frame_participants (
+    frame_participant_id TEXT PRIMARY KEY,
+    frame_id TEXT NOT NULL REFERENCES contextual_event_frames(frame_id) ON DELETE CASCADE,
+    role_code TEXT NOT NULL,
+    ordinal INTEGER NOT NULL DEFAULT 0 CHECK(ordinal>=0),
+    entity_kind TEXT NOT NULL CHECK(entity_kind IN ('ORGANIZATION','PERSON','COUNTRY','AUTHORITY','UNKNOWN')),
+    entity_id TEXT,
+    surface_text TEXT NOT NULL,
+    mention_id TEXT REFERENCES mentions(mention_id) ON DELETE RESTRICT,
+    resolution_status TEXT NOT NULL CHECK(resolution_status IN ('UNRESOLVED','CANDIDATE','RESOLVED','REJECTED')),
+    confidence REAL CHECK(confidence IS NULL OR confidence BETWEEN 0 AND 1),
+    evidence_text TEXT,
+    metadata_json TEXT NOT NULL DEFAULT '{}' CHECK(json_valid(metadata_json) AND json_type(metadata_json)='object'),
+    UNIQUE(frame_id,role_code,ordinal),
+    CHECK(resolution_status<>'RESOLVED' OR entity_id IS NOT NULL)
+) STRICT;
+
+CREATE TABLE contextual_frame_targets (
+    frame_target_id TEXT PRIMARY KEY,
+    frame_id TEXT NOT NULL REFERENCES contextual_event_frames(frame_id) ON DELETE CASCADE,
+    target_kind TEXT NOT NULL CHECK(target_kind IN (
+      'ASSET','ASSET_CLASS','PROJECT','REGION','INDUSTRY','ORGANIZATION','MARKET','POLICY_AREA','COMMODITY'
+    )),
+    target_id TEXT,
+    target_code TEXT,
+    surface_text TEXT NOT NULL,
+    role_code TEXT NOT NULL DEFAULT 'AFFECTED_TARGET',
+    resolution_status TEXT NOT NULL CHECK(resolution_status IN ('UNRESOLVED','CANDIDATE','RESOLVED','REJECTED')),
+    confidence REAL CHECK(confidence IS NULL OR confidence BETWEEN 0 AND 1),
+    metadata_json TEXT NOT NULL DEFAULT '{}' CHECK(json_valid(metadata_json) AND json_type(metadata_json)='object'),
+    UNIQUE(frame_id,target_kind,role_code,surface_text),
+    CHECK(resolution_status<>'RESOLVED' OR target_id IS NOT NULL OR target_code IS NOT NULL)
+) STRICT;
+
+CREATE TABLE contextual_impact_assertions (
+    impact_assertion_id TEXT PRIMARY KEY,
+    cause_frame_id TEXT NOT NULL REFERENCES contextual_event_frames(frame_id) ON DELETE CASCADE,
+    effect_frame_id TEXT REFERENCES contextual_event_frames(frame_id) ON DELETE RESTRICT,
+    target_kind TEXT NOT NULL CHECK(target_kind IN ('ASSET','ASSET_CLASS','PROJECT','REGION','INDUSTRY','ORGANIZATION','MARKET','COST','DEMAND','SUPPLY','LIQUIDITY','VALUE')),
+    target_id TEXT,
+    target_code TEXT,
+    target_text TEXT NOT NULL,
+    mechanism_code TEXT NOT NULL,
+    direction_code TEXT NOT NULL CHECK(direction_code IN ('INCREASE','DECREASE','POSITIVE','NEGATIVE','MIXED','UNCERTAIN')),
+    horizon_code TEXT NOT NULL CHECK(horizon_code IN ('IMMEDIATE','SHORT_TERM','MEDIUM_TERM','LONG_TERM','UNKNOWN')),
+    assertion_basis TEXT NOT NULL CHECK(assertion_basis IN (
+      'DIRECT_FACT','OFFICIAL_FORECAST','INDUSTRY_ASSESSMENT','MODEL_DERIVED','ANALYST_HYPOTHESIS','UNCONFIRMED'
+    )),
+    confidence REAL NOT NULL CHECK(confidence BETWEEN 0 AND 1),
+    review_status TEXT NOT NULL CHECK(review_status IN ('CANDIDATE','REVIEW_READY','APPROVED','REJECTED','SUPERSEDED')),
+    evidence_text TEXT NOT NULL,
+    source_claim_id TEXT REFERENCES claims(claim_id) ON DELETE RESTRICT,
+    metadata_json TEXT NOT NULL DEFAULT '{}' CHECK(json_valid(metadata_json) AND json_type(metadata_json)='object'),
+    CHECK(review_status<>'APPROVED' OR (length(trim(evidence_text))>0 AND assertion_basis<>'UNCONFIRMED'))
+) STRICT;
+
+CREATE TABLE contextual_review_decisions (
+    review_decision_id TEXT PRIMARY KEY,
+    campaign_id TEXT NOT NULL REFERENCES contextual_processing_campaigns(campaign_id) ON DELETE RESTRICT,
+    target_kind TEXT NOT NULL CHECK(target_kind IN ('FRAME','PARTICIPANT','TARGET','IMPACT_ASSERTION')),
+    target_id TEXT NOT NULL,
+    decision_code TEXT NOT NULL CHECK(decision_code IN ('APPROVE','CORRECT','REJECT','SUPERSEDE','DEFER')),
+    before_json TEXT NOT NULL CHECK(json_valid(before_json) AND json_type(before_json)='object'),
+    after_json TEXT NOT NULL CHECK(json_valid(after_json) AND json_type(after_json)='object'),
+    reason_code TEXT NOT NULL,
+    reviewer TEXT NOT NULL,
+    eligible_for_training INTEGER NOT NULL DEFAULT 1 CHECK(eligible_for_training IN (0,1)),
+    reviewed_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
+    UNIQUE(target_kind,target_id,reviewed_at)
+) STRICT;
+
+CREATE TABLE contextual_search_records (
+    search_record_id TEXT PRIMARY KEY,
+    campaign_id TEXT NOT NULL REFERENCES contextual_processing_campaigns(campaign_id) ON DELETE RESTRICT,
+    frame_id TEXT REFERENCES contextual_event_frames(frame_id) ON DELETE CASCADE,
+    record_mode TEXT NOT NULL CHECK(record_mode IN ('APPROVED','CANDIDATE','LEGACY')),
+    source_record_kind TEXT NOT NULL,
+    source_record_id TEXT NOT NULL,
+    title TEXT NOT NULL,
+    summary TEXT,
+    event_domain TEXT,
+    event_type TEXT,
+    event_subtype TEXT,
+    stage_code TEXT,
+    process_type TEXT,
+    action_code TEXT,
+    event_date TEXT,
+    temporal_basis TEXT,
+    participant_roles_json TEXT NOT NULL DEFAULT '[]' CHECK(json_valid(participant_roles_json) AND json_type(participant_roles_json)='array'),
+    participant_entity_ids_json TEXT NOT NULL DEFAULT '[]' CHECK(json_valid(participant_entity_ids_json) AND json_type(participant_entity_ids_json)='array'),
+    asset_ids_json TEXT NOT NULL DEFAULT '[]' CHECK(json_valid(asset_ids_json) AND json_type(asset_ids_json)='array'),
+    region_ids_json TEXT NOT NULL DEFAULT '[]' CHECK(json_valid(region_ids_json) AND json_type(region_ids_json)='array'),
+    industry_codes_json TEXT NOT NULL DEFAULT '[]' CHECK(json_valid(industry_codes_json) AND json_type(industry_codes_json)='array'),
+    impact_directions_json TEXT NOT NULL DEFAULT '[]' CHECK(json_valid(impact_directions_json) AND json_type(impact_directions_json)='array'),
+    source_grade TEXT,
+    confidence REAL CHECK(confidence IS NULL OR confidence BETWEEN 0 AND 1),
+    review_status TEXT NOT NULL,
+    evidence_text TEXT,
+    evidence_locator TEXT,
+    rule_version TEXT,
+    model_version TEXT,
+    search_text TEXT NOT NULL,
+    updated_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
+    metadata_json TEXT NOT NULL DEFAULT '{}' CHECK(json_valid(metadata_json) AND json_type(metadata_json)='object'),
+    UNIQUE(campaign_id,record_mode,source_record_kind,source_record_id),
+    CHECK((record_mode='APPROVED' AND review_status='APPROVED') OR
+          (record_mode='CANDIDATE' AND review_status IN ('CANDIDATE','REVIEW_READY')) OR
+          record_mode='LEGACY')
+) STRICT;
+
+CREATE INDEX ix_contextual_campaign_status ON contextual_processing_campaigns(status_code,corpus_cutoff_at);
+CREATE INDEX ix_contextual_runs_campaign_status ON contextual_document_runs(campaign_id,status_code,document_version_id);
+CREATE INDEX ix_contextual_legacy_campaign_kind ON legacy_derived_records(campaign_id,target_kind,source_table);
+CREATE INDEX ix_contextual_frames_mode ON contextual_event_frames(review_status,event_domain,event_type,event_date_start);
+CREATE INDEX ix_contextual_frames_document ON contextual_event_frames(document_version_id,review_status);
+CREATE INDEX ix_contextual_frames_canonical ON contextual_event_frames(canonical_event_id,review_status);
+CREATE INDEX ix_contextual_participants_lookup ON contextual_frame_participants(role_code,entity_id,resolution_status);
+CREATE INDEX ix_contextual_targets_lookup ON contextual_frame_targets(target_kind,target_code,target_id);
+CREATE INDEX ix_contextual_impacts_lookup ON contextual_impact_assertions(direction_code,target_kind,review_status);
+CREATE INDEX ix_contextual_search_filters ON contextual_search_records(record_mode,event_domain,event_type,stage_code,event_date);
+CREATE INDEX ix_contextual_search_grade ON contextual_search_records(record_mode,source_grade,review_status);
+
 INSERT INTO schema_meta(schema_key, schema_value) VALUES
     ('schema_name', 'cre-market-intelligence-sqlite'),
-    ('schema_version', '3.3.0'),
+    ('schema_version', '3.5.0'),
     ('authority_model', 'source-document-to-mention-to-claim-to-event'),
-    ('created_for', 'serverless-local-accumulation');
+    ('created_for', 'serverless-local-accumulation'),
+    ('contextual_intelligence_schema_version', '1.0.0');
 
 COMMIT;

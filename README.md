@@ -9,18 +9,27 @@
   → source document / version / extraction lineage
   → event candidate 및 관계 정합화
   → event / asset / organization / capital / sale process
-  → Supabase PostgreSQL (main)
+  → local SQLite archive / dashboard serving projection
+  → Turso/libSQL (compact online serving)
   → Next.js read-only intelligence workspace
 ```
 
-- **Main DB:** Supabase PostgreSQL 17, `market_intelligence` schema
-- **Local snapshot:** Supabase에서 재생성하는 read-only SQLite sub
-- **Web runtime:** Next.js Node runtime, server-side PostgreSQL adapter
+- **Full archive:** `data/market.db`, 전체 이력·비활성 상세·evidence lineage의 로컬 권위 저장소
+- **Online serving:** Turso/libSQL, `data/market-serving-v2.candidate.db`를 기반으로 한 compact 데이터. 원본과 가공본을 구분합니다.
+- **Web runtime:** Next.js Node runtime, server-only `@libsql/client` adapter
+- **Classification authority:** schema 3.3.0의 `classification_schemes` → `classification_terms` → `record_classifications`; 운영계약은 [`docs/classification-taxonomy-v1.md`](docs/classification-taxonomy-v1.md)
 - 브라우저에 DB URI·credential·raw SQL endpoint를 노출하지 않습니다.
 
-## Workspace
+### 2026-09-08 개편 / 운영 상태
+
+현재 개편은 최신기사와 시계열자료 두 화면에 집중합니다. [분석·레퍼런스·수정 계획](docs/12-dashboard-redesign-plan-20260908.md)을 기준으로 기사 대표 분류, 관측 시계열, 로컬 수집과 원격 게시를 정리합니다.
+
+Turso는 읽기 26.3억 / 무료 5억 행 소진으로 차단됐습니다. 저장공간은 474.64MB / 5GB이며, 계정 화면의 읽기 초기화일은 2026-10-01입니다. 사용자는 무료 요금제를 유지하기로 했습니다. 로컬 원본과 가공 작업은 계속하며, 온라인 게시·실조회 성공 여부는 별도로 기록합니다. 아래의 Supabase 절차는 이전 운영 이력이며 신규 갱신 대상으로 사용하지 않습니다.
+
+## 기존 데이터 기능과 보존 범위
 
 - 카테고리 탐색과 세부 필터 분리
+- 공통 시장 카테고리·문서 목적은 관리형 taxonomy를 우선하고 기존 도메인 분류는 하위 호환 fallback으로 유지
 - 기사·공시·공고·실거래 유형별 문서 template
 - 이벤트 상세: 단계·자산·참여조직·근거문서
 - 자산 상세: 입지·관련 이벤트·회사·문서
@@ -55,12 +64,13 @@ npm run build
 npm run dev
 ```
 
-운영 또는 로컬 server runtime에 다음 중 하나를 제공합니다.
+운영 또는 로컬 server runtime에 DB 연결 설정 중 하나와 세션 secret을 제공합니다.
 
 ```text
 SUPABASE_DB_URL=<server-side read-only PostgreSQL connection string>
 # 또는 로컬 전용
 SUPABASE_ENV_FILE=<absolute path to a private env file>
+DASHBOARD_SESSION_SECRET=<32-byte-or-longer server-only HMAC secret>
 ```
 
 `NEXT_PUBLIC_` 변수에 DB credential을 넣지 않습니다.
@@ -86,7 +96,8 @@ python -m unittest discover -s tests
 
 이 저장소는 Next.js **server runtime**과 PostgreSQL을 사용하므로 GitHub Pages만으로는 전체 앱을 실행할 수 없습니다. Vercel, Render, Railway 또는 별도 Node server에 `web/`을 배포하고, 서버 secret으로 read-only `SUPABASE_DB_URL`을 설정해야 합니다.
 
-공개 배포 전에는 SSO·접근코드·private network 등 인증 계층을 추가하는 것을 권장합니다.
+배포는 PostgreSQL 전용 `app_security` migration → runtime 최소 권한 → 초기 승인 이메일 → web/API → Android 순서로 진행합니다. 승인·해제 SQL과 운영 한계는 [`docs/dashboard-email-access.md`](docs/dashboard-email-access.md)를 따릅니다. 이메일만 입력하는 MVP는 메일함 소유를 증명하지 않으므로 공개 배포 시 OTP·magic link·SSO 또는 private network를 추가해야 합니다.
+운영 DSN은 owner/admin 연결이 아니라 전용 read-only LOGIN role이어야 하며, 공개 배포 전 공유 저장소 또는 hosting platform rate limit도 필요합니다.
 
 ## Security
 

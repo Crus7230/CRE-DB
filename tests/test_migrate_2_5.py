@@ -7,6 +7,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from schema_fixture_utils import seed_before_contextual
+
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA = ROOT / "db" / "v2" / "schema.sql"
 SEED = ROOT / "db" / "v2" / "seed.sql"
@@ -19,7 +21,7 @@ def schema_24() -> str:
     text = SCHEMA.read_text(encoding="utf-8")
     prefix, rest = text.split(MARKER, 1)
     _, suffix = rest.split("INSERT INTO schema_meta", 1)
-    return prefix + "INSERT INTO schema_meta" + suffix.replace("'2.7.0'", "'2.4.0'", 1)
+    return prefix + "INSERT INTO schema_meta" + suffix.replace("'3.5.0'", "'2.4.0'", 1)
 
 
 class Migrate25Test(unittest.TestCase):
@@ -27,7 +29,7 @@ class Migrate25Test(unittest.TestCase):
         con = sqlite3.connect(path)
         con.execute("PRAGMA foreign_keys=ON")
         con.executescript(schema_24())
-        con.executescript(SEED.read_text(encoding="utf-8"))
+        con.executescript(seed_before_contextual(SEED, legacy_version="2.4.0"))
         con.execute(
             "INSERT INTO organizations(organization_id,organization_type,canonical_name) VALUES('legacy_org','COMPANY','기존조직')"
         )

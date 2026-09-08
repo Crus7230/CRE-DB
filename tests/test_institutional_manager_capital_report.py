@@ -17,7 +17,8 @@ def test_manager_capital_report_preserves_evidence_layers_and_never_fabricates_d
         text=True,
     )
     payload = json.loads((ROOT / "artifacts" / f"{STEM}.json").read_text(encoding="utf-8"))
-    assert payload["summary"]["official_selection_rows"] == 4
+    assert payload["summary"]["official_selection_rows"] == payload["live_counts"]["lp_mandate_selections"]
+    assert payload["summary"]["official_selection_rows"] == 5
     assert payload["summary"]["official_domestic_asset_manager_rows"] == 1
     assert payload["summary"]["official_domestic_other_gp_rows"] == 2
     assert payload["summary"]["foreign_manager_rows"] == 1
@@ -44,10 +45,18 @@ def test_manager_capital_report_preserves_evidence_layers_and_never_fabricates_d
     assert all(x["capital_trace_status"] == "OFFICIAL_SELECTED_REQUEST_AMOUNT_ONLY" for x in coolidge)
     gcm = next(x for x in official if x["manager_name"] == "GCM Grosvenor")
     assert gcm["capital_trace_status"] == "OFFICIAL_SELECTED_NO_AMOUNT"
+    khug = next(x for x in official if x["manager_name"] == "우리자산운용")
+    assert khug["mandate_code"] == "KHUG-FUTURE-CITY-FUND-1"
+    assert khug["evidence_layer"] == "CANONICAL_VERIFIED_SELECTION"
+    assert khug["capital_trace_status"] == "OFFICIAL_SELECTED_NO_AMOUNT"
+    assert khug["verified_available_krw"] is None
 
     with (ROOT / "artifacts" / f"{STEM}.csv").open(encoding="utf-8-sig", newline="") as f:
         rows = list(csv.DictReader(f))
-    assert len(rows) == 10
+    official_rows = [row for row in rows if row["evidence_layer"] == "CANONICAL_VERIFIED_SELECTION"]
+    likely_rows = [row for row in rows if row["evidence_layer"] == "LIKELY_REPORTED_PENDING_PRIMARY"]
+    assert len(official_rows) == len(official)
+    assert {row["manager"] for row in likely_rows} == set(likely)
     assert all(not row["verified_available_krw"] for row in rows)
 
     md = (ROOT / "artifacts" / f"{STEM}.md").read_text(encoding="utf-8")

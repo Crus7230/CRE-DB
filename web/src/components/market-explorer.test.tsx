@@ -1,170 +1,92 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { render, screen, waitFor } from "@testing-library/react";
 import { MarketExplorer } from "@/components/market-explorer";
 
-const response = {
-  request: { q: "", kind: "EVENT", category: "", from: "2026-01-01", to: "2026-07-31", page: 1, pageSize: 50 },
-  results: [{
-    kind: "EVENT", id: "evt-1", title: "용인 데이터센터 본PF 약정",
-    subtitle: "PF · MAIN_PF_COMMITTED", summary: "6,200억원 대주단 약정",
-    date: "2026-07-13", status: "ACTIVE", confidence: 0.91,
-    source: "canonical event", href: null, category: "PF", categoryLabel: "PF",
-    metadata: { assets: "용인 남사 데이터센터", participants: "대주단" },
-  }],
-  facets: { EVENT: 28, ASSET: 16, ORGANIZATION: 70, DOCUMENT: 54985, LP_MANDATE: 12, SALE_PROCESS: 16 },
-  total: 28, elapsedMs: 184, generatedAt: "2026-08-18T03:00:00Z", database: "supabase-postgresql",
-};
+vi.mock("@/components/daily-article-workspace", () => ({
+  DailyArticleWorkspace: ({ onOpenArticle }: { onOpenArticle: (id: string, title: string) => void }) => <section aria-label="최신기사 목록"><button type="button" onClick={() => onOpenArticle("doc-1", "서울 오피스 매각")}>서울 오피스 매각</button></section>,
+}));
 
-const indexResponse = {
-  groups: [
-    { group: "EVENT_CATEGORY", label: "이벤트 카테고리", kind: "EVENT", items: [{ key: "PF", label: "PF", itemCount: 645, canonicalCount: 0 }] },
-    { group: "DOCUMENT_TYPE", label: "근거 목적", kind: "DOCUMENT", items: [
-      { key: "TRANSACTION_EVIDENCE", label: "거래·가격 근거", itemCount: 47264 },
-      { key: "CORPORATE_EVIDENCE", label: "기업·사업 근거", itemCount: 40 },
-      { key: "MARKET_EVIDENCE", label: "시장동향 근거", itemCount: 10329 },
-      { key: "PROCESS_EVIDENCE", label: "절차·공고 근거", itemCount: 16 },
-    ] },
-  ],
-  generatedAt: "2026-08-18T03:00:00Z", elapsedMs: 12, database: "supabase-postgresql",
-};
+vi.mock("@/components/document-detail-drawer", () => ({
+  DocumentDetailDrawer: ({ fallbackTitle, onClose }: { fallbackTitle: string; onClose: () => void }) => <section role="dialog" aria-label="기사 상세"><strong>{fallbackTitle}</strong><button type="button" onClick={onClose}>닫기</button></section>,
+}));
 
-const detailResponse = { kind: "EVENT", id: "evt-1", title: "용인 데이터센터 본PF 약정", subtitle: "PF · MAIN_PF_COMMITTED", status: "ACTIVE", overview: [{ label: "검증 수준", value: "VERIFIED" }], assets: [], events: [], organizations: [], documents: [] };
+vi.mock("@/components/quantitative-market-pulse", () => ({
+  QuantitativeMarketPulse: () => <section aria-label="거래시장 시계열"><input aria-label="거래 메모"/></section>,
+}));
 
-const dailyResponse = {
-  selectedDate: "2026-08-19",
-  latestAvailableDate: "2026-08-19",
-  lastCollectedAt: "2026-08-19T07:30:00Z",
-  generatedAt: "2026-08-19T08:00:00Z",
-  total: 1,
-  articles: [{
-    id: "doc-news-1",
-    title: "서울 오피스 거래시장 회복 신호",
-    publisher: "테스트경제",
-    publishedAt: "2026-08-19T01:20:00Z",
-    collectedAt: "2026-08-19T07:30:00Z",
-    summary: "서울 오피스 거래시장 관련 기사 요약",
-    summaryMode: "BODY_EXTRACTIVE",
-    summaryGeneratedAt: "2026-08-19T07:31:00Z",
-    href: "https://example.com/news-1",
-  }],
-};
+vi.mock("@/components/macro-timeseries-workspace", () => ({
+  MacroTimeseriesWorkspace: () => <section aria-label="금리 시계열"><input aria-label="금리 메모"/></section>,
+}));
 
-const documentResponse = {
-  ...response,
-  request: { ...response.request, kind: "DOCUMENT", category: "MARKET_EVIDENCE" },
-  results: [{
-    kind: "DOCUMENT", id: "doc-news-1", title: "서울 오피스 거래시장 회복 신호",
-    subtitle: "테스트경제 · RSS_ITEM", summary: "시장 동향 요약", date: "2026-08-19",
-    status: "ACCESSIBLE", confidence: null, source: "테스트경제", href: "https://example.com/news-1",
-    category: "RSS_ITEM", categoryLabel: "RSS_ITEM", metadata: { documentType: "RSS_ITEM" },
-  }],
-  total: 1,
-};
-
-afterEach(() => vi.restoreAllMocks());
+vi.mock("@/components/permit-timeseries-workspace", () => ({
+  PermitTimeseriesWorkspace: () => <section aria-label="건축 인허가 시계열"><input aria-label="인허가 메모"/></section>,
+}));
 
 describe("MarketExplorer", () => {
-  it("keeps category navigation separate from filters and opens an inspection drawer", async () => {
+  it("exposes exactly two keyboard-operable primary tabs", async () => {
     const user = userEvent.setup();
-    const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
-      const url = String(input);
-      const payload = url.startsWith("/api/index") ? indexResponse : url.startsWith("/api/articles/daily") ? dailyResponse : url.startsWith("/api/entities") ? detailResponse : response;
-      return new Response(JSON.stringify(payload), { status: 200, headers: { "Content-Type": "application/json" } });
-    });
+    render(<MarketExplorer/>);
 
-    render(<MarketExplorer />);
-    expect(await screen.findByRole("heading", { name: "시장 변화부터 근거까지 한 흐름으로 탐색" })).toBeInTheDocument();
-    expect(screen.getByRole("navigation", { name: "업무 화면" })).toHaveTextContent("무엇을 할까요?");
-    expect(screen.getByRole("complementary")).toHaveTextContent("탐색 기준");
-    expect(screen.getByRole("region", { name: "조회 조건" })).toHaveTextContent("조회 조건");
-    expect(screen.queryByText("DOCUMENT TYPES")).not.toBeInTheDocument();
-    expect(await screen.findByText("용인 데이터센터 본PF 약정")).toBeInTheDocument();
+    const navigation = screen.getByRole("tablist", { name: "주요 화면" });
+    const tabs = within(navigation).getAllByRole("tab");
+    expect(tabs).toHaveLength(2);
+    expect(tabs[0]).toHaveAccessibleName(/최신기사/);
+    expect(tabs[0]).toHaveAttribute("aria-current", "page");
+    expect(tabs[0]).toHaveAttribute("aria-selected", "true");
+    expect(tabs[1]).toHaveAccessibleName(/시계열자료/);
+    expect(screen.getByRole("region", { name: "최신기사 목록" })).toBeInTheDocument();
+    expect(screen.queryByText("브리핑")).not.toBeInTheDocument();
+    expect(screen.queryByText("기업·자산")).not.toBeInTheDocument();
+    expect(screen.queryByText("데이터 품질")).not.toBeInTheDocument();
 
-    const input = screen.getByRole("textbox", { name: "통합 검색" });
-    await user.type(input, "데이터센터");
-    await user.click(screen.getByRole("button", { name: "검색" }));
-    await waitFor(() => expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining("q=%EB%8D%B0%EC%9D%B4%ED%84%B0%EC%84%BC%ED%84%B0"), expect.anything()));
-
-    await user.click(await screen.findByRole("button", { name: /PF.*645/ }));
-    await waitFor(() => expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining("category=PF"), expect.anything()));
-
-    await user.click(screen.getByRole("button", { name: /용인 데이터센터 본PF 약정/ }));
-    expect(await screen.findByRole("dialog", { name: "이벤트 상세" })).toBeInTheDocument();
-    expect(await screen.findByText("VERIFIED")).toBeInTheDocument();
+    tabs[0].focus();
+    await user.keyboard("{ArrowRight}");
+    expect(tabs[1]).toHaveFocus();
+    expect(tabs[1]).toHaveAttribute("aria-selected", "true");
   });
 
-  it("groups documents by evidence purpose instead of exposing source-format codes", async () => {
+  it("lazy-mounts each time-series mode once and preserves it across tab reentry", async () => {
     const user = userEvent.setup();
-    const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
-      const url = String(input);
-      const payload = url.startsWith("/api/index") ? indexResponse : url.includes("kind=DOCUMENT") ? documentResponse : response;
-      return new Response(JSON.stringify(payload), { status: 200, headers: { "Content-Type": "application/json" } });
-    });
+    render(<MarketExplorer/>);
 
-    render(<MarketExplorer />);
-    await user.click(screen.getByRole("button", { name: /근거자료/ }));
+    expect(document.querySelector('[aria-label="거래시장 시계열"]')).toBeNull();
+    expect(document.querySelector('[aria-label="금리 시계열"]')).toBeNull();
+    expect(document.querySelector('[aria-label="건축 인허가 시계열"]')).toBeNull();
 
-    expect(await screen.findByRole("button", { name: /거래·가격 근거/ })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /기업·사업 근거/ })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /시장동향 근거/ })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /절차·공고 근거/ })).toBeInTheDocument();
-    expect(screen.queryByText("RSS_ITEM")).not.toBeInTheDocument();
-    expect(screen.queryByText("API_RECORD")).not.toBeInTheDocument();
+    await user.click(screen.getByRole("tab", { name: /시계열자료/ }));
+    const transaction = screen.getByRole("region", { name: "거래시장 시계열" });
+    expect(transaction).toBeInTheDocument();
+    expect(document.querySelector('[aria-label="금리 시계열"]')).toBeNull();
 
-    await user.click(screen.getByRole("button", { name: /시장동향 근거/ }));
-    await waitFor(() => expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining("category=MARKET_EVIDENCE"), expect.anything()));
-    expect(await screen.findByText("서울 오피스 거래시장 회복 신호")).toBeInTheDocument();
-    expect(screen.getAllByText("시장기사·RSS").length).toBeGreaterThan(0);
-    expect(screen.queryByText("RSS_ITEM")).not.toBeInTheDocument();
+    await user.type(screen.getByLabelText("거래 메모"), "유지");
+    await user.click(screen.getByRole("tab", { name: /금리·거시/ }));
+    const rates = screen.getByRole("region", { name: "금리 시계열" });
+    expect(rates).toBeInTheDocument();
+    expect(screen.queryByRole("region", { name: "거래시장 시계열" })).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("tab", { name: /건축 인허가/ }));
+    const permits = screen.getByRole("region", { name: "건축 인허가 시계열" });
+    await user.type(screen.getByLabelText("인허가 메모"), "유지");
+    expect(permits).toBeInTheDocument();
+
+    await user.click(screen.getByRole("tab", { name: /거래시장/ }));
+    expect(screen.getByLabelText("거래 메모")).toHaveValue("유지");
+    await user.click(screen.getByRole("tab", { name: /최신기사/ }));
+    await user.click(screen.getByRole("tab", { name: /시계열자료/ }));
+    expect(screen.getByLabelText("거래 메모")).toHaveValue("유지");
+    expect(rates).toBeInTheDocument();
+    expect(permits).toBeInTheDocument();
+    expect(screen.getByLabelText("인허가 메모")).toHaveValue("유지");
   });
 
-  it("opens archived compact metadata without requesting retired live detail", async () => {
+  it("opens an article detail and closes it when the workspace changes", async () => {
     const user = userEvent.setup();
-    const archivedResponse = {
-      ...documentResponse,
-      results: [{
-        ...documentResponse.results[0],
-        id: "doc-archived-1",
-        status: "ARCHIVED_LOCAL",
-        metadata: {
-          archived: true,
-          originalStatus: "CRE_CONFIRMED",
-          archiveLocator: "sqlite://archive-abc#table=source_documents&pk=doc-archived-1",
-          archiveSnapshotSha256: "a".repeat(64),
-        },
-      }],
-    };
-    const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
-      const url = String(input);
-      const payload = url.startsWith("/api/index") ? indexResponse : url.includes("kind=DOCUMENT") ? archivedResponse : response;
-      return new Response(JSON.stringify(payload), { status: 200, headers: { "Content-Type": "application/json" } });
-    });
+    render(<MarketExplorer/>);
 
-    render(<MarketExplorer />);
-    await user.click(screen.getByRole("button", { name: /근거자료/ }));
-    await user.click(await screen.findByRole("button", { name: /서울 오피스 거래시장 회복 신호/ }));
-
-    expect(await screen.findByRole("dialog", { name: "로컬 보관 상세" })).toHaveTextContent("CRE_CONFIRMED");
-    expect(screen.getByRole("dialog", { name: "로컬 보관 상세" })).toHaveTextContent("archive-abc");
-    expect(fetchMock.mock.calls.some(([input]) => String(input).startsWith("/api/documents/"))).toBe(false);
-  });
-
-  it("opens a separate daily article workspace with publication and collection freshness", async () => {
-    const user = userEvent.setup();
-    const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
-      const url = String(input);
-      const payload = url.startsWith("/api/articles/daily") ? dailyResponse : url.startsWith("/api/index") ? indexResponse : response;
-      return new Response(JSON.stringify(payload), { status: 200, headers: { "Content-Type": "application/json" } });
-    });
-
-    render(<MarketExplorer />);
-    await user.click(screen.getByRole("button", { name: /뉴스 모니터/ }));
-
-    expect(await screen.findByRole("heading", { name: "매일 확인하는 부동산 시장기사" })).toBeInTheDocument();
-    expect(await screen.findByText("서울 오피스 거래시장 회복 신호")).toBeInTheDocument();
-    expect(screen.getByText("최근 수집").parentElement).toHaveTextContent("2026");
-    expect(screen.getByText("테스트경제")).toBeInTheDocument();
-    await waitFor(() => expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining("/api/articles/daily?date="), expect.anything()));
+    await user.click(screen.getByRole("button", { name: "서울 오피스 매각" }));
+    expect(screen.getByRole("dialog", { name: "기사 상세" })).toHaveTextContent("서울 오피스 매각");
+    await user.click(screen.getByRole("tab", { name: /시계열자료/ }));
+    expect(screen.queryByRole("dialog", { name: "기사 상세" })).not.toBeInTheDocument();
   });
 });

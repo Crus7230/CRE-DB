@@ -68,7 +68,7 @@ export type SearchResponse = {
   total: number;
   elapsedMs: number;
   generatedAt: string;
-  database: "supabase-postgresql";
+  database: "turso-libsql";
 };
 
 export type CategoryIndexItem = {
@@ -79,6 +79,7 @@ export type CategoryIndexItem = {
   parentKey?: string | null;
   parentLabel?: string | null;
   countsByKind?: Record<string, number>;
+  yearToDateCountsByKind?: Record<string, number>;
 };
 
 export type CategoryIndexGroup = {
@@ -89,6 +90,7 @@ export type CategoryIndexGroup = {
   classificationScheme?: string;
   targetKinds?: string[];
   countSemantics?: string;
+  countWindow?: { from: string; to: string };
   vocabularyVersion?: string;
 };
 
@@ -96,11 +98,26 @@ export type CategoryIndexResponse = {
   groups: CategoryIndexGroup[];
   generatedAt: string;
   elapsedMs: number;
-  database: "supabase-postgresql";
+  database: "turso-libsql";
 };
 
 const kindSet = new Set<string>(searchKinds);
 const isoDate = /^\d{4}-\d{2}-\d{2}$/;
+
+export function hasInvalidSearchDateRange(from: string, to: string): boolean {
+  return Boolean(from && to && from > to);
+}
+
+export function koreanIsoDate(now: Date = new Date()): string {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(now);
+  const value = (type: Intl.DateTimeFormatPartTypes) => parts.find((part) => part.type === type)?.value ?? "";
+  return `${value("year")}-${value("month")}-${value("day")}`;
+}
 
 function validDate(value: string | null): string | null {
   if (!value || !isoDate.test(value)) return null;

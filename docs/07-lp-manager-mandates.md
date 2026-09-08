@@ -94,3 +94,40 @@ Live import 전에는 SQLite backup API snapshot을 생성한다. importer는 st
 
 - `v_lp_mandate_deal_sources`: LP→운용사→vehicle→딜 연결
 - `v_lp_mandate_source_balance`: 검증된 LP 배정액 대비 공개 확인 deployment 및 미추적액
+
+## 후속 문서 기반 선정 판단
+
+공식 선정 결과가 아직 없어도 기사·기관 문서·거래 당사자 문서에서 동일 기관 자금의 입찰 또는 집행이 확인될 수 있다. 이때 결과는 canonical selection에 바로 넣지 않고 assessment claim으로 보존한다.
+
+```text
+기관·mandate → 동일 track·vintage → 후속 문서 → vehicle·deal → 운용사 역할 → 판정
+```
+
+판정 단계는 다음과 같다.
+
+| 판정 | 필수 근거 | 해석 |
+|---|---|---|
+| 공식 선정 | 기관 공식 결과가 운용사를 직접 명시 | canonical selection |
+| 집행 기반 선정 유추 | 동일 LP·mandate·track, 후속 약정·집행, vehicle 또는 deal, 운용사 identity, 직접 원문, 상충 없음 | 공식 결과는 아니지만 선정 가능성이 높은 reviewable inference |
+| 입찰 참여 | 동일 LP 자금과 운용사의 지원·shortlist·입찰 연결 | 참여 사실일 뿐 선정 아님 |
+| 검토 필요 | 기사상 선정 보도 또는 일부 연결만 존재 | 공식 결과나 집행 교차검증 필요 |
+
+입찰 참여만으로 선정 유추를 만들지 않는다. `COMMITTED`, `EXECUTED`, `REALISED`처럼 자금 사용이 실제 단계로 진행됐고 기관·track·vehicle/deal·운용사가 모두 연결될 때만 집행 기반 유추가 가능하다. 자금 basis는 반드시 `LP_SOURCE_DEPLOYMENT`여야 하며 `FUND_EQUITY_DEPLOYMENT`, GP 자기자금, 공동투자금, 출처 미상 자금은 선정 유추 근거로 쓰지 않는다. 다른 vintage나 전략일 가능성, 운용사가 GP가 아니라 단순 입찰 컨소시엄 구성원일 가능성, 자기자금과 기관자금의 혼재가 있으면 `CONTRADICTION_NOTE`를 남기고 판단을 보류한다.
+
+assessment claim은 다음 predicate를 사용한다.
+
+- `LP_MANDATE_MANAGER_BID_PARTICIPANT`
+- `LP_MANDATE_MANAGER_INFERRED_FROM_DEPLOYMENT`
+
+필수 argument는 `MANDATE_CODE`, `MANDATE_TRACK`, `FOLLOW_UP_ACTION`, `FUNDING_BASIS`, `INFERENCE_RULE_VERSION`이며, `LINKED_VEHICLE` 또는 `LINKED_DEAL` 중 하나 이상을 저장한다. 필요하면 `CONTRADICTION_NOTE`도 함께 보존한다. 선정 유추 claim은 `certainty_code=INFERRED`, `extraction_method=CALCULATED`, `verification_status=VERIFIED`, `review_status=ACCEPTED`를 모두 충족해야 화면에서 `집행 기반 선정 유추`로 표시된다. 그 전에는 `검토 필요`로만 보이며 `lp_mandate_selections`로 승격하지 않는다. `SUPERSEDED`, `CORRECTED`, `REJECTED`, `CONTRADICTED` 상태는 유추 합계에서 제외하거나 검토 대상으로 내린다.
+
+판단 순서는 결정론적으로 고정한다.
+
+1. 기관 공식 공고·프로그램 문서와 mandate code를 확인한다.
+2. 동일 vintage·전략의 정확한 track을 연결한다. track이 없거나 다르면 판단을 보류한다.
+3. 후속 원문에서 `APPLIED`·`SHORTLISTED` 또는 `COMMITTED`·`EXECUTED`·`REALISED`를 구분한다.
+4. 기관 출처 자금(`LP_SOURCE_DEPLOYMENT`)과 vehicle 또는 deal을 연결한다.
+5. 해당 vehicle·deal의 실제 운용사를 식별한다.
+6. 공식 결과면 `공식 선정`, 집행 조건 전체 충족이면 `집행 기반 선정 유추`, 입찰만 확인되면 `입찰 참여`, 나머지는 `검토 필요`로 표시한다.
+
+2026-08-25 운영 DB 기준 화면 집계는 공식 선정 5건, 기사상 선정 후보 6건, LP 자금 연계 입찰 0건, 확인된 집행 0건이다. 기사상 후보는 검토 대상으로만 보이며 공식 선정 합계에 포함하지 않는다.

@@ -33,8 +33,9 @@ from collector.backfill_2025 import (
 )
 
 DEFAULT_ENV = Path(r"C:\10137_WorkSpace\env\.env.supabase.local")
-DEFAULT_CONFIG = ROOT / "campaigns" / "backfill-2026-h1.json"
-RUNNER_VERSION = "daily-google-news-rss-postgres-v1"
+DEFAULT_CONFIG = ROOT / "campaigns" / "rolling-2026-current.json"
+RUNNER_VERSION = "daily-google-news-rss-postgres-v2"
+JOB_VERSION = 2
 SEOUL = ZoneInfo("Asia/Seoul")
 DOTENV_RE = re.compile(r"^(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*=(.*)$")
 IDENT_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
@@ -58,6 +59,65 @@ def utc_window_for_seoul_day(day: date) -> tuple[datetime, datetime]:
     start = datetime.combine(day, time.min, SEOUL).astimezone(timezone.utc)
     end = start + timedelta(days=1)
     return start, end
+
+
+def collection_slot_key(moment: datetime) -> str:
+    """Return the deterministic Seoul schedule slot for an execution.
+
+    Retries within one slot keep the same identity, while the morning,
+    afternoon, and evening runs can ingest newly published documents.
+    """
+    local = moment.astimezone(SEOUL)
+    slots = [
+        datetime.combine(local.date(), time(hour, 0), SEOUL)
+        for hour in (6, 9, 12, 15, 18, 21)
+    ]
+    eligible = [slot for slot in slots if slot <= local]
+    if eligible:
+        return eligible[-1].isoformat(timespec="minutes")
+    previous_evening = datetime.combine(
+        local.date() - timedelta(days=1),
+        time(21, 0),
+        SEOUL,
+    )
+    return previous_evening.isoformat(timespec="minutes")
+
+
+def parse_collection_slot(value: str) -> str:
+    try:
+        parsed = datetime.fromisoformat(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("collection slot must be an ISO datetime") from exc
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        raise argparse.ArgumentTypeError("collection slot must include a UTC offset")
+    local = parsed.astimezone(SEOUL)
+    if local.minute != 0 or local.second != 0 or local.microsecond != 0 or local.hour not in (6, 9, 12, 15, 18, 21):
+        raise argparse.ArgumentTypeError("collection slot must be a KST scheduler fire at 06:00, 09:00, 12:00, 15:00, 18:00, or 21:00")
+    return local.isoformat(timespec="minutes")
+
+
+def lock_collection_run(conn, run_id: str) -> None:
+    conn.execute(
+        "SELECT pg_advisory_xact_lock(hashtextextended(%s, 0))",
+        (run_id,),
+    )
+
+
+def configure_connection(conn: Any) -> None:
+    conn.execute("SET statement_timeout TO 60000")
+    conn.commit()
+
+
+def partition_cursor_json(day: date, collection_slot: str) -> str:
+    start_utc, end_utc = utc_window_for_seoul_day(day)
+    return json.dumps(
+        {
+            "collection_slot": collection_slot,
+            "window_end": end_utc.isoformat(timespec="seconds").replace("+00:00", "Z"),
+            "window_start": start_utc.isoformat(timespec="seconds").replace("+00:00", "Z"),
+        },
+        sort_keys=True,
+    )
 
 
 def fetch_partition(base_query: str, day: date) -> tuple[str, list[DiscoveredDocument]]:
@@ -84,6 +144,7 @@ def ingest_partition_postgres(
     source_code: str,
     category_code: str,
     day: date,
+    collection_slot: str,
     query_rendered: str,
     documents: list[DiscoveredDocument],
 ) -> dict:
@@ -91,7 +152,7 @@ def ingest_partition_postgres(
     start_utc, end_utc = utc_window_for_seoul_day(day)
     window_start = start_utc.isoformat(timespec="seconds").replace("+00:00", "Z")
     window_end = end_utc.isoformat(timespec="seconds").replace("+00:00", "Z")
-    cursor_json = json.dumps({"window_start": window_start, "window_end": window_end}, sort_keys=True)
+    cursor_json = partition_cursor_json(day, collection_slot)
     job_code = f"DAILY_GOOGLE_NEWS_RSS_{category_code}"
     now = _utc_now()
 
@@ -108,28 +169,40 @@ def ingest_partition_postgres(
             raise RuntimeError(f"missing active source/category: {source_code}/{category_code}")
 
         job = conn.execute(
-            f"SELECT job_id FROM {namespace}.collection_jobs WHERE job_code=%s AND job_version=1",
-            (job_code,),
+            f"SELECT job_id FROM {namespace}.collection_jobs WHERE job_code=%s AND job_version=%s",
+            (job_code, JOB_VERSION),
         ).fetchone()
         if job is None:
-            job_id = _stable_id("job", f"{job_code}:1")
+            candidate_job_id = _stable_id("job", f"{job_code}:{JOB_VERSION}")
             conn.execute(
                 f"""INSERT INTO {namespace}.collection_jobs(
                     job_id,job_code,job_version,job_kind,source_id,query_template,
                     cadence_code,config_json,valid_from,is_active
-                ) VALUES(%s,%s,1,'CATEGORY_SEARCH',%s,%s,'DAILY',%s,%s,1)""",
-                (job_id, job_code, source[0], query_rendered,
+                ) VALUES(%s,%s,%s,'CATEGORY_SEARCH',%s,%s,'DAILY',%s,%s,1)
+                ON CONFLICT DO NOTHING""",
+                (candidate_job_id, job_code, JOB_VERSION, source[0], query_rendered,
                  json.dumps({"pipeline": RUNNER_VERSION, "timezone": "Asia/Seoul"}, sort_keys=True),
                  window_start),
             )
-        else:
-            job_id = job[0]
+            job = conn.execute(
+                f"SELECT job_id FROM {namespace}.collection_jobs WHERE job_code=%s AND job_version=%s",
+                (job_code, JOB_VERSION),
+            ).fetchone()
+            if job is None:
+                raise RuntimeError(f"failed to create collection job: {job_code} v{JOB_VERSION}")
+        job_id = job[0]
         conn.execute(
             f"""INSERT INTO {namespace}.collection_job_categories(job_id,event_category_id,is_primary)
                 VALUES(%s,%s,1)
                 ON CONFLICT(job_id,event_category_id) DO UPDATE SET is_primary=EXCLUDED.is_primary""",
             (job_id, category[0]),
         )
+
+        run_id = _stable_id(
+            "run",
+            f"{job_id}:{window_start}:{window_end}:{collection_slot}:{query_rendered}",
+        )
+        lock_collection_run(conn, run_id)
 
         existing = conn.execute(
             f"""SELECT run_id,discovered_count,inserted_count,updated_count
@@ -150,7 +223,6 @@ def ingest_partition_postgres(
                 "skipped": True,
             }
 
-        run_id = _stable_id("run", f"{job_id}:{window_start}:{window_end}:{query_rendered}")
         conn.execute(
             f"""INSERT INTO {namespace}.collection_runs(
                 run_id,job_id,scheduled_for,started_at,status_code,query_rendered,cursor_in,runner_version
@@ -247,6 +319,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--date", type=date.fromisoformat)
     parser.add_argument("--lookback-days", type=int, default=2)
     parser.add_argument("--category")
+    parser.add_argument("--collection-slot", type=parse_collection_slot)
     return parser.parse_args()
 
 
@@ -273,11 +346,12 @@ def main() -> None:
             raise SystemExit(f"unknown category: {args.category}")
         categories = {args.category: categories[args.category]}
     target = args.date or datetime.now(SEOUL).date()
+    collection_slot = args.collection_slot or collection_slot_key(datetime.now(SEOUL))
     days = [target - timedelta(days=offset) for offset in reversed(range(args.lookback_days))]
 
     summaries: list[dict] = []
     with psycopg.connect(dsn, connect_timeout=20) as conn:
-        conn.execute("SET statement_timeout TO 60000")
+        configure_connection(conn)
         for day in days:
             for category_code, base_query in categories.items():
                 query, documents = fetch_partition(base_query, day)
@@ -287,6 +361,7 @@ def main() -> None:
                     source_code="GOOGLE_NEWS_RSS",
                     category_code=category_code,
                     day=day,
+                    collection_slot=collection_slot,
                     query_rendered=query,
                     documents=documents,
                 )

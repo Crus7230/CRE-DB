@@ -1,4 +1,5 @@
 import copy
+import json
 import sqlite3
 import sys
 import tempfile
@@ -12,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from collector.backfill_2025 import (
+    DiscoveredDocument,
     derive_molit_seoul_monthly_macro,
     extract_title_candidates,
     ingest_partition,
@@ -161,6 +163,46 @@ class ParseDartFilingsTest(unittest.TestCase):
 
 
 class IngestPartitionTest(unittest.TestCase):
+    def test_opendart_ingest_writes_version_bound_cre_scope_assessment(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = Path(tmp) / "market.db"
+            con = sqlite3.connect(db_path)
+            con.executescript((ROOT / "db" / "v2" / "schema.sql").read_text(encoding="utf-8"))
+            con.executescript((ROOT / "db" / "v2" / "seed.sql").read_text(encoding="utf-8"))
+            con.close()
+            doc = DiscoveredDocument(
+                canonical_url="https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20260820000123",
+                external_key="20260820000123",
+                title="유형자산 양도 결정",
+                publisher_name="공시회사",
+                published_at="2026-08-20T00:00:00Z",
+                snippet_text="공시회사 | 유형자산 양도 결정",
+                document_type="DISCLOSURE",
+                rights_status="FULL_STORAGE_ALLOWED",
+                stored_text="1. 자산구분 토지 및 건물 자산명 서울 물류센터 2. 양도내역",
+                metadata={"provider": "OpenDART"},
+            )
+
+            ingest_partition(
+                db_path=db_path, source_code="OPENDART",
+                job_code="BACKFILL_2026_H2_OPENDART_SALE_DOCUMENT_TEXT_V3",
+                category_code="SALE", window_start="2026-08-01T00:00:00Z",
+                window_end="2026-09-01T00:00:00Z", query_rendered="OpenDART test",
+                documents=[doc], runner_version="test",
+            )
+
+            con = sqlite3.connect(db_path)
+            row = con.execute("""SELECT a.status_code,a.classifier_version,a.evidence_json,
+                                          a.document_version_id=v.document_version_id
+                                   FROM document_scope_assessments a
+                                   JOIN document_versions v ON v.document_version_id=a.document_version_id""").fetchone()
+            con.close()
+            self.assertIsNotNone(row)
+            self.assertEqual(row[0], "CRE_CONFIRMED")
+            self.assertEqual(row[1], "DART_CRE_SCOPE_RULE_V1")
+            self.assertEqual(row[3], 1)
+            self.assertEqual(json.loads(row[2])["assetCategory"], "토지 및 건물")
+
     def test_repeated_completed_partition_is_idempotent(self):
         with tempfile.TemporaryDirectory() as tmp:
             db_path = Path(tmp) / "market.db"
@@ -203,6 +245,37 @@ class IngestPartitionTest(unittest.TestCase):
             }
             con.close()
             self.assertEqual(counts, {"runs": 1, "documents": 1, "versions": 1, "links": 1, "relationship_runs": 2})
+
+    def test_sqlite_ingest_preserves_collection_slot_in_cursor_provenance(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = Path(tmp) / "market.db"
+            con = sqlite3.connect(db_path)
+            con.executescript((ROOT / "db" / "v2" / "schema.sql").read_text(encoding="utf-8"))
+            con.executescript((ROOT / "db" / "v2" / "seed.sql").read_text(encoding="utf-8"))
+            con.close()
+
+            docs = parse_google_news_rss(
+                RSS_FIXTURE,
+                start=datetime(2025, 1, 1, tzinfo=timezone.utc),
+                end=datetime(2025, 2, 1, tzinfo=timezone.utc),
+            )
+            ingest_partition(
+                db_path=db_path,
+                source_code="GOOGLE_NEWS_RSS",
+                job_code="DAILY_GOOGLE_NEWS_RSS_SALE",
+                category_code="SALE",
+                window_start="2025-01-01T00:00:00Z",
+                window_end="2025-02-01T00:00:00Z",
+                query_rendered="sale query collection_slot=2025-01-15T15:15+09:00",
+                documents=docs,
+                runner_version="test",
+                cursor_metadata={"collection_slot": "2025-01-15T15:15+09:00"},
+            )
+
+            con = sqlite3.connect(db_path)
+            cursor = json.loads(con.execute("SELECT cursor_in FROM collection_runs").fetchone()[0])
+            con.close()
+            self.assertEqual(cursor["collection_slot"], "2025-01-15T15:15+09:00")
 
     def test_campaign_metadata_is_derived_from_2026_half_year_job_code(self):
         with tempfile.TemporaryDirectory() as tmp:
