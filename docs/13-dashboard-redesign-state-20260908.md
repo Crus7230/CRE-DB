@@ -1,11 +1,11 @@
 # CRE 대시보드 개편 상태 — 2026-09-08
 
-이 문서는 현재 작업의 검증 기록이다. 아래 `진행 중` 항목은 배포·정상 동작 완료를 의미하지 않는다. 설계 근거는 [개편 계획](12-dashboard-redesign-plan-20260908.md)을 참고한다.
+이 문서는 개편·로컬 데이터 갱신·예약·코드 배포의 검증 기록이다. **온라인 코드 배포 완료와 온라인 DB 접속 복구는 별개**다. Turso 읽기 제한 때문에 온라인 인증·데이터 QA는 보류다. 설계 근거는 [개편 계획](12-dashboard-redesign-plan-20260908.md)을 참고한다.
 
 ## 권위와 연결
 
 - 원본: `data/market.db` — 수집 원문, 버전, 분류, 근거와 이력을 보존하는 로컬 SQLite.
-- 기존 온라인 가공본: `data/market-serving-v2.candidate.db` — 원본과 별개인 compact serving 후보. 이번 검증본은 `data/market-serving-redesign-20260908.candidate.db`로 별도 생성한다.
+- 기존 온라인 가공본: `data/market-serving-v2.candidate.db` — 원본과 별개인 compact serving 후보. 이번 검증본은 `data/market-serving-redesign-20260908.candidate.db`로 별도 생성했다.
 - 온라인: Vercel Next.js → 승인목록 확인 → Turso serving 조회. 원본 전체 이력의 반복 조회는 기사·거래용 projection으로 대체한다.
 - Turso는 9월 월간 읽기 한도가 초과됐다. 사용자는 무료 유지와 다른 DB 별도 검토를 선택했다. `2026-10-01` 전에는 예약 작업에서 원격 접속·발행을 시도하지 않는다. 저장용량 부족과 구분한다.
 - 온라인 로그인과 실제 데이터 조회 QA는 읽기 제한 해제 및 첫 migration/publication 후 통과해야 한다. 로컬 SQLite QA 성공만으로 온라인 정상화를 주장하지 않는다.
@@ -61,7 +61,13 @@ Windows 작업은 동일한 단일 실행기와 lock을 사용한다. PC가 켜�
 - 최종 원본: 1,712,238,592 bytes, 원천 문서 37,034건 / 버전 39,291건. 최종 compact: 664,363,008 bytes. 두 파일의 4개 dataset content SHA-256이 모두 같고, 전체 integrity=ok / FK 위반 0이다. compact 생성 과정에서 제외한 원천 인허가 이력은 원본에 그대로 보존된다.
 - 최종 compact 복제본을 연결한 production 로컬 빌드의 인증 후 API 실측: 기사 3.9–6.1ms, 거래 3.7–4.8ms, 인허가 5.4–6.0ms, 금리 warm 11.7–12.7ms. 캐시가 준비된 로컬 환경 수치이며 인터넷/Turso 성능을 보장하지 않는다.
 - 거래 차트는 최근 기준월을 포함한 19개월(2025-02~2026-08)을 표시하고, 연초 누계 계산에는 2025-01부터의 전체 비교 이력을 사용한다. 2026-09는 진행 중 월로 제외한다. 이제 검증된 비교월이 있어 연초 누계와 전년 비교를 계산할 수 있다.
-- Git/Vercel 최종 반영: 진행 중.
+- 최종 브라우저 QA: 최신 6건과 대표 주제 거래 2건 / 개발·공급 4건 일치, 9월 8일 오전 기사의 상세 게시일도 KST 2026-09-08로 일치. 데스크톱·390px 모바일 렌더 확인, 가로 넘침 및 콘솔 오류 0.
+- 원래 저장소 `sjleeigisam-RA-IEO/Org_dashboard`: 개편 커밋 `a00b6277f1ef971a22d9040901bd83eec94448d6`, main 푸시 완료. 원래 작업 폴더의 미커밋 작업은 그대로 보존하고 별도 worktree에서 커밋했다.
+- 실제 배포 저장소 `Crus7230/CRE-DB`: 개편 커밋 `b8bd0c0f40a3a2a6b0454f86bc4942972ccc536c`, main 푸시 완료. 저장된 두 GitHub 계정 중 기존 Crus7230 계정을 명시해 인증했다. 새 인증정보나 전역 자격증명 설정은 만들지 않았다.
+- GitHub `web-ci` 원격 검증도 해당 개편 커밋에서 success: https://github.com/Crus7230/CRE-DB/actions/runs/34200641402 . 이 문서의 최종 검증 기록은 후속 문서 전용 커밋으로 반영한다.
+- 배포 저장소의 runtime 파일 157개가 모두 추적됨을 확인했다. Pretendard font/license, 배포 설정 포함; 실환경변수·DB·백업·원문 산출물 제외. 최종 배포 텍스트 526개와 읽은 credential 17개 값의 일치 0건.
+- Vercel production `dpl_7DWCMt1y81gDFbf4riGDQQQyCsEZ`: 원격 Next.js/TypeScript 빌드 성공, READY. 기존 도메인 `https://cre-db.vercel.app` alias 완료. 실제 연결 저장소 rootDirectory=web, 배포 시각 2026-09-08 오후.
+- 공개 `/login` HTTP 200, 새 디자인과 안내 문구의 실제 브라우저 렌더 및 콘솔 오류 0 확인. 온라인 이메일 제출 또는 보호된 API 조회는 하지 않았다. 로그인 화면 성공은 Turso 접속 복구를 뜻하지 않는다.
 
 캐시의 최대 정상 반영 지연은 기사 15분, 금리 1시간, 주간 거래·인허가 6시간이다. DB 장애나 공급자 갱신 지연은 이 정상 지연과 별도로 표시한다. 인증 없는 강제 캐시 삭제 API는 만들지 않았다.
 
