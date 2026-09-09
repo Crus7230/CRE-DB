@@ -24,7 +24,7 @@ function Invoke-GitLines {
         [Parameter(Mandatory = $true)][string[]]$GitArgs
     )
 
-    $result = @(& git -C $Repository @GitArgs)
+    $result = @(& git -c "safe.directory=$Repository" -C $Repository @GitArgs)
     if ($LASTEXITCODE -ne 0) {
         throw "git failed in ${Repository}: git $($GitArgs -join ' ')"
     }
@@ -106,7 +106,7 @@ if ($releaseRemoteMain -ne $ExpectedBaseCommit) {
     throw "Release checkout origin/main is $releaseRemoteMain; expected the independently verified remote baseline $ExpectedBaseCommit."
 }
 
-& git -C $stagingRoot merge-base --is-ancestor $ExpectedBaseCommit HEAD
+& git -c "safe.directory=$stagingRoot" -C $stagingRoot merge-base --is-ancestor $ExpectedBaseCommit HEAD
 if ($LASTEXITCODE -ne 0) {
     throw "Expected base $ExpectedBaseCommit is not an ancestor of the release checkout."
 }
@@ -187,7 +187,7 @@ foreach ($entry in $manifestEntries) {
     }
 }
 
-$diffCheck = @(& git -C $stagingRoot diff --check)
+$diffCheck = @(& git -c "safe.directory=$stagingRoot" -C $stagingRoot diff --check)
 if ($LASTEXITCODE -ne 0) {
     throw "git diff --check failed: $($diffCheck -join [Environment]::NewLine)"
 }
