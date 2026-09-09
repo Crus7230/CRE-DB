@@ -43,7 +43,12 @@ function formatPublishedAt(value: string) {
 }
 
 function normalizeComparableText(value: string) {
-  return value.normalize("NFKC").trim().replace(/\s+/gu, " ").toLocaleLowerCase("ko-KR");
+  return value
+    .normalize("NFKC")
+    .trim()
+    .replace(/\s+[-–—]\s+/gu, " ")
+    .replace(/\s+/gu, " ")
+    .toLocaleLowerCase("ko-KR");
 }
 
 export function ArticleEvidenceSearch({

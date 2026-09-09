@@ -87,7 +87,11 @@ describe("ArticleEvidenceSearch", () => {
   it("collapses a title-only match instead of repeating the headline as an excerpt", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify({
       ...payload,
-      items: [{ ...payload.items[0], evidenceText: "  서울  오피스 매각  " }],
+      items: [{
+        ...payload.items[0],
+        title: "일본 JDI, 오피스 매각 관심 - 지디넷코리아",
+        evidenceText: "  일본 JDI,  오피스 매각 관심 지디넷코리아  ",
+      }],
     }), { status: 200, headers: { "Content-Type": "application/json" } })));
     const user = userEvent.setup();
     render(<ArticleEvidenceSearch onOpenArticle={vi.fn()}/>);
@@ -97,6 +101,6 @@ describe("ArticleEvidenceSearch", () => {
 
     expect(await screen.findByText("제목 일치")).toBeInTheDocument();
     expect(screen.queryByText("기사 발췌")).not.toBeInTheDocument();
-    expect(screen.getAllByText("서울 오피스 매각")).toHaveLength(1);
+    expect(screen.getAllByText("일본 JDI, 오피스 매각 관심 - 지디넷코리아")).toHaveLength(1);
   });
 });
