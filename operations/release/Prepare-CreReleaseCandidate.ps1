@@ -111,7 +111,7 @@ if ($LASTEXITCODE -ne 0) {
     throw "Expected base $ExpectedBaseCommit is not an ancestor of the release checkout."
 }
 
-$stagingChanges = Get-WorkingTreePaths -Repository $stagingRoot
+$stagingChanges = @(Get-WorkingTreePaths -Repository $stagingRoot)
 if ($stagingChanges.Count -gt 0) {
     throw "Release checkout must be clean before import. Commit the release tooling first. Pending paths: $($stagingChanges -join ', ')"
 }
@@ -150,7 +150,7 @@ if ($forbidden.Count -gt 0) {
 }
 
 $legacyManifestPaths = @($manifestEntries | Where-Object Source -eq "legacy" | ForEach-Object Path)
-$legacyChanges = Get-WorkingTreePaths -Repository $legacyRoot
+$legacyChanges = @(Get-WorkingTreePaths -Repository $legacyRoot)
 $unexpectedLegacy = @($legacyChanges | Where-Object { $_ -notin $legacyManifestPaths })
 $missingLegacy = @($legacyManifestPaths | Where-Object { $_ -notin $legacyChanges })
 if ($unexpectedLegacy.Count -gt 0 -or $missingLegacy.Count -gt 0) {
