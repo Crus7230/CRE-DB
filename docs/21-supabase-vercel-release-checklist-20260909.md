@@ -48,7 +48,9 @@ Record these values from direct readback immediately before release:
 | Load privileges | the separate migration/load authority completed schema/load work and is not exposed to browser code |
 | RPC separation | cold/warm timings are reported separately for data RPC and authentication RPC; do not combine them |
 
-Preparation facts only—not final release evidence: PostgreSQL `17.6`, Tokyo pooler, and approximately `10.4 MB` initial database size were observed before final loading. Replace these with final readback values.
+Final independent pre-release readback is dataset `cre-20260909T060407Z-5c55a7cb58de`, schema `1.1.0`, source freshness `2026-09-09T06:04:07Z`, PostgreSQL `17.6`, Tokyo pooler, and `pg_database_size=61,549,715 B`. Physical schema totals are `cre_news=20,021,248 B` (table/index `7,380,992/8,855,552 B`), `cre_timeseries=29,933,568 B` (`15,368,192/14,516,224 B`), and `cre_system=303,104 B` (`49,152/147,456 B`). The deterministic article-search object is `4,136,960 B` (`1,802,240 B` table plus `2,228,224 B` indexes). RLS is enabled on all 15 private tables and invalid constraints are `0`.
+
+Local Supabase-backed QA on `http://127.0.0.1:3015` passed all three tabs, article detail/index search, address/company smart lookup, and desktop/mobile visual checks; the existing port `3005` was preserved. Standard regression is `77 files / 311 passed / 1 skipped`, and lint passed. Local warm HTTP observations were news `5.8 ms`, macro `11.3 ms`, pulse `6.3 ms`, and permits first request `131.9 ms` then repeat `4.8 ms`. These are not production results and not a true cold-DB benchmark; staged and live checks below remain required.
 
 ## Vercel environment gate
 
