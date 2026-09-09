@@ -28,6 +28,8 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
+throw "Historical direct-source deploy helper disabled: this release uses the GitHub-connected Vercel workflow. Use Set-CreVercelProductionEnvironment.ps1 for the reviewed environment-only step; do not deploy from this checkout."
+
 if (-not $RootQaApproved -or -not $ApproveEnvironmentMutation) {
     throw "Both -RootQaApproved and -ApproveEnvironmentMutation are required. This script mutates production environment metadata."
 }

@@ -1,117 +1,171 @@
-# CRE DB 신규 Supabase 전환 · Vercel 릴리스 인수인계
+# CRE DB 신규 Supabase 전환 · GitHub/Vercel 릴리스 인수인계
 
-> 이 릴리스에는 생성형 AI/LLM 호출이 없다. `스마트 조회`와 기사 `색인 검색`은 고정된 외부 API 및 사전 구축 인덱스를 이용하는 결정론적 조회 경로다.
+> 기준일: 2026-09-09. 이 문서는 배포 직전 상태와 남은 production gate를 기록한다. 생성형 AI/LLM은 범위 밖이며, 스마트 조회와 기사 근거 검색은 고정 API 및 사전 구축 색인을 사용하는 결정론적 조회다.
 
 ## 현재 결론
 
-- 신규 Supabase 적재·검증과 로컬 Supabase 연동 QA는 완료됐다.
-- 표준 웹 테스트는 `77 files / 311 passed / 1 skipped`, lint는 종료 코드 `0`으로 통과했다.
-- 실제 UI/API 검증은 로컬 `http://localhost:3015`의 신규 Supabase 연동 서버에서 통과했다. 이는 프로덕션 검증 결과가 아니다.
-- `https://cre-db.vercel.app`의 환경 변수, 배포, alias는 아직 변경하지 않았다.
-- 남은 외부 차단 조건은 Vercel 인증이다. 준비 시점의 개인 환경 파일에는 `VERCEL_TOKEN`이 없고, 대시보드도 로그인 상태가 아니다.
-- GitHub `Crus7230` 자격 증명도 현재 없으므로 원격 push는 별도 미완료가 될 수 있다. Vercel CLI 직접 배포는 GitHub push 없이 진행 가능하며, 그 경우 로컬 릴리스 커밋과 미push 상태를 명시한다.
+- 신규 Supabase compact snapshot의 적재와 독립 readback, 로컬 웹 QA, 격리 release checkout 검증은 완료됐다.
+- 최종 배포 경로는 **GitHub `Crus7230/CRE-DB`의 `main` push → 기존 Vercel `cre-db` 연동 자동 배포** 하나뿐이다.
+- 로컬 checkout을 대상으로 `vercel deploy`, `vercel --prod`, `--skip-domain`을 실행하지 않는다. 별도 staged production deployment와 수동 promote 단계도 사용하지 않는다.
+- Vercel CLI `59.13.1`의 `whoami`는 `cruslee00-6855`로 확인됐고, project/team/root/GitHub branch 연결도 read-only preflight로 일치했다.
+- Windows Git Credential Manager에는 GitHub `Crus7230` 자격이 저장돼 있으며 push dry-run이 통과했다. 인증 차단은 없다.
+- 현재 production 환경과 alias는 아직 변경되지 않았다. 배포 담당 D가 env 8개 적용·readback 및 최종 push/deploy 결과를 보고하기 전에는 완료로 간주하지 않는다.
+- 현재 rollback 대상은 `dpl_5xDokCmsUozCt4K31USiDVywHv34`이며 READY, production alias `cre-db.vercel.app`에 연결돼 있다.
+- 현재 release source는 `8d6d8d3`까지 준비됐고, 최종 commit·`main` push·Vercel production 배포는 아직 남아 있다.
 
-## 신규 Supabase 최종 스냅샷
+## 고정 대상
 
-| 항목 | 최종 검증값 |
+| 항목 | 값 |
 | --- | --- |
-| project ref | `rjalzmmiqhrdmhojbxsk` |
-| PostgreSQL / 연결 위치 | PostgreSQL `17.6` / Tokyo pooler |
-| dataset version | `cre-20260909T060407Z-5c55a7cb58de` |
+| GitHub | `Crus7230/CRE-DB` |
+| 배포 branch | `main` |
+| Vercel project | `cre-db` / `prj_1DTajzRAaw2IbqffiAwN2aZWC5Bb` |
+| Vercel team | `team_ZraFevjGRitnuj6w5suDl9Cs` |
+| Vercel project root | `web` |
+| Vercel CLI/account | `59.13.1` / `cruslee00-6855` |
+| Production URL | `https://cre-db.vercel.app` |
+| 현재 rollback deployment | `dpl_5xDokCmsUozCt4K31USiDVywHv34` |
+| 신규 Supabase ref | `rjalzmmiqhrdmhojbxsk` |
+| 최종 dataset version | `cre-20260909T060407Z-5c55a7cb58de` |
 | schema version | `1.1.0` |
-| source freshness | `2026-09-09T06:04:07Z` (`2026-09-09 15:04:07 KST`) |
-| 전체 `pg_database_size` | `61,549,715 B` (약 `61.55 MB`, `58.70 MiB`) |
-| `cre_news` | table `7,380,992 B` / index `8,855,552 B` / total `20,021,248 B` |
-| `cre_timeseries` | table `15,368,192 B` / index `14,516,224 B` / total `29,933,568 B` |
-| `cre_system` | table `49,152 B` / index `147,456 B` / total `303,104 B` |
-| 기사 색인 객체 `article_search_documents` | table `1,802,240 B` / index `2,228,224 B` / total `4,136,960 B` |
-| 무효 constraint | `0` |
-| RLS | private table `15/15` 활성 |
+| source freshness | `2026-09-09T06:04:07Z` |
+| 격리 release checkout | `.codex_tmp/cre-release-20260909` |
 
-스키마 객체 합계와 전체 DB 크기의 차이는 PostgreSQL 시스템 카탈로그·확장·TOAST 등 스키마 집계 밖 저장공간이다. 원본 아카이브나 로컬 DB를 Vercel 릴리스에 포함하지 않는다.
+## 완료된 release source 검증
 
-### 적재·조회 정합성
+- canonical/source parity: `211/211`, mismatch `0`.
+- source match: `182`.
+- 최종 웹 테스트: `77 files / 312 passed / 1 skipped`.
+- 격리 release checkout에서 production build, lint, TypeScript check, secret scan, forbidden/conflict scan이 모두 통과했다.
+- 데이터·백업·raw·artifact/report/log·env·credential·`.vercel`·`node_modules`·`.next*`는 릴리스 source에서 제외한다.
+- source authority는 검토된 manifest와 SHA-256 대조 결과이며, dirty canonical 전체를 무차별 복사하지 않는다.
 
-| 데이터셋 | 행 수 |
+이 완료 상태는 로컬·격리 checkout 검증이다. GitHub push와 Vercel production 결과를 의미하지 않는다.
+
+## 신규 Supabase 최종 snapshot
+
+### 데이터 범위
+
+현재 dashboard serving 대상은 전체 archive가 아니라 아래 9개 compact table이다.
+
+| 논리 데이터 | 행 수 |
 | --- | ---: |
-| articles / article_details / article_search_documents | `2,145 / 2,145 / 2,145` |
-| article_dates / article_topics | `498 / 1,103` |
-| macro_series / macro_monthly | `19 / 4,471` |
-| market_pulse | `1` |
+| articles | `2,145` |
+| article_details | `2,145` |
+| article_search_documents | `2,145` |
+| article_dates | `498` |
+| article_topics | `1,103` |
+| macro_series | `19` |
+| macro_monthly | `4,471` |
 | permit_monthly | `90,907` |
+| market_pulse | `1` |
 
-- 패키지와 DB의 의미 해시는 위 9개 데이터셋 모두 일치했다.
-- 승인 subject는 `3`건이며 미등록 subject는 거절됐다.
-- 최초 rate-limit 점검은 차단되지 않았고, 테스트 상태 정리는 완료됐다.
-- 2글자 검색은 전용 terms 인덱스, 3글자 이상 검색은 trigram 인덱스를 사용하는 실행 계획을 확인했다.
-- 최종 독립 검증의 fresh connection 측정은 OS 캐시를 강제로 비우지 않은 별도 DB 연결/준비 계획 측정이다: 2글자 query `75.103 ms`, trigram query `103.333 ms`. 웹 warm HTTP 수치와 혼동하지 않는다.
+- 기사 `2,145`건은 현재 dashboard serving 대상이며 전체 raw archive 기사 수가 아니다.
+- raw archive/source history, MOLIT raw 거래, permit hot detail, embedding/vector는 업로드하지 않았다.
+- market pulse는 현재 dashboard 범위를 로컬에서 사전 계산한 1개 payload다.
+- 검색은 문서별 2글자 token `text[]` GIN과 3글자 이상 trigram 후보 색인이다.
+- 9개 table의 package↔PostgreSQL 전수 semantic hash, RLS `15/15`, invalid constraint `0`, 승인 subject `3`/미승인 거부가 통과했다.
 
-검증 원본은 canonical 작업 폴더의 `artifacts/supabase-compact/publish-report-20260909-final.json`에 있으나, `artifacts/`는 릴리스에서 명시적으로 제외한다.
+### 물리 용량
 
-위 표는 root 독립 검증 보고서의 최종 snapshot(`61,549,715 B`)이다. 같은 dataset version에 대한 후속 no-op `verified-existing` readback은 `61,516,947 B`였고, 차이 `32,768 B`는 system 영역의 물리 배치 변동이다. 따라서 dataset 동일성은 version/semantic hash/행 수로, 물리 용량은 보고서 측정 시각과 함께 기록한다.
+독립 최종 readback의 `pg_database_size`는 `61,549,715 B`다. publisher report의 후속 no-op 측정은 `61,516,947 B`였으며, 같은 version/행/semantic hash에서 생긴 약 32 KiB 물리 배치 변동이다. 운영 보고는 약 `61.5 MB`로 표현하되 측정 시각별 원값을 함께 보존한다.
 
-## 로컬 웹 QA 증거
+| schema/object | table bytes | index bytes | total bytes |
+| --- | ---: | ---: | ---: |
+| `cre_news` | `7,380,992` | `8,855,552` | `20,021,248` |
+| `cre_timeseries` | `15,368,192` | `14,516,224` | `29,933,568` |
+| `cre_system` | `49,152` | `147,456` | `303,104` |
+| `article_search_documents` | `1,802,240` | `2,228,224` | `4,136,960` |
 
-검증 대상은 신규 Supabase에 연결된 `http://127.0.0.1:3015`이며, 기존 포트 `3005`는 건드리지 않았다.
+스키마 합계와 전체 DB의 차이는 system catalog, extension, TOAST 등이다. 원본 SQLite 크기와 PostgreSQL 물리 크기, gzip package 크기를 직접 비교해 절감률로 표현하지 않는다.
 
-- 최신기사: 기사 `7`건, 카테고리 합계 `7`, 기사 상세 drawer와 색인 검색 동작 확인.
-- 시계열자료: macro `13`개, permit `2025-01`~`2026-08`, market pulse 및 차트 렌더 확인.
-- 스마트 조회: 주소 `서울시청`의 건축물대장 HUB 카드 `2`건, 회사 `005930`의 DART·공시·KRX 상태 정상 확인.
-- desktop/mobile 모두 3개 탭, 상세 drawer, 검색 결과를 확인했고 가로 overflow와 브라우저 오류는 `0`이었다.
-- 실제 렌더 증거는 canonical의 `artifacts/cre-dashboard-visual-qa.json` 등 QA 산출물에 있으며 릴리스에는 포함하지 않는다. evidence 검색은 첫 상세 API가 반환 ID/title과 일치하는 `200`이었고, 2글자 검색은 `8`건과 `truncated=true`, `%_` literal은 `200/0건`, 1글자·역순 기간·`topK=99`는 모두 `400`이었다.
-- auth login은 로컬 격리 환경 밖 요청으로 `200`을 확인했다. 초기 evidence 요청의 `403`은 Next 내부 URL과 QA origin 불일치였으며 same-origin 수정 후 전체 회귀 테스트가 통과했다.
+### 발행 의미
 
-### 로컬 warm HTTP 측정
+현재 publisher는 9개 table 전체를 하나의 immutable snapshot으로 발행한다. 어느 한 source content라도 달라지면 인허가 90,907행을 포함한 9개 table 전체가 새 version으로 복사된다. no-op은 schema, 9개 table hash/count, lineage, facet 등 전체 identity가 동일할 때만 성립한다.
 
-| 경로 | 측정 |
-| --- | ---: |
-| news | `5.8 ms` |
-| macro | `11.3 ms` |
-| pulse | `6.3 ms` |
-| permits | 첫 요청 `131.9 ms` → 반복 `4.8 ms` |
+자동 수집·자동 publish 예약은 연결하지 않았다. 이번 릴리스 이후에도 수동 snapshot publish가 기본이며, 원격 update 실패 시 transaction 내부 pre-activation semantic gate가 active pointer 전환 전에 rollback한다. domain별 증분 version은 후속 최적화다.
 
-이 수치는 실행 중인 로컬 서버의 HTTP 관측값이며 프로덕션 수치나 OS/DB 캐시를 비운 진정한 cold DB 측정이 아니다. 응답 계약은 data RPC를 `Server-Timing: data`, 인증 RPC를 `X-CRE-Authz-Ms`로 분리해 기록한다. 데이터 API는 `private, no-store`이며 익명 `401` 계약은 자동화 테스트로 검증됐다. staged/live의 실제 익명 `401`, 로그인, cold/warm 헤더 검증은 배포 후 다시 수행해야 한다.
+## 완료된 로컬 웹 QA
 
-## 릴리스 후보의 출처와 제외 범위
+검증 URL은 **`http://127.0.0.1:3015`**이다. `localhost` 표기로 대체하지 않는다.
 
-- 기준: 실제 원격 `main`으로 확인한 `eef5faf4a773f3b6080e852380ba6cfcac05c5db`.
-- 분리 checkout: `.codex_tmp/cre-release-20260909`.
-- 로컬 branch: `codex/cre-supabase-release-20260909`.
-- 1차 overlay: 보존된 기존 checkout의 정확한 31-file 3탭·스마트조회·로컬분리 delta.
-- 2차 overlay: canonical `09. CRE DB Board`의 신규 Supabase runtime/cache/auth/evidence/API, 마이그레이션·export/publish·테스트·운영 문서.
-- 파일 단위 authority는 `operations/release/source-delta-files.txt`로 고정하고, copy 전후 SHA-256을 대조한다.
-- 제외: DB/SQLite와 journal, backup, raw, artifact/report/log, 환경 파일, credential, `.vercel`, `node_modules`, `.next`, `.next-*`, `.codex_tmp`, 임시 smoke 파일.
-
-## 프로덕션 환경 변경 범위
-
-root QA 승인 후 production target에서 아래 8개만 현재 authority와 동기화한다. 기존 세션 비밀과 그 밖의 환경 변수는 보존하며 전체 삭제/재생성하지 않는다.
-
-| 키 | authority / 요구사항 |
+| 항목 | 결과 |
 | --- | --- |
-| `SUPABASE_URL` | 개인 환경의 신규 project URL |
-| `SUPABASE_SECRET_KEY` | 개인 환경의 신규 server secret |
-| `SUPABASE_PROJECT_REF` | 반드시 `rjalzmmiqhrdmhojbxsk` |
-| `DASHBOARD_DATA_PROVIDER` | 반드시 `supabase` |
-| `VWORLD_KEY` | 기존 global 외부 API authority |
-| `DATA_GO_KR_KEY` | 기존 global 외부 API authority |
-| `DART_API_KEY` | 기존 global 외부 API authority |
-| `KRX_API_KEY` | 기존 global 외부 API authority |
+| server | v4, PID `41084` |
+| BUILD_ID | `NBLbFsREXkgUMaKUHDMX1` |
+| 3개 tab | 통과 |
+| smart address/company API | 통과 |
+| evidence results | `8` |
+| evidence title matches | `8` |
+| duplicate blockquotes | `0` |
+| mobile collapsed height | `44px` |
+| desktop/mobile visual QA | root 실제 확인 완료 |
 
-- 개인 env의 중복 정의는 값 충돌이 없다: URL·secret·publishable은 각각 2개 정의가 같은 값이고 project ref는 1개이며 신규 ref와 일치한다.
-- 기존 production에 `DASHBOARD_SUPABASE_RPC_SCHEMA`가 있으면 값을 노출하지 않고 `public`인지 preflight한다. `SUPABASE_DB_SCHEMA`는 현재 runtime에서 무시되지만 삭제하지 않는다.
-- `DASHBOARD_SESSION_SECRET`과 기존 모든 비대상 key는 보존한다.
-- `SMART_LOOKUP_ENV_FILE`은 local-only이므로 Vercel에 넣지 않는다.
+로컬 warm HTTP 관측값은 news `4.3ms`, macro `11.4ms`, pulse `6.3ms`, permits `3.9ms`다. 이는 production 성능도, OS/DB cache를 비운 cold benchmark도 아니다.
 
-## 남은 gate와 실행 순서
+모바일 검증은 responsive web viewport QA다. 이번 릴리스는 web only이며 APK/native app QA 결과가 아니다.
 
-1. canonical 최종 파일 목록을 manifest에 확정하고 clean staging에서 validate-only를 통과시킨다.
-2. 명시 파일만 staging에 복사하고 SHA-256, full test, lint, type/build, visual 검증 및 secret/forbidden/conflict scan을 완료한다.
-3. 로컬 branch에 릴리스 후보를 커밋한다. GitHub 인증이 없으면 push 미완료를 기록한다.
-4. Vercel 인증이 확보되고 root가 QA 및 환경 변경을 명시 승인한 뒤, project/team/root와 기존 env 이름·target을 read-only로 확인한다.
-5. 위 8개 production env만 동기화하고 metadata를 재확인한다.
-6. `--prod --skip-domain`으로 alias 없는 staged production deployment를 만들고 READY까지 기다린다. 현재 `cre-db.vercel.app`은 계속 이전 배포를 가리킨다.
-7. staged URL에서 익명 `401`, 허용/비허용 로그인, 3탭 API, 기사 상세·색인 검색, 주소/회사 스마트조회, version/cache/header, data/auth timing, desktop/mobile을 재검증한다.
-8. root의 두 번째 promotion 승인을 받은 뒤 staged 배포를 rebuild 없이 promote한다.
-9. production URL에서 같은 검증을 반복하고 deployment ID·READY 시각·alias·Supabase 버전·rollback ID를 기록한다.
+## Production 환경 gate — main push 전에 완료
 
-이전 정상 배포 `dpl_7DWCMt1y81gDFbf4riGDQQQyCsEZ`는 rollback 대상으로 보존한다. staged 또는 live 검증 실패 시 DB를 변경하지 말고 이전 배포를 다시 promote한다.
+배포 담당 D가 production 환경의 이름/target을 읽고, 아래 **정확히 8개 승인 key**를 production target에 설정한 뒤 이름/target과 ref 일치를 readback해야 한다. 값은 출력·문서화하지 않는다.
+
+| 승인 key | 요구사항 |
+| --- | --- |
+| `SUPABASE_URL` | 신규 project URL |
+| `SUPABASE_SECRET_KEY` | 신규 server secret |
+| `SUPABASE_PROJECT_REF` | `rjalzmmiqhrdmhojbxsk` |
+| `DASHBOARD_DATA_PROVIDER` | `supabase` |
+| `VWORLD_KEY` | 주소 후보 조회 |
+| `DATA_GO_KR_KEY` | 건축물대장 상세 |
+| `DART_API_KEY` | 회사·공시 조회 |
+| `KRX_API_KEY` | 상장종목 enrichment |
+
+현재 production에 존재하는 `TURSO_AUTH_TOKEN`, `TURSO_DATABASE_URL`, `SUPABASE_DB_URL`, `DASHBOARD_SESSION_SECRET` 4개는 삭제·교체하지 않고 보존한다. 이 4개와 기타 비대상 key를 건드리지 않는다. 승인된 변경은 위 8개 production-only key의 추가/갱신뿐이다.
+
+환경 변경 범위는 root 검토를 마쳤지만, approval reviewer가 실제 secret upload를 허용하지 않아 명시적 사용자 승인을 기다리고 있다. 승인 전에는 외부 환경을 변경하지 않으며, D의 실제 apply 및 readback 보고 전에는 `main`을 push하지 않는다.
+
+## 유일한 production 실행 순서
+
+1. D가 Vercel CLI `59.13.1`, account, project/team/root, GitHub repo/branch, 현재 production alias/deployment를 다시 readback한다.
+2. D가 승인된 production env 8개만 적용한다.
+3. D가 env 이름·target `production`, 신규 Supabase ref 일치, 기존 4개 보존을 값 노출 없이 readback한다.
+4. 격리 release checkout의 최종 diff/commit SHA와 clean release 범위를 확정한다.
+5. GitHub `Crus7230/CRE-DB`의 `main`에 push한다.
+6. GitHub 연동으로 생성된 Vercel deployment를 식별하고 source commit SHA가 방금 push한 SHA와 같은지 확인한다.
+7. deployment가 READY가 되고 `cre-db.vercel.app` alias가 새 deployment를 가리키는지 확인한다.
+8. production URL에서 아래 smoke/visual QA를 수행한다.
+9. 성공 시 commit SHA, deployment ID/URL/READY 시각, alias, env readback, dataset version/freshness를 기록한다.
+
+금지 사항:
+
+- 로컬 source를 `vercel deploy` 또는 `vercel --prod`로 직접 배포하지 않는다.
+- 별도 `--skip-domain` staged production deployment를 만들지 않는다.
+- staged deployment를 수동 promote하는 절차를 정상 release 경로로 사용하지 않는다.
+- env 전체 삭제/재생성, 기존 session secret 교체, credential 출력, DB 재발행을 하지 않는다.
+
+## Production 검증과 rollback
+
+Production에서 다음을 확인한다.
+
+- 익명 protected API는 `401` 및 `Cache-Control: no-store`.
+- 허용 email login 성공, 비허용 email 거부.
+- 최신기사·시계열자료·스마트 조회 3개 tab.
+- 기사 상세 ID/title 일치, evidence 8개와 title 8개 일치, 중복 blockquote 0.
+- address/company smart API.
+- manifest와 data RPC의 dataset version이 `cre-20260909T060407Z-5c55a7cb58de`.
+- source/cache/auth timing header 및 production 로그.
+- desktop/mobile responsive web, collapsed height `44px`, horizontal overflow와 console error 없음.
+
+실패하면 신규 Supabase를 수정하지 않는다. 현재 rollback deployment `dpl_5xDokCmsUozCt4K31USiDVywHv34`를 Vercel control plane에서 복구하고 production alias readback을 확인한다. 이는 로컬 source 직접 재배포가 아니다.
+
+## 아직 완료되지 않은 항목
+
+- [ ] D의 production env 8개 apply/readback
+- [ ] 최종 release commit 생성
+- [ ] GitHub `main` push
+- [ ] GitHub-triggered Vercel deployment READY
+- [ ] production alias 전환 readback
+- [ ] production API/auth/desktop/mobile QA
+- [ ] 최종 deployment·commit·rollback 증적 기록
+
+위 항목을 모두 확인하기 전에는 릴리스를 완료로 보고하지 않는다.

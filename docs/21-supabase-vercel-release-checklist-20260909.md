@@ -1,110 +1,157 @@
-# CRE DB Supabase/Vercel release checklist — 2026-09-09
+# CRE DB Supabase/GitHub/Vercel release checklist — 2026-09-09
 
-## Scope and immutable targets
+## 고정 release 경로
 
-- Production URL: `https://cre-db.vercel.app`
-- Vercel project: `cre-db` / `prj_1DTajzRAaw2IbqffiAwN2aZWC5Bb`
-- Vercel team: `team_ZraFevjGRitnuj6w5suDl9Cs`
-- Vercel project root: `web`
-- GitHub source: `https://github.com/Crus7230/CRE-DB.git`
-- Verified remote `main` baseline at preparation time: `eef5faf4a773f3b6080e852380ba6cfcac05c5db`
-- Isolated release checkout: `.codex_tmp/cre-release-20260909`
-- Local release branch: `codex/cre-supabase-release-20260909`
-- New Supabase project ref: `rjalzmmiqhrdmhojbxsk`
-- Generative AI is explicitly out of scope. The smart lookup remains deterministic pre-indexing and retrieval only.
+- [x] GitHub source: `Crus7230/CRE-DB`
+- [x] production branch: `main`
+- [x] Vercel project: `cre-db` / `prj_1DTajzRAaw2IbqffiAwN2aZWC5Bb`
+- [x] Vercel team: `team_ZraFevjGRitnuj6w5suDl9Cs`
+- [x] Vercel root: `web`
+- [x] Vercel CLI/account: `59.13.1` / `cruslee00-6855`
+- [x] GitHub GCM account: `Crus7230`; push dry-run 통과
+- [x] current production rollback: `dpl_5xDokCmsUozCt4K31USiDVywHv34`, READY
+- [x] production URL: `https://cre-db.vercel.app`
+- [ ] final commit을 `main`에 push하여 기존 GitHub integration으로 Vercel production 배포
 
-Do not modify the dirty parent repository or the 31-file source checkout in place. Do not upload databases, journals, backups, raw captures, artifacts, reports, logs, environment files, access-code files, credentials, or local build/cache directories.
+정상 경로는 **production env readback → GitHub `main` push → 기존 Vercel integration 자동 배포**다. 로컬 source 직접 `vercel deploy`, `--prod --skip-domain`, 별도 staged production deployment, 정상 경로의 수동 promote는 금지한다.
 
-## Current authority checkpoint
+## 현재 완료 증적
 
-- Vercel link metadata matches the project/team/name above.
-- The earlier production release recorded in `docs/13-dashboard-redesign-state-20260908.md` is `dpl_7DWCMt1y81gDFbf4riGDQQQyCsEZ`, READY and aliased to the production URL.
-- A current `VERCEL_TOKEN` or interactive Vercel login is still required before any environment update or deployment.
-- The current Windows Git Credential Manager has no reusable `Crus7230` GitHub credential. A Vercel CLI source deployment can proceed without a GitHub push; report the local commit and any unpushed state explicitly.
+- [x] release source `8d6d8d3` 기준 준비; final commit/push는 미완료
+- [x] canonical/source parity `211/211`
+- [x] mismatch `0`
+- [x] source match `182`
+- [x] web tests `77 files / 312 passed / 1 skipped`
+- [x] 격리 release checkout production build
+- [x] lint
+- [x] TypeScript check
+- [x] secret/forbidden/conflict scan
+- [x] database/backup/raw/artifact/env/credential/build cache 제외
 
-## Candidate assembly gate
+## Supabase gate
 
-1. Keep `source-delta-files.txt` as an exact, reviewed two-source inventory. `legacy` rows must equal the complete pre-existing three-tab/smart-lookup/local-split delta in `cre-online-redesign-20260908`; `canonical` rows point to exact current files under `09. CRE DB Board` and overlay the legacy copy. It must include the final Supabase runtime/cache/migration/export/schema-document additions—not just a new cache file.
-2. Run `Prepare-CreReleaseCandidate.ps1 -ValidateOnly` first from a clean release checkout, passing both source content roots. Remote-baseline authority is checked in the release checkout; the canonical content root is intentionally not treated as a standalone Git repository. The script compares the complete legacy delta with its manifest rows, rejects forbidden paths, and hashes every listed source without copying. Remove `-ValidateOnly` only after the canonical manifest is final; copy mode verifies destination SHA-256 and runs `git diff --check`.
-3. Confirm runtime imports, fonts and licenses, `package.json`, lockfile, required operational scripts, and the new schema/state documentation are present. Add a path only after explaining why the deployed runtime or release verification requires it.
-4. Run all relevant unit tests, lint, TypeScript checks, production build, and visual QA from the release checkout.
-5. Run `Test-CreReleaseCandidate.ps1`. Required result: secret matches `0`, forbidden paths `0`, conflict markers `0`, and `git diff --check` passed. The scanner compares credential values in memory and prints only counts and matching paths.
-6. Commit locally on the scoped release branch. Push only if `Crus7230` GitHub authorization is available; a missing push does not authorize embedding credentials or changing global Git settings.
+- [x] project ref `rjalzmmiqhrdmhojbxsk`
+- [x] dataset `cre-20260909T060407Z-5c55a7cb58de`
+- [x] schema `1.1.0`
+- [x] source freshness `2026-09-09T06:04:07Z`
+- [x] current dashboard serving articles `2,145`; 전체 raw archive가 아님
+- [x] compact table 9개 전수 semantic parity
+- [x] RLS `15/15`
+- [x] invalid constraints `0`
+- [x] 승인 subject `3`, unknown 거부
+- [x] 독립 `pg_database_size=61,549,715 B`
+- [x] publisher report `pg_database_size=61,516,947 B`; 동일 snapshot의 물리 변동으로 설명
+- [x] `cre_news=20,021,248 B`
+- [x] `cre_timeseries=29,933,568 B`
+- [x] `cre_system=303,104 B`
+- [x] `article_search_documents=4,136,960 B`
 
-## Supabase data and permission gate
+운영 의미:
 
-Record these values from direct readback immediately before release:
+- [x] 자동 snapshot publisher/scheduler를 연결하지 않음
+- [x] 어느 한 serving content라도 달라지면 현재 publisher는 9개 table 전체를 새 version으로 적재
+- [x] no-op은 schema/table hash/count/lineage/facet을 포함한 전체 identity가 동일할 때만 성립
+- [x] update 실패 시 pre-activation semantic gate와 transaction rollback으로 이전 active 유지
+- [x] 이번 release에서 DB 재발행 불필요
 
-| Check | Required evidence |
-| --- | --- |
-| Project identity | project ref `rjalzmmiqhrdmhojbxsk`, PostgreSQL version, region/pooler |
-| Dataset contract | final dataset/schema version from the canonical version marker |
-| Freshness | source-specific maximum observation/published/indexed timestamps and timezone |
-| News physical size | relation/index/total bytes for the news serving objects |
-| Time-series physical size | relation/index/total bytes for the time-series serving objects |
-| Search-index physical size | relation/index/total bytes for deterministic lookup/index objects |
-| Whole database | `pg_database_size(current_database())` |
-| Runtime privileges | production data RPC can execute required read paths and cannot perform DDL or direct table writes |
-| Load privileges | the separate migration/load authority completed schema/load work and is not exposed to browser code |
-| RPC separation | cold/warm timings are reported separately for data RPC and authentication RPC; do not combine them |
+## 로컬 web QA
 
-Final independent pre-release readback is dataset `cre-20260909T060407Z-5c55a7cb58de`, schema `1.1.0`, source freshness `2026-09-09T06:04:07Z`, PostgreSQL `17.6`, Tokyo pooler, and `pg_database_size=61,549,715 B`. Physical schema totals are `cre_news=20,021,248 B` (table/index `7,380,992/8,855,552 B`), `cre_timeseries=29,933,568 B` (`15,368,192/14,516,224 B`), and `cre_system=303,104 B` (`49,152/147,456 B`). The deterministic article-search object is `4,136,960 B` (`1,802,240 B` table plus `2,228,224 B` indexes). RLS is enabled on all 15 private tables and invalid constraints are `0`.
+검증 URL은 `http://127.0.0.1:3015`이다. `localhost`로 기록하지 않는다.
 
-Local Supabase-backed QA on `http://127.0.0.1:3015` passed all three tabs, article detail/index search, address/company smart lookup, and desktop/mobile visual checks; the existing port `3005` was preserved. Standard regression is `77 files / 311 passed / 1 skipped`, and lint passed. Local warm HTTP observations were news `5.8 ms`, macro `11.3 ms`, pulse `6.3 ms`, and permits first request `131.9 ms` then repeat `4.8 ms`. These are not production results and not a true cold-DB benchmark; staged and live checks below remain required.
+- [x] v4 server PID `41084`
+- [x] BUILD_ID `NBLbFsREXkgUMaKUHDMX1`
+- [x] 최신기사·시계열자료·스마트 조회 3개 tab
+- [x] address/company smart API
+- [x] desktop/mobile responsive web visual QA
+- [x] evidence results `8`
+- [x] title matches `8`
+- [x] duplicate blockquotes `0`
+- [x] mobile collapsed height `44px`
+- [x] warm news `4.3ms`
+- [x] warm macro `11.4ms`
+- [x] warm pulse `6.3ms`
+- [x] warm permits `3.9ms`
+- [x] web-only 범위 확인; mobile은 responsive viewport QA이며 APK/native QA가 아님
 
-## Vercel environment gate
+로컬 warm 수치는 production 또는 cold DB benchmark가 아니다.
 
-1. Inspect the existing project and list environment variable **keys/targets only**. Never print values.
-2. The mutation manifest must contain only environment variables actually referenced by the final server runtime. Data-provider requirements are `SUPABASE_URL`, `SUPABASE_SECRET_KEY`, `SUPABASE_PROJECT_REF=rjalzmmiqhrdmhojbxsk`, and `DASHBOARD_DATA_PROVIDER=supabase`. The ref must match the URL or the runtime fails closed.
-3. Apply the minimal production-only Supabase delta. Preserve `DASHBOARD_SESSION_SECRET`, existing API keys, and every unrelated environment entry. Never clear all variables.
-4. Root QA approval authorizes replacing the exact three target keys above because switching the production connection to the new Supabase project is the requested release. Do not touch any other key. Sensitive old values may not be readable, so preserve the currently aliased deployment as the rollback target.
-5. Re-read environment metadata and verify every pre-existing entry identity remains plus the required production Supabase keys.
-6. Environment changes affect only new deployments, so build a new staged production deployment.
+## Production env 8개 — push 전 필수
 
-`Invoke-CreVercelStage.ps1` requires both `-RootQaApproved` and `-ApproveEnvironmentMutation`. It pins Vercel CLI `59.13.1`, updates only the key manifest from the declared per-key authority, deploys with `--prod --skip-domain`, waits for READY, and deliberately leaves `cre-db.vercel.app` unchanged.
+D가 아래 정확히 8개만 production target에 추가/갱신하고, 값은 출력하지 않는다.
 
-### Smart-lookup runtime environment
+- [ ] `SUPABASE_URL`
+- [ ] `SUPABASE_SECRET_KEY`
+- [ ] `SUPABASE_PROJECT_REF=rjalzmmiqhrdmhojbxsk`
+- [ ] `DASHBOARD_DATA_PROVIDER=supabase`
+- [ ] `VWORLD_KEY`
+- [ ] `DATA_GO_KR_KEY`
+- [ ] `DART_API_KEY`
+- [ ] `KRX_API_KEY`
 
-The canonical server allowlist in `smart-lookup-http.ts` contains exactly four provider keys and permits only the four fixed HTTPS provider hosts. No provider base URL is configurable.
+기존 production 4개는 보존한다.
 
-| Key | Functional requirement | Approved local authority at preparation time |
-| --- | --- | --- |
-| `VWORLD_KEY` | Required for address candidate search | Existing global external-API authority |
-| `DATA_GO_KR_KEY` | Required for selected-address building-register detail | Existing global external-API authority |
-| `DART_API_KEY` | Required for company candidate search, company overview, and disclosures | Existing global external-API authority |
-| `KRX_API_KEY` | Optional to the DART company flow, but required for the KRX listed-security enrichment card | Existing global external-API authority |
+- [x] 보존 대상 확인: `TURSO_AUTH_TOKEN`
+- [x] 보존 대상 확인: `TURSO_DATABASE_URL`
+- [x] 보존 대상 확인: `SUPABASE_DB_URL`
+- [x] 보존 대상 확인: `DASHBOARD_SESSION_SECRET`
+- [ ] env apply 후 기존 4개와 신규 8개의 name/target 존재를 readback
+- [ ] 신규 URL/ref 일치와 provider=`supabase`를 값 노출 없이 검증
+- [ ] 비대상 production env가 삭제·변경되지 않았음을 확인
 
-Name-only inspection found none of these four keys in `C:\10137_WorkSpace\env\.env.personal.txt` and all four in `C:\10137_WorkSpace\env\.env`. The global file is already the canonical workstation fallback read by this feature, so it is the per-key authority for adding these existing provider credentials to Vercel. Values stay in memory and are never printed or copied into the repository. `SMART_LOOKUP_ENV_FILE` is a local-only optional override and must not be added to Vercel; Vercel supplies its own `VERCEL` system variable.
+변경 범위의 root 검토는 완료됐지만 approval reviewer가 실제 secret upload를 허용하지 않아 명시적 사용자 승인을 기다리고 있다. 승인 전에는 외부 환경을 변경하지 않으며, 실제 D apply/readback 전에는 push하지 않는다.
 
-Vercel key/target presence is still unknown while authorization is absent. After login, list names/targets only and then add or replace exactly the eight entries in `vercel-env-mutations.tsv`; do not infer missing smart-lookup keys from the old Turso release. If `DASHBOARD_SUPABASE_RPC_SCHEMA` already exists for production, read it in memory and require exactly `public`; do not delete it or print its value. The old `SUPABASE_DB_SCHEMA` is ignored and should be preserved.
+## Commit·push gate
 
-## Staged deployment QA gate
+- [ ] 지정 source manifest만 final diff에 포함
+- [ ] `git diff --check`
+- [ ] secret/forbidden/conflict scan 재확인
+- [ ] final commit SHA 기록
+- [ ] `git status`와 push 대상 branch가 `main`인지 확인
+- [ ] `Crus7230/CRE-DB main` push
+- [ ] 원격 `main` SHA가 local final commit과 동일한지 readback
 
-Run each check against the staged deployment URL before promotion and retain status, response headers, timing, and a small non-sensitive payload sample.
+## GitHub-triggered Vercel gate
 
-- Anonymous calls to every protected data API return `401` with `Cache-Control: no-store`.
-- Allowed email `sjlee@igisam.com` logs in successfully and receives the secure HTTP-only session cookie.
-- A unique, non-allowlisted IGIS email is rejected. Do not weaken the existing email-only allowlist model in this release.
-- The three dashboard tabs load from the new Supabase-backed data paths: 최신기사, 시계열자료, and 스마트 조회.
-- Article-detail lookup resolves an ID returned by 최신기사, and the article tab's deterministic index search returns source-grounded results.
-- 스마트 조회 exercises both the address and company API paths. There is no generative response path or model call.
-- Source/dataset version and cache-state headers match the final server contract. Record cold and warm responses independently.
-- Data RPC timing and authorization RPC timing are captured independently (for example, separate `Server-Timing` entries); neither hides the other.
-- Desktop and mobile visual QA cover login, all three tabs, article detail, indexed search, loading/empty/error states, and a mobile viewport around `390 × 844`.
-- No production alias has changed at this point.
+- [ ] push로 생성된 Vercel deployment 식별
+- [ ] deployment source commit SHA가 push SHA와 동일
+- [ ] project/team/root가 고정 대상과 동일
+- [ ] deployment READY
+- [ ] `cre-db.vercel.app` alias가 새 deployment를 가리킴
+- [ ] 기존 rollback deployment `dpl_5xDokCmsUozCt4K31USiDVywHv34` 보존
 
-## Promotion and live verification gate
+직접 Vercel source deploy 명령을 실행하지 않는다.
 
-Promotion requires a second explicit approval after staged QA:
+## Production API/auth/visual QA
 
-1. Confirm the staged deployment ID, URL, project ID, production target, and READY state.
-2. Record the currently aliased production deployment for rollback.
-3. Promote the staged production deployment with `vercel promote <deployment-url> --yes`; do not rebuild.
-4. Confirm `cre-db.vercel.app` is assigned to the new deployment.
-5. Repeat anonymous `401`, allowed and rejected login, three-tab APIs, article detail, indexed search, source/version/cache headers, cold/warm data RPC, auth RPC, and desktop/mobile visual checks on the production URL.
-6. Review recent production error logs.
-7. Record the local release commit, GitHub push status, Vercel deployment ID/URL/READY timestamp, production alias verification, final Supabase version/freshness/size evidence, and rollback deployment ID.
+- [ ] anonymous protected API `401`
+- [ ] `Cache-Control: no-store`
+- [ ] 허용 email login 성공
+- [ ] 비허용 email 거부
+- [ ] 최신기사 tab
+- [ ] 시계열자료 tab
+- [ ] 스마트 조회 tab
+- [ ] article detail ID/title 일치
+- [ ] evidence results/title matches `8/8`
+- [ ] duplicate blockquotes `0`
+- [ ] address smart API
+- [ ] company smart API
+- [ ] manifest/data RPC version `cre-20260909T060407Z-5c55a7cb58de`
+- [ ] cache/source/auth timing headers
+- [ ] recent production error log
+- [ ] desktop responsive web
+- [ ] mobile responsive web 및 collapsed `44px`
+- [ ] horizontal overflow/console error 없음
 
-`Promote-CreVercelRelease.ps1` implements this second gate. It refuses to run without both staged-QA and production-promotion switches, verifies that the target is a READY staged production deployment, records the currently aliased deployment, promotes without rebuilding, and confirms the production alias by API readback.
+## 완료 기록
 
-If live verification fails, promote the previously recorded production deployment back immediately. Do not alter Supabase data during rollback.
+- [ ] GitHub final commit SHA
+- [ ] push 완료 시각
+- [ ] Vercel deployment ID/URL
+- [ ] READY 시각
+- [ ] production alias readback
+- [ ] env 8개 readback 증적
+- [ ] Supabase dataset/freshness readback
+- [ ] production QA 결과
+- [ ] rollback deployment 기록
+
+실패 시 DB를 변경하거나 로컬 source를 재배포하지 않는다. Vercel control plane에서 `dpl_5xDokCmsUozCt4K31USiDVywHv34`를 복구하고 production alias를 readback한다.
