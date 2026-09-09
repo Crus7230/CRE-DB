@@ -145,7 +145,12 @@ if ($project.id -ne $ProjectId -or $project.name -ne $ExpectedProjectName -or $p
 
 $beforeResponse = Invoke-RestMethod -Method Get -Uri $environmentUri -Headers $headers
 $beforeEnvironments = @($beforeResponse.envs)
-$beforeIdentities = @($beforeEnvironments | ForEach-Object { Get-EnvironmentIdentity -EnvironmentVariable $_ } | Sort-Object)
+$beforeUnrelatedIdentities = @(
+    $beforeEnvironments |
+        Where-Object { $_.key -notin $supabaseKeys } |
+        ForEach-Object { Get-EnvironmentIdentity -EnvironmentVariable $_ } |
+        Sort-Object
+)
 
 $existingTargetKeys = @()
 foreach ($key in $supabaseKeys) {
@@ -171,13 +176,15 @@ try {
         if ($key -in $existingTargetKeys) {
             [void](Invoke-VercelCli -CliArgs @("env", "update", $key, "production", "--yes", "--cwd", $candidateGitRoot, "--no-color") -StandardInputValue $value -SensitiveValues $sensitiveValues)
         } else {
-            [void](Invoke-VercelCli -CliArgs @("env", "add", $key, "production", "--sensitive", "--yes", "--cwd", $candidateGitRoot, "--no-color") -StandardInputValue $value -SensitiveValues $sensitiveValues)
+            $addArguments = @("env", "add", $key, "production", "--yes", "--cwd", $candidateGitRoot, "--no-color")
+            if ($key -match "(SECRET|KEY|TOKEN)$") { $addArguments += "--sensitive" }
+            [void](Invoke-VercelCli -CliArgs $addArguments -StandardInputValue $value -SensitiveValues $sensitiveValues)
         }
     }
 
     $afterResponse = Invoke-RestMethod -Method Get -Uri $environmentUri -Headers $headers
     $afterEnvironments = @($afterResponse.envs)
-    foreach ($identity in $beforeIdentities) {
+    foreach ($identity in $beforeUnrelatedIdentities) {
         $afterIdentities = @($afterEnvironments | ForEach-Object { Get-EnvironmentIdentity -EnvironmentVariable $_ })
         if ($identity -notin $afterIdentities) {
             throw "A pre-existing Vercel environment entry changed identity or disappeared; stop before deployment."
