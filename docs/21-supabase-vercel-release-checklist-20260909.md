@@ -53,7 +53,7 @@ Preparation facts only—not final release evidence: PostgreSQL `17.6`, Tokyo po
 ## Vercel environment gate
 
 1. Inspect the existing project and list environment variable **keys/targets only**. Never print values.
-2. The mutation manifest must contain only environment variables actually referenced by the final server runtime. Data-provider requirements are `SUPABASE_URL`, `SUPABASE_SECRET_KEY`, and `DASHBOARD_DATA_PROVIDER=supabase`; add a project-ref variable only if the final runtime reads it.
+2. The mutation manifest must contain only environment variables actually referenced by the final server runtime. Data-provider requirements are `SUPABASE_URL`, `SUPABASE_SECRET_KEY`, `SUPABASE_PROJECT_REF=rjalzmmiqhrdmhojbxsk`, and `DASHBOARD_DATA_PROVIDER=supabase`. The ref must match the URL or the runtime fails closed.
 3. Apply the minimal production-only Supabase delta. Preserve `DASHBOARD_SESSION_SECRET`, existing API keys, and every unrelated environment entry. Never clear all variables.
 4. Root QA approval authorizes replacing the exact three target keys above because switching the production connection to the new Supabase project is the requested release. Do not touch any other key. Sensitive old values may not be readable, so preserve the currently aliased deployment as the rollback target.
 5. Re-read environment metadata and verify every pre-existing entry identity remains plus the required production Supabase keys.
@@ -74,7 +74,7 @@ The canonical server allowlist in `smart-lookup-http.ts` contains exactly four p
 
 Name-only inspection found none of these four keys in `C:\10137_WorkSpace\env\.env.personal.txt` and all four in `C:\10137_WorkSpace\env\.env`. The global file is already the canonical workstation fallback read by this feature, so it is the per-key authority for adding these existing provider credentials to Vercel. Values stay in memory and are never printed or copied into the repository. `SMART_LOOKUP_ENV_FILE` is a local-only optional override and must not be added to Vercel; Vercel supplies its own `VERCEL` system variable.
 
-Vercel key/target presence is still unknown while authorization is absent. After login, list names/targets only and then add or replace exactly the seven entries in `vercel-env-mutations.tsv`; do not infer missing smart-lookup keys from the old Turso release.
+Vercel key/target presence is still unknown while authorization is absent. After login, list names/targets only and then add or replace exactly the eight entries in `vercel-env-mutations.tsv`; do not infer missing smart-lookup keys from the old Turso release. If `DASHBOARD_SUPABASE_RPC_SCHEMA` already exists for production, read it in memory and require exactly `public`; do not delete it or print its value. The old `SUPABASE_DB_SCHEMA` is ignored and should be preserved.
 
 ## Staged deployment QA gate
 

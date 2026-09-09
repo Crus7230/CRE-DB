@@ -1,6 +1,7 @@
 # key	source	requirement
 SUPABASE_URL	personal	required-data
 SUPABASE_SECRET_KEY	personal	required-data
+SUPABASE_PROJECT_REF	personal	required-data-identity
 DASHBOARD_DATA_PROVIDER	constant	required-data
 VWORLD_KEY	global	required-address-search
 DATA_GO_KR_KEY	global	required-address-detail

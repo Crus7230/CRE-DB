@@ -32,7 +32,7 @@ function Test-ForbiddenReleasePath {
     $path = $RelativePath.Replace("\", "/")
     if ($path -match "(?i)(^|/)[.]git(/|$)") { return $true }
     if ($path -match "(?i)(^|/)[.]vercel(/|$)") { return $true }
-    if ($path -match "(?i)(^|/)(node_modules|[.]next)(/|$)") { return $true }
+    if ($path -match "(?i)(^|/)(node_modules|[.]next(?:-[^/]+)?)(/|$)") { return $true }
     if ($path -match "(?i)(^|/)(data|backups?|raw|artifacts?|reports?|logs)(/|$)") { return $true }
     if ($path -match "(?i)(^|/)[.]env($|[.])" -and $path -notmatch "(?i)(^|/)[.]env[.]example$") { return $true }
     if ($path -match "(?i)[.](db|sqlite|sqlite3|pem|key|p12|pfx)$") { return $true }

@@ -137,7 +137,7 @@ $mutationKeys = @($mutationEntries | ForEach-Object Key)
 $duplicateKeys = @($mutationKeys | Group-Object | Where-Object Count -gt 1 | ForEach-Object Name)
 if ($duplicateKeys.Count -gt 0) { throw "Environment mutation manifest has duplicate keys: $($duplicateKeys -join ', ')" }
 $allowedKeys = @(
-    "SUPABASE_URL", "SUPABASE_SECRET_KEY", "DASHBOARD_DATA_PROVIDER",
+    "SUPABASE_URL", "SUPABASE_SECRET_KEY", "SUPABASE_PROJECT_REF", "DASHBOARD_DATA_PROVIDER",
     "VWORLD_KEY", "DATA_GO_KR_KEY", "DART_API_KEY", "KRX_API_KEY"
 )
 $unexpectedKeys = @($mutationKeys | Where-Object { $_ -notin $allowedKeys })
@@ -175,6 +175,26 @@ if ($project.id -ne $ProjectId -or $project.name -ne $ExpectedProjectName -or $p
 
 $beforeResponse = Invoke-RestMethod -Method Get -Uri $environmentUri -Headers $headers
 $beforeEnvironments = @($beforeResponse.envs)
+$rpcSchemaEntries = @(
+    $beforeEnvironments |
+        Where-Object {
+            $_.key -eq "DASHBOARD_SUPABASE_RPC_SCHEMA" -and
+            (@($_.target) -contains "production") -and
+            [string]::IsNullOrWhiteSpace([string]$_.gitBranch)
+        }
+)
+if ($rpcSchemaEntries.Count -gt 1) {
+    throw "Multiple unscoped production DASHBOARD_SUPABASE_RPC_SCHEMA entries exist; resolve manually."
+}
+if ($rpcSchemaEntries.Count -eq 1) {
+    $schemaEntryId = [Uri]::EscapeDataString([string]$rpcSchemaEntries[0].id)
+    $schemaEntryUri = "https://api.vercel.com/v9/projects/$ProjectId/env/$schemaEntryId`?teamId=$TeamId"
+    $schemaEntry = Invoke-RestMethod -Method Get -Uri $schemaEntryUri -Headers $headers
+    if ([string]$schemaEntry.value -ne "public") {
+        throw "Existing production DASHBOARD_SUPABASE_RPC_SCHEMA is not 'public'; refusing environment mutation."
+    }
+    $schemaEntry = $null
+}
 $beforeUnrelatedIdentities = @(
     $beforeEnvironments |
         Where-Object { $_.key -notin $mutationKeys } |
