@@ -2,9 +2,11 @@
 param(
     [string]$CandidateRoot = (Join-Path $PSScriptRoot "..\.."),
 
-    [string]$EnvironmentFile = "C:\10137_WorkSpace\env\.env.personal.txt",
+    [string]$PersonalEnvironmentFile = "C:\10137_WorkSpace\env\.env.personal.txt",
 
-    [string]$EnvironmentKeyManifest = (Join-Path $PSScriptRoot "vercel-supabase-env-keys.txt"),
+    [string]$GlobalEnvironmentFile = "C:\10137_WorkSpace\env\.env",
+
+    [string]$EnvironmentMutationManifest = (Join-Path $PSScriptRoot "vercel-env-mutations.tsv"),
 
     [string]$ProjectId = "prj_1DTajzRAaw2IbqffiAwN2aZWC5Bb",
 
@@ -106,34 +108,62 @@ if ($candidateStatus.Count -gt 0) {
     throw "Candidate must be committed and clean before staged production deployment."
 }
 
-& (Join-Path $PSScriptRoot "Test-CreReleaseCandidate.ps1") -CandidateRoot $candidateGitRoot -CredentialEnvironmentFiles @($EnvironmentFile)
+& (Join-Path $PSScriptRoot "Test-CreReleaseCandidate.ps1") -CandidateRoot $candidateGitRoot -CredentialEnvironmentFiles @($PersonalEnvironmentFile, $GlobalEnvironmentFile)
 if ($LASTEXITCODE -ne 0) { throw "Release candidate safety check failed." }
 
-$environment = Read-EnvironmentMap -Path $EnvironmentFile
-if (-not $environment.ContainsKey("VERCEL_TOKEN")) {
+$personalEnvironment = Read-EnvironmentMap -Path $PersonalEnvironmentFile
+$globalEnvironment = Read-EnvironmentMap -Path $GlobalEnvironmentFile
+if (-not $personalEnvironment.ContainsKey("VERCEL_TOKEN")) {
     throw "VERCEL_TOKEN is absent from the approved environment file."
 }
-$vercelToken = [string]$environment["VERCEL_TOKEN"]
+$vercelToken = [string]$personalEnvironment["VERCEL_TOKEN"]
 
-$supabaseKeys = @(
-    Get-Content -LiteralPath $EnvironmentKeyManifest |
+$mutationEntries = @(
+    Get-Content -LiteralPath $EnvironmentMutationManifest |
         ForEach-Object { $_.Trim() } |
-        Where-Object { $_ -and -not $_.StartsWith("#") }
-)
-if ($supabaseKeys.Count -eq 0) { throw "Supabase environment-key manifest is empty." }
-foreach ($key in $supabaseKeys) {
-    if ($key -notmatch "^(SUPABASE_[A-Z0-9_]+|DASHBOARD_DATA_PROVIDER)$") { throw "Unexpected key is not allowed in the mutation manifest: $key" }
-    if ($key -eq "DASHBOARD_DATA_PROVIDER") {
-        if ($environment.ContainsKey($key) -and [string]$environment[$key] -ne "supabase") {
-            throw "DASHBOARD_DATA_PROVIDER must be exactly 'supabase'."
+        Where-Object { $_ -and -not $_.StartsWith("#") } |
+        ForEach-Object {
+            $fields = @($_ -split "`t", 3)
+            if ($fields.Count -ne 3) { throw "Environment mutation row must be '<key><TAB><source><TAB><requirement>': $_" }
+            [pscustomobject]@{
+                Key = $fields[0].Trim()
+                Source = $fields[1].Trim().ToLowerInvariant()
+                Requirement = $fields[2].Trim()
+            }
         }
-        $environment[$key] = "supabase"
+)
+if ($mutationEntries.Count -eq 0) { throw "Environment mutation manifest is empty." }
+$mutationKeys = @($mutationEntries | ForEach-Object Key)
+$duplicateKeys = @($mutationKeys | Group-Object | Where-Object Count -gt 1 | ForEach-Object Name)
+if ($duplicateKeys.Count -gt 0) { throw "Environment mutation manifest has duplicate keys: $($duplicateKeys -join ', ')" }
+$allowedKeys = @(
+    "SUPABASE_URL", "SUPABASE_SECRET_KEY", "DASHBOARD_DATA_PROVIDER",
+    "VWORLD_KEY", "DATA_GO_KR_KEY", "DART_API_KEY", "KRX_API_KEY"
+)
+$unexpectedKeys = @($mutationKeys | Where-Object { $_ -notin $allowedKeys })
+if ($unexpectedKeys.Count -gt 0) { throw "Unexpected key is not allowed in the mutation manifest: $($unexpectedKeys -join ', ')" }
+
+$mutationValues = @{}
+foreach ($entry in $mutationEntries) {
+    if ($entry.Source -eq "constant") {
+        if ($entry.Key -ne "DASHBOARD_DATA_PROVIDER") { throw "Only DASHBOARD_DATA_PROVIDER may use constant authority." }
+        $mutationValues[$entry.Key] = "supabase"
         continue
     }
-    if (-not $environment.ContainsKey($key)) { throw "Required environment key is absent from the approved environment file: $key" }
+    $authority = if ($entry.Source -eq "personal") {
+        $personalEnvironment
+    } elseif ($entry.Source -eq "global") {
+        $globalEnvironment
+    } else {
+        throw "Unknown environment authority '$($entry.Source)' for $($entry.Key)."
+    }
+    if (-not $authority.ContainsKey($entry.Key)) {
+        throw "Required environment key is absent from its approved $($entry.Source) authority: $($entry.Key)"
+    }
+    $mutationValues[$entry.Key] = [string]$authority[$entry.Key]
 }
 
-$sensitiveValues = @($vercelToken) + @($supabaseKeys | ForEach-Object { [string]$environment[$_] })
+$sensitiveValues = @($vercelToken) + @($mutationKeys | ForEach-Object { [string]$mutationValues[$_] })
 $headers = @{ Authorization = "Bearer $vercelToken" }
 $projectUri = "https://api.vercel.com/v9/projects/$ProjectId`?teamId=$TeamId"
 $environmentUri = "https://api.vercel.com/v9/projects/$ProjectId/env?teamId=$TeamId"
@@ -147,13 +177,13 @@ $beforeResponse = Invoke-RestMethod -Method Get -Uri $environmentUri -Headers $h
 $beforeEnvironments = @($beforeResponse.envs)
 $beforeUnrelatedIdentities = @(
     $beforeEnvironments |
-        Where-Object { $_.key -notin $supabaseKeys } |
+        Where-Object { $_.key -notin $mutationKeys } |
         ForEach-Object { Get-EnvironmentIdentity -EnvironmentVariable $_ } |
         Sort-Object
 )
 
 $existingTargetKeys = @()
-foreach ($key in $supabaseKeys) {
+foreach ($key in $mutationKeys) {
     $matching = @(
         $beforeEnvironments |
             Where-Object { $_.key -eq $key -and (@($_.target) -contains "production") -and [string]::IsNullOrWhiteSpace([string]$_.gitBranch) }
@@ -171,8 +201,8 @@ try {
     $env:VERCEL_PROJECT_ID = $ProjectId
     $env:npm_config_cache = Join-Path (Split-Path -Parent $candidateGitRoot) "npm-cache-vercel-release"
 
-    foreach ($key in $supabaseKeys) {
-        $value = [string]$environment[$key]
+    foreach ($key in $mutationKeys) {
+        $value = [string]$mutationValues[$key]
         if ($key -in $existingTargetKeys) {
             [void](Invoke-VercelCli -CliArgs @("env", "update", $key, "production", "--yes", "--cwd", $candidateGitRoot, "--no-color") -StandardInputValue $value -SensitiveValues $sensitiveValues)
         } else {
@@ -190,7 +220,7 @@ try {
             throw "A pre-existing Vercel environment entry changed identity or disappeared; stop before deployment."
         }
     }
-    foreach ($key in $supabaseKeys) {
+    foreach ($key in $mutationKeys) {
         $matching = @($afterEnvironments | Where-Object { $_.key -eq $key -and (@($_.target) -contains "production") })
         if ($matching.Count -eq 0) { throw "Environment readback did not find production key: $key" }
     }
@@ -225,7 +255,8 @@ try {
         ProjectName = $ExpectedProjectName
         RootDirectory = $ExpectedRootDirectory
         ReleaseCommit = $commit
-        EnvironmentKeysChanged = $supabaseKeys
+        EnvironmentKeysChanged = $mutationKeys
+        EnvironmentAuthorities = @($mutationEntries | Select-Object Key, Source, Requirement)
         PreExistingEnvironmentEntryCount = $beforeEnvironments.Count
         PostUpdateEnvironmentEntryCount = $afterEnvironments.Count
         DeploymentId = $deployment.id
@@ -241,6 +272,8 @@ finally {
     $env:VERCEL_PROJECT_ID = $oldVercelProjectId
     $env:npm_config_cache = $oldNpmCache
     $vercelToken = $null
-    $environment = $null
+    $personalEnvironment = $null
+    $globalEnvironment = $null
+    $mutationValues = $null
     $sensitiveValues = $null
 }

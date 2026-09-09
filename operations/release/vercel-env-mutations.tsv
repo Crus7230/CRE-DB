@@ -1,0 +1,8 @@
+# key	source	requirement
+SUPABASE_URL	personal	required-data
+SUPABASE_SECRET_KEY	personal	required-data
+DASHBOARD_DATA_PROVIDER	constant	required-data
+VWORLD_KEY	global	required-address-search
+DATA_GO_KR_KEY	global	required-address-detail
+DART_API_KEY	global	required-company
+KRX_API_KEY	global	optional-company-enrichment
