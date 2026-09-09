@@ -23,18 +23,23 @@ vi.mock("@/components/permit-timeseries-workspace", () => ({
   PermitTimeseriesWorkspace: () => <section aria-label="건축 인허가 시계열"><input aria-label="인허가 메모"/></section>,
 }));
 
+vi.mock("@/components/smart-api-search", () => ({
+  SmartApiSearch: () => <section aria-label="스마트 조회 화면"><input aria-label="조회 메모"/></section>,
+}));
+
 describe("MarketExplorer", () => {
-  it("exposes exactly two keyboard-operable primary tabs", async () => {
+  it("keeps the two existing destinations and adds one keyboard-operable smart lookup tab", async () => {
     const user = userEvent.setup();
     render(<MarketExplorer/>);
 
     const navigation = screen.getByRole("tablist", { name: "주요 화면" });
     const tabs = within(navigation).getAllByRole("tab");
-    expect(tabs).toHaveLength(2);
+    expect(tabs).toHaveLength(3);
     expect(tabs[0]).toHaveAccessibleName(/최신기사/);
     expect(tabs[0]).toHaveAttribute("aria-current", "page");
     expect(tabs[0]).toHaveAttribute("aria-selected", "true");
     expect(tabs[1]).toHaveAccessibleName(/시계열자료/);
+    expect(tabs[2]).toHaveAccessibleName(/스마트 조회/);
     expect(screen.getByRole("region", { name: "최신기사 목록" })).toBeInTheDocument();
     expect(screen.queryByText("브리핑")).not.toBeInTheDocument();
     expect(screen.queryByText("기업·자산")).not.toBeInTheDocument();
@@ -44,6 +49,22 @@ describe("MarketExplorer", () => {
     await user.keyboard("{ArrowRight}");
     expect(tabs[1]).toHaveFocus();
     expect(tabs[1]).toHaveAttribute("aria-selected", "true");
+    await user.keyboard("{ArrowRight}");
+    expect(tabs[2]).toHaveFocus();
+    expect(tabs[2]).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("region", { name: "스마트 조회 화면" })).toBeInTheDocument();
+  });
+
+  it("lazy-mounts smart lookup and preserves its local state across workspace changes", async () => {
+    const user = userEvent.setup();
+    render(<MarketExplorer/>);
+
+    expect(document.querySelector('[aria-label="스마트 조회 화면"]')).toBeNull();
+    await user.click(screen.getByRole("tab", { name: /스마트 조회/ }));
+    await user.type(screen.getByLabelText("조회 메모"), "테헤란로");
+    await user.click(screen.getByRole("tab", { name: /최신기사/ }));
+    await user.click(screen.getByRole("tab", { name: /스마트 조회/ }));
+    expect(screen.getByLabelText("조회 메모")).toHaveValue("테헤란로");
   });
 
   it("lazy-mounts each time-series mode once and preserves it across tab reentry", async () => {

@@ -15,13 +15,17 @@ export async function loadMacroTimeseriesResponse(loader: MacroTimeseriesLoader)
   try {
     return jsonWithServerTiming(
       normalizeCanonicalMacroTimeseries(await loader()),
-      { headers: { "cache-control": "private, max-age=3600" } },
+      { headers: { "cache-control": "private, no-store" } },
       "data",
       startedAt,
     );
   } catch (error) {
     console.error("macro timeseries request failed", safeErrorDescriptor(error));
-    return infrastructureUnavailableResponse("MACRO_TIMESERIES_UNAVAILABLE", startedAt);
+    return infrastructureUnavailableResponse(
+      "MACRO_TIMESERIES_UNAVAILABLE",
+      startedAt,
+      { "Cache-Control": "private, no-store" },
+    );
   }
 }
 

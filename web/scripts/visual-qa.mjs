@@ -90,6 +90,11 @@ report.desktop.rates = await desktop.evaluate(() => ({
   hasSignedRoundedZero: (document.querySelector(".macro-dashboard")?.textContent ?? "").includes("+0bp"),
 }));
 
+await desktop.getByRole("tab", { name: /건축 인허가/ }).click();
+await desktop.locator(".permit-chart svg").waitFor({ timeout: 30000 });
+await desktop.screenshot({ path: path.join(outDir, "cre-dashboard-permits-desktop.png"), fullPage: false });
+report.desktop.permits = { chartVisible: await desktop.locator(".permit-chart svg").isVisible() };
+
 await openPrimaryTab(desktop, /최신기사/);
 await desktop.locator(".daily-article-row").first().waitFor();
 report.desktop.newsPreserved = await desktop.locator(".daily-article-row h2").first().textContent() === firstArticleTitle;
@@ -141,8 +146,14 @@ report.mobile.timeseries = await mobile.evaluate(() => ({
   chartWidth: document.querySelector(".macro-series-chart")?.getBoundingClientRect().width,
 }));
 
+await mobile.getByRole("tab", { name: /건축 인허가/ }).click();
+await mobile.locator(".permit-chart svg").waitFor({ timeout: 30000 });
+await mobile.screenshot({ path: path.join(outDir, "cre-dashboard-permits-mobile.png"), fullPage: false });
+report.mobile.permits = await mobile.evaluate(() => ({ chartVisible: Boolean(document.querySelector(".permit-chart svg")), noOverflow: document.documentElement.scrollWidth <= window.innerWidth }));
+
 await browser.close();
 report.passed =
+  report.desktop.permits.chartVisible && report.mobile.permits.chartVisible && report.mobile.permits.noOverflow &&
   report.consoleErrors.length === 0 &&
   report.pageErrors.length === 0 &&
   report.desktop.news.scrollWidth <= report.desktop.news.viewport[0] &&
@@ -150,8 +161,8 @@ report.passed =
   report.mobile.timeseries.scrollWidth <= report.mobile.news.viewport[0] &&
   report.desktop.news.mastheadHeight === 56 &&
   report.mobile.news.mastheadHeight === 56 &&
-  report.desktop.news.primaryTabCount === 2 &&
-  report.mobile.news.primaryTabCount === 2 &&
+  report.desktop.news.primaryTabCount === 3 &&
+  report.mobile.news.primaryTabCount === 3 &&
   report.desktop.news.firstRowVisible === true &&
   report.mobile.news.firstRowVisible === true &&
   report.desktop.news.titleFontSize >= 15 &&

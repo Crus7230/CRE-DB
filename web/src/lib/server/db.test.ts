@@ -1,175 +1,245 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const { closeMock, createClientMock, executeMock, readFileSyncMock } = vi.hoisted(() => ({
-  closeMock: vi.fn(),
-  createClientMock: vi.fn(),
-  executeMock: vi.fn(),
-  readFileSyncMock: vi.fn(),
+const mocks = vi.hoisted(() => ({
+  close: vi.fn(), createClient: vi.fn(), execute: vi.fn(), fetch: vi.fn(),
+  readFileSync: vi.fn(), statSync: vi.fn(),
 }));
 
 vi.mock("server-only", () => ({}));
-vi.mock("@libsql/client", () => ({ createClient: createClientMock }));
-vi.mock("node:fs", () => ({
-  default: { readFileSync: readFileSyncMock },
-}));
+vi.mock("@libsql/client", () => ({ createClient: mocks.createClient }));
+vi.mock("node:fs", () => ({ default: { readFileSync: mocks.readFileSync, statSync: mocks.statSync } }));
 
-type GlobalWithClient = typeof globalThis & {
-  __marketLibsqlClient?: unknown;
-  __marketLibsqlClientFingerprint?: string;
+type CacheGlobals = typeof globalThis & {
+  __creDashboardSqliteClients?: Record<string, unknown>;
+  __creDashboardSqliteFingerprints?: Record<string, string>;
+  __creDashboardSqliteInitializations?: Record<string, Promise<void>>;
 };
+
+const ENV_NAMES = [
+  "DASHBOARD_DATA_PROVIDER", "DASHBOARD_HOSTED_DEPLOYMENT", "DASHBOARD_DATASET_VERSION",
+  "DASHBOARD_QUERY_TIMEOUT_MS", "DASHBOARD_ENV_FILE", "SUPABASE_URL",
+  "SUPABASE_PROJECT_REF", "SUPABASE_SECRET_KEY", "SUPABASE_PUBLISHABLE_KEY",
+  "DASHBOARD_SUPABASE_RPC_SCHEMA", "SUPABASE_DB_SCHEMA", "TURSO_DATABASE_URL",
+  "NEWS_DATABASE_URL", "TIMESERIES_DATABASE_URL", "TURSO_ENV_FILE", "VERCEL",
+] as const;
+
+function setSqliteEnvironment() {
+  vi.stubEnv("DASHBOARD_DATA_PROVIDER", "sqlite");
+  vi.stubEnv("DASHBOARD_DATASET_VERSION", "sqlite-test-v1");
+  vi.stubEnv("TURSO_DATABASE_URL", "file:auth.db");
+  vi.stubEnv("NEWS_DATABASE_URL", "file:news.db");
+  vi.stubEnv("TIMESERIES_DATABASE_URL", "file:timeseries.db");
+}
+
+function setSupabaseEnvironment() {
+  vi.stubEnv("DASHBOARD_DATA_PROVIDER", "supabase");
+  vi.stubEnv("SUPABASE_URL", "https://rjalzmmiqhrdmhojbxsk.supabase.co");
+  vi.stubEnv("SUPABASE_PROJECT_REF", "rjalzmmiqhrdmhojbxsk");
+  vi.stubEnv("SUPABASE_SECRET_KEY", "sb_secret_test_only");
+}
 
 beforeEach(() => {
   vi.resetModules();
-  vi.stubEnv("TURSO_DATABASE_URL", "");
-  vi.stubEnv("TURSO_AUTH_TOKEN", "");
-  vi.stubEnv("TURSO_ENV_FILE", "");
-  delete process.env.TURSO_DATABASE_URL;
-  delete process.env.TURSO_AUTH_TOKEN;
-  delete process.env.TURSO_ENV_FILE;
-  delete (globalThis as GlobalWithClient).__marketLibsqlClient;
-  delete (globalThis as GlobalWithClient).__marketLibsqlClientFingerprint;
-  executeMock.mockReset();
-  readFileSyncMock.mockReset();
-  createClientMock.mockReset();
-  closeMock.mockReset();
-  createClientMock.mockReturnValue({ execute: executeMock, close: closeMock });
+  vi.unstubAllEnvs();
+  for (const name of ENV_NAMES) delete process.env[name];
+  delete (globalThis as CacheGlobals).__creDashboardSqliteClients;
+  delete (globalThis as CacheGlobals).__creDashboardSqliteFingerprints;
+  delete (globalThis as CacheGlobals).__creDashboardSqliteInitializations;
+  Object.values(mocks).forEach((mock) => mock.mockReset());
+  mocks.createClient.mockReturnValue({ execute: mocks.execute, close: mocks.close });
+  mocks.execute.mockImplementation(async (statement: string | { sql: string }) => ({
+    rows: statement === "PRAGMA query_only" ? [{ query_only: 1 }] : [],
+  }));
+  mocks.statSync.mockReturnValue({ size: 100, mtimeMs: 1_000 });
+  vi.stubGlobal("fetch", mocks.fetch);
 });
 
 afterEach(() => {
   vi.useRealTimers();
+  vi.unstubAllGlobals();
   vi.unstubAllEnvs();
-  delete (globalThis as GlobalWithClient).__marketLibsqlClient;
-  delete (globalThis as GlobalWithClient).__marketLibsqlClientFingerprint;
+  for (const name of ENV_NAMES) delete process.env[name];
+  delete (globalThis as CacheGlobals).__creDashboardSqliteClients;
+  delete (globalThis as CacheGlobals).__creDashboardSqliteFingerprints;
+  delete (globalThis as CacheGlobals).__creDashboardSqliteInitializations;
 });
 
-describe("libSQL database executor", () => {
-  it("creates one lazy Turso client from process.env and preserves bind values", async () => {
-    vi.stubEnv("TURSO_DATABASE_URL", "libsql://dashboard.example.turso.io");
-    vi.stubEnv("TURSO_AUTH_TOKEN", "test-token");
-    executeMock.mockResolvedValue({
-      rows: [{ payload: "{\"ok\":true}", untouched: "value" }],
-    });
-    const { executeMarketSql } = await import("@/lib/server/db");
-
-    await expect(executeMarketSql("SELECT ? AS payload", ["bound-value"]))
-      .resolves.toEqual({ rows: [{ payload: { ok: true }, untouched: "value" }] });
-    expect(createClientMock).toHaveBeenCalledOnce();
-    expect(createClientMock).toHaveBeenCalledWith({
-      url: "libsql://dashboard.example.turso.io",
-      authToken: "test-token",
-    });
-    expect(readFileSyncMock).not.toHaveBeenCalled();
-    expect(executeMock).toHaveBeenCalledWith({
-      sql: "SELECT ? AS payload",
-      args: ["bound-value"],
-    });
-  });
-
-  it("uses the personal authority path only when process.env has no Turso authority", async () => {
-    readFileSyncMock.mockReturnValue([
-      "# test authority",
-      "export TURSO_DATABASE_URL='libsql://authority.example.turso.io'",
-      "TURSO_AUTH_TOKEN=authority-token",
+describe("dashboard database provider", () => {
+  it("uses the last duplicate authority assignment without reading unrelated values", async () => {
+    const { parseDatabaseAuthority } = await import("@/lib/server/db");
+    const parsed = parseDatabaseAuthority([
+      "SUPABASE_URL=https://aaaaaaaaaaaaaaaaaaaa.supabase.co",
+      "UNRELATED_SECRET=must-not-be-read",
+      "export SUPABASE_URL='https://rjalzmmiqhrdmhojbxsk.supabase.co'",
+      "DASHBOARD_DATA_PROVIDER=supabase",
     ].join("\n"));
-    executeMock.mockResolvedValue({ rows: [] });
-    const { executeAuthSql } = await import("@/lib/server/db");
+    expect(parsed.get("SUPABASE_URL")).toBe("https://rjalzmmiqhrdmhojbxsk.supabase.co");
+    expect(parsed.has("UNRELATED_SECRET")).toBe(false);
+  });
 
-    await executeAuthSql("SELECT 1", []);
+  it("requires an explicit provider and forbids sqlite only on hosted deployments", async () => {
+    vi.stubEnv("TURSO_DATABASE_URL", "file:auth.db");
+    let database = await import("@/lib/server/db");
+    expect(() => database.getDashboardDataProvider()).toThrow(/explicitly configured/u);
 
-    expect(readFileSyncMock).toHaveBeenCalledWith(
-      String.raw`C:\10137_WorkSpace\env\.env.personal.txt`,
-      "utf8",
-    );
-    expect(createClientMock).toHaveBeenCalledWith({
-      url: "libsql://authority.example.turso.io",
-      authToken: "authority-token",
+    vi.resetModules();
+    setSqliteEnvironment();
+    vi.stubEnv("VERCEL", "1");
+    database = await import("@/lib/server/db");
+    expect(() => database.getDashboardDataProvider()).toThrow(/require.*supabase/u);
+    expect(mocks.createClient).not.toHaveBeenCalled();
+  });
+
+  it("keeps explicit local split sqlite available under next start production mode", async () => {
+    setSqliteEnvironment();
+    vi.stubEnv("NODE_ENV", "production");
+    const database = await import("@/lib/server/db");
+    await expect(database.executeNewsSql("SELECT 1", [])).resolves.toEqual({ rows: [] });
+    expect(database.getDashboardDataProvider()).toBe("sqlite");
+    expect(mocks.createClient).toHaveBeenCalledWith({ url: "file:news.db" });
+  });
+
+  it("routes split reads to query-only files and rejects an old remote Turso authority", async () => {
+    setSqliteEnvironment();
+    let database = await import("@/lib/server/db");
+    await database.executeMarketSql("SELECT 'auth'", []);
+    await database.executeNewsSql("SELECT 'news'", []);
+    await database.executeTimeseriesSql("SELECT 'timeseries'", []);
+    expect(mocks.createClient).toHaveBeenNthCalledWith(1, { url: "file:auth.db" });
+    expect(mocks.createClient).toHaveBeenNthCalledWith(2, { url: "file:news.db" });
+    expect(mocks.createClient).toHaveBeenNthCalledWith(3, { url: "file:timeseries.db" });
+    expect(mocks.execute.mock.calls.filter(([statement]) => statement === "PRAGMA query_only")).toHaveLength(2);
+    expect(database.getProjectCacheNamespace()).toMatch(/^sqlite-[0-9a-f]{16}$/u);
+    expect(database.canUseNewsArchiveFallback()).toBe(false);
+
+    vi.resetModules();
+    setSqliteEnvironment();
+    vi.stubEnv("NEWS_DATABASE_URL", "libsql://old-project.turso.io");
+    database = await import("@/lib/server/db");
+    await expect(database.executeNewsSql("SELECT 1", [])).rejects.toThrow(/local file/u);
+  });
+
+  it("replaces HMR clients and namespaces when a local database URL changes", async () => {
+    setSqliteEnvironment();
+    let database = await import("@/lib/server/db");
+    const firstNamespace = database.getProjectCacheNamespace();
+    await database.executeMarketSql("SELECT 1", []);
+
+    vi.resetModules();
+    setSqliteEnvironment();
+    vi.stubEnv("TURSO_DATABASE_URL", "file:auth-next.db");
+    database = await import("@/lib/server/db");
+    const secondNamespace = database.getProjectCacheNamespace();
+    await database.executeMarketSql("SELECT 1", []);
+    expect(secondNamespace).not.toBe(firstNamespace);
+    expect(mocks.close).toHaveBeenCalledOnce();
+    expect(mocks.createClient).toHaveBeenLastCalledWith({ url: "file:auth-next.db" });
+  });
+
+  it("uses only a server apikey and pins data RPCs to the manifest version", async () => {
+    setSupabaseEnvironment();
+    mocks.fetch.mockImplementation(async () => new Response(JSON.stringify({ ok: true }), { status: 200 }));
+    const database = await import("@/lib/server/db");
+    await database.fetchDashboardDailyArticles("LATEST", "dataset-v1");
+    await database.fetchDashboardPermitTimeseries({
+      groupBy: "ASSET_TYPE", from: "2025-01", to: "2026-08", eventType: null,
+      assetType: "OFFICE", district: "강남구", constructionAction: null,
+    }, "dataset-v1");
+    await database.fetchDashboardContextualEvidence({
+      q: "매각", from: null, to: null, topic: "SALE", topK: 8,
+    }, "dataset-v1");
+
+    const [dailyUrl, dailyInit] = mocks.fetch.mock.calls[0] as [string, RequestInit];
+    expect(dailyUrl).toMatch(/\/rest\/v1\/rpc\/dashboard_daily_articles$/u);
+    const headers = new Headers(dailyInit.headers);
+    expect(headers.get("apikey")).toBe("sb_secret_test_only");
+    expect(headers.has("authorization")).toBe(false);
+    expect(headers.get("content-profile")).toBe("public");
+    expect(dailyInit.cache).toBe("no-store");
+    expect(JSON.parse(String(dailyInit.body))).toEqual({
+      p_date: null, p_limit: 200, p_dataset_version: "dataset-v1",
     });
+    expect(JSON.parse(String((mocks.fetch.mock.calls[1][1] as RequestInit).body))).toMatchObject({
+      p_from: "2025-01-01", p_to: "2026-08-01", p_asset_type: "OFFICE",
+      p_district: "강남구", p_dataset_version: "dataset-v1",
+    });
+    expect(JSON.parse(String((mocks.fetch.mock.calls[2][1] as RequestInit).body))).toEqual({
+      q: "매각", filters: { from: null, to: null, topic: "SALE" }, top_k: 8,
+      p_dataset_version: "dataset-v1",
+    });
+    expect(database.getProjectCacheNamespace()).toMatch(/^supabase-[0-9a-f]{16}$/u);
   });
 
-  it("does not mix a process URL with a token from the fallback authority", async () => {
-    vi.stubEnv("TURSO_DATABASE_URL", "libsql://process.example.turso.io");
-    executeMock.mockResolvedValue({ rows: [] });
-    const { executeAuthSql } = await import("@/lib/server/db");
-
-    await expect(executeAuthSql("SELECT 1", []))
-      .rejects.toThrow("TURSO_AUTH_TOKEN is not configured");
-    expect(readFileSyncMock).not.toHaveBeenCalled();
-    expect(createClientMock).not.toHaveBeenCalled();
-  });
-
-  it("allows an unauthenticated local file URL for read-only smoke checks", async () => {
-    vi.stubEnv("TURSO_DATABASE_URL", "file:local-smoke.db");
-    executeMock.mockResolvedValue({ rows: [{ payload: "not-json" }] });
-    const { executeMarketSql } = await import("@/lib/server/db");
-
-    await expect(executeMarketSql("SELECT payload FROM smoke", []))
-      .resolves.toEqual({ rows: [{ payload: "not-json" }] });
-    expect(createClientMock).toHaveBeenCalledWith({ url: "file:local-smoke.db" });
-  });
-
-  it("derives a lazy token-free cache authority from the normalized database URL", async () => {
-    vi.stubEnv("TURSO_DATABASE_URL", "LIBSQL://Dashboard.Example.Turso.IO/?credential=ignored#fragment");
-    vi.stubEnv("TURSO_AUTH_TOKEN", "first-token");
-    const firstModule = await import("@/lib/server/db");
-
-    expect(readFileSyncMock).not.toHaveBeenCalled();
-    expect(createClientMock).not.toHaveBeenCalled();
-    const firstNamespace = firstModule.getMarketCacheAuthorityNamespace();
-    expect(firstNamespace).toMatch(/^url-[0-9a-f]{16}$/u);
-    expect(firstNamespace).not.toContain("first-token");
-    expect(firstModule.isLocalMarketDatabaseAuthority()).toBe(false);
-    expect(createClientMock).not.toHaveBeenCalled();
+  it("fails before fetch when URL, ref, or a legacy JWT authority disagree", async () => {
+    setSupabaseEnvironment();
+    vi.stubEnv("SUPABASE_PROJECT_REF", "aaaaaaaaaaaaaaaaaaaa");
+    let database = await import("@/lib/server/db");
+    expect(() => database.getProjectCacheNamespace()).toThrow(/does not match/u);
 
     vi.resetModules();
-    vi.stubEnv("TURSO_DATABASE_URL", "libsql://dashboard.example.turso.io");
-    vi.stubEnv("TURSO_AUTH_TOKEN", "different-token");
-    const sameAuthorityModule = await import("@/lib/server/db");
-    expect(sameAuthorityModule.getMarketCacheAuthorityNamespace()).toBe(firstNamespace);
-
-    vi.resetModules();
-    vi.stubEnv("TURSO_DATABASE_URL", "file:local-smoke.db");
-    delete process.env.TURSO_AUTH_TOKEN;
-    const localModule = await import("@/lib/server/db");
-    expect(localModule.getMarketCacheAuthorityNamespace()).not.toBe(firstNamespace);
-    expect(localModule.isLocalMarketDatabaseAuthority()).toBe(true);
+    setSupabaseEnvironment();
+    const payload = Buffer.from(JSON.stringify({ ref: "aaaaaaaaaaaaaaaaaaaa" })).toString("base64url");
+    vi.stubEnv("SUPABASE_SECRET_KEY", `eyJ.${payload}.signature`);
+    database = await import("@/lib/server/db");
+    expect(() => database.getProjectCacheNamespace()).toThrow(/API key does not match/u);
+    expect(mocks.fetch).not.toHaveBeenCalled();
   });
 
-  it("rejects a stuck query after the bounded timeout", async () => {
+  it("times out a stalled response body and sqlite execution that ignores AbortSignal", async () => {
     vi.useFakeTimers();
-    vi.stubEnv("TURSO_DATABASE_URL", "file:local-smoke.db");
-    vi.stubEnv("TURSO_QUERY_TIMEOUT_MS", "1000");
-    executeMock.mockReturnValue(new Promise(() => undefined));
-    const { executeMarketSql } = await import("@/lib/server/db");
-
-    const pending = executeMarketSql("SELECT 1", []);
-    const assertion = expect(pending).rejects.toMatchObject({
-      name: "DatabaseQueryTimeoutError",
-      code: "DATABASE_QUERY_TIMEOUT",
-      timeoutMs: 1000,
-    });
+    setSupabaseEnvironment();
+    vi.stubEnv("DASHBOARD_QUERY_TIMEOUT_MS", "1000");
+    mocks.fetch.mockResolvedValue({ ok: true, json: () => new Promise(() => undefined) });
+    let database = await import("@/lib/server/db");
+    let pending = database.fetchDashboardMacroTimeseries("dataset-v1");
+    let assertion = expect(pending).rejects.toMatchObject({ code: "DATABASE_QUERY_TIMEOUT", timeoutMs: 1000 });
     await vi.advanceTimersByTimeAsync(1000);
     await assertion;
-    vi.useRealTimers();
-  });
-
-  it("replaces a hot-reload client when the secret-safe configuration fingerprint changes", async () => {
-    vi.stubEnv("TURSO_DATABASE_URL", "libsql://first.example.turso.io");
-    vi.stubEnv("TURSO_AUTH_TOKEN", "first-token");
-    executeMock.mockResolvedValue({ rows: [] });
-    const firstModule = await import("@/lib/server/db");
-    await firstModule.executeMarketSql("SELECT 1", []);
 
     vi.resetModules();
-    vi.stubEnv("TURSO_DATABASE_URL", "libsql://second.example.turso.io");
-    vi.stubEnv("TURSO_AUTH_TOKEN", "second-token");
-    const secondModule = await import("@/lib/server/db");
-    await secondModule.executeMarketSql("SELECT 1", []);
+    setSqliteEnvironment();
+    vi.stubEnv("DASHBOARD_QUERY_TIMEOUT_MS", "1000");
+    mocks.execute.mockReturnValue(new Promise(() => undefined));
+    database = await import("@/lib/server/db");
+    pending = database.executeMarketSql("SELECT 1", []);
+    assertion = expect(pending).rejects.toMatchObject({ code: "DATABASE_QUERY_TIMEOUT", timeoutMs: 1000 });
+    await vi.advanceTimersByTimeAsync(1000);
+    await assertion;
+  });
 
-    expect(closeMock).toHaveBeenCalledOnce();
-    expect(createClientMock).toHaveBeenCalledTimes(2);
-    expect(createClientMock).toHaveBeenLastCalledWith({
-      url: "libsql://second.example.turso.io",
-      authToken: "second-token",
+  it("keeps authorization and data-call diagnostics separate", async () => {
+    setSupabaseEnvironment();
+    mocks.fetch
+      .mockResolvedValueOnce(new Response(JSON.stringify({
+        authorized: true, subject_id: "subject-1", authz_version: 1, dataset_version: "dataset-v1",
+      }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ dataset_version: "dataset-v1" }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ articles: [] }), { status: 200 }));
+    const database = await import("@/lib/server/db");
+    await database.authorizeDashboardSubject("subject-1");
+    await database.getServingManifest();
+    await database.fetchDashboardDailyArticles("LATEST", "dataset-v1");
+    expect(database.getDatabaseDiagnostics()).toMatchObject({
+      authRpcCalls: 1, manifestRpcCalls: 1, dataRpcCalls: 1,
+      sqliteAuthQueries: 0, sqliteDataQueries: 0,
     });
+  });
+
+  it("fails closed when the local limiter returns duplicate keys or non-boolean blocked", async () => {
+    setSqliteEnvironment();
+    mocks.execute
+      .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({ rows: [
+        { rate_limit_key: "ip:1", blocked: 0 }, { rate_limit_key: "ip:1", blocked: 0 },
+      ] });
+    const database = await import("@/lib/server/db");
+    await expect(database.consumeDashboardLoginAttempts(["ip:1", "email:a"]))
+      .rejects.toThrow(/duplicate key/u);
+
+    mocks.execute
+      .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({ rows: [{ rate_limit_key: "ip:1", blocked: null }] });
+    await expect(database.consumeDashboardLoginAttempts(["ip:1"]))
+      .rejects.toThrow(/invalid/u);
   });
 });

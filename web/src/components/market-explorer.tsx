@@ -1,19 +1,21 @@
 "use client";
 
 import { type KeyboardEvent, useRef, useState } from "react";
-import { BarChart3, Building2, Landmark, Newspaper, Percent } from "lucide-react";
+import { BarChart3, Building2, Landmark, Newspaper, Percent, Search } from "lucide-react";
 import { DailyArticleWorkspace } from "@/components/daily-article-workspace";
 import { DocumentDetailDrawer } from "@/components/document-detail-drawer";
 import { MacroTimeseriesWorkspace } from "@/components/macro-timeseries-workspace";
 import { PermitTimeseriesWorkspace } from "@/components/permit-timeseries-workspace";
 import { QuantitativeMarketPulse } from "@/components/quantitative-market-pulse";
+import { SmartApiSearch } from "@/components/smart-api-search";
 
-type Workspace = "NEWS" | "TIMESERIES";
+type Workspace = "NEWS" | "TIMESERIES" | "LOOKUP";
 type TimeseriesView = "TRANSACTIONS" | "RATES" | "PERMITS";
 
 const workspaceTabs = [
   { key: "NEWS" as const, label: "최신기사", description: "분류된 CRE 기사", icon: Newspaper },
   { key: "TIMESERIES" as const, label: "시계열자료", description: "거래·금리·공급 인허가", icon: BarChart3 },
+  { key: "LOOKUP" as const, label: "스마트 조회", description: "주소·기업 외부정보", icon: Search },
 ];
 
 const timeseriesTabs = [
@@ -57,7 +59,7 @@ export function MarketExplorer() {
         <span><strong>CRE DB</strong><small>Market intelligence</small></span>
       </a>
 
-      <nav className="primary-tabs" aria-label="주요 화면" role="tablist">
+      <nav className="primary-tabs" aria-label="주요 화면" role="tablist" style={{ gridTemplateColumns: "repeat(3, minmax(0, 1fr))", width: "min(680px, 100%)" }}>
         {workspaceTabs.map((tab, index) => {
           const Icon = tab.icon;
           const selected = workspace === tab.key;
@@ -154,6 +156,15 @@ export function MarketExplorer() {
           aria-labelledby="timeseries-tab-permits"
           hidden={timeseriesView !== "PERMITS"}
         ><PermitTimeseriesWorkspace/></div>}
+      </section>}
+
+      {visitedWorkspaces.has("LOOKUP") && <section
+        id="workspace-panel-lookup"
+        role="tabpanel"
+        aria-labelledby="workspace-tab-lookup"
+        hidden={workspace !== "LOOKUP"}
+      >
+        <SmartApiSearch/>
       </section>}
     </div>
 

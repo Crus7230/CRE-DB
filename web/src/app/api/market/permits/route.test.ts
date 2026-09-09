@@ -15,7 +15,7 @@ describe("GET /api/market/permits", () => {
       loader,
     );
     expect(response.status).toBe(200);
-    expect(response.headers.get("cache-control")).toContain("max-age=21600");
+    expect(response.headers.get("cache-control")).toBe("private, no-store");
     expect(response.headers.get("server-timing")).toMatch(/^data;dur=/u);
     expect(loader).toHaveBeenCalledWith(expect.objectContaining({
       groupBy: "DISTRICT", eventType: "PERMIT", from: "2025-01", to: "2026-08",

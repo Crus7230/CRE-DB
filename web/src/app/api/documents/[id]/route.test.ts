@@ -1,14 +1,19 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { DATA_SERVER_UNAVAILABLE_MESSAGE } from "@/lib/server/api-response";
 
 const mocks = vi.hoisted(() => ({
-  execute: vi.fn(),
-  isLocalAuthority: vi.fn(),
+  getCachedArticleDetail: vi.fn(),
+  executeNewsSql: vi.fn(),
+  canUseNewsArchiveFallback: vi.fn(),
   getDocumentDetail: vi.fn(),
 }));
 
+vi.mock("@/lib/server/market-data-cache", () => ({
+  getCachedArticleDetail: mocks.getCachedArticleDetail,
+}));
 vi.mock("@/lib/server/db", () => ({
-  executeMarketSql: mocks.execute,
-  isLocalMarketDatabaseAuthority: mocks.isLocalAuthority,
+  executeNewsSql: mocks.executeNewsSql,
+  canUseNewsArchiveFallback: mocks.canUseNewsArchiveFallback,
 }));
 vi.mock("@/lib/server/document-intelligence", () => ({
   getDocumentDetail: mocks.getDocumentDetail,
@@ -17,15 +22,12 @@ vi.mock("@/lib/server/document-intelligence", () => ({
 import { GET } from "@/app/api/documents/[id]/route";
 
 beforeEach(() => {
-  mocks.execute.mockReset();
-  mocks.isLocalAuthority.mockReset();
-  mocks.getDocumentDetail.mockReset();
+  for (const mock of Object.values(mocks)) mock.mockReset();
 });
 
-describe("document detail authority routing", () => {
-  it("returns a controlled 404 without enabling raw fallback for a remote compact miss", async () => {
-    mocks.isLocalAuthority.mockReturnValue(false);
-    mocks.getDocumentDetail.mockResolvedValue(null);
+describe("document detail cache-adapter routing", () => {
+  it("returns a controlled no-store 404 for a cached compact miss without raw fallback", async () => {
+    mocks.getCachedArticleDetail.mockResolvedValue(null);
 
     const response = await GET(
       new Request("https://dashboard.example/api/documents/missing"),
@@ -33,24 +35,47 @@ describe("document detail authority routing", () => {
     );
 
     expect(response.status).toBe(404);
+    expect(response.headers.get("cache-control")).toBe("private, no-store");
     await expect(response.json()).resolves.toEqual({ error: "문서를 찾지 못했습니다." });
-    expect(mocks.getDocumentDetail).toHaveBeenCalledWith(mocks.execute, "missing", {
-      allowArchiveFallback: false,
-    });
+    expect(mocks.getCachedArticleDetail).toHaveBeenCalledOnce();
+    expect(mocks.getCachedArticleDetail).toHaveBeenCalledWith("missing");
+    expect(mocks.executeNewsSql).not.toHaveBeenCalled();
+    expect(mocks.canUseNewsArchiveFallback).not.toHaveBeenCalled();
+    expect(mocks.getDocumentDetail).not.toHaveBeenCalled();
   });
 
-  it("enables legacy raw fallback only for an explicit local database authority", async () => {
-    mocks.isLocalAuthority.mockReturnValue(true);
-    mocks.getDocumentDetail.mockResolvedValue({ id: "legacy-local" });
+  it("serves the cache-adapter detail without reintroducing route-level raw fallback", async () => {
+    const detail = { id: "supabase-article", title: "Article" };
+    mocks.getCachedArticleDetail.mockResolvedValue(detail);
 
     const response = await GET(
-      new Request("http://localhost/api/documents/legacy-local"),
-      { params: Promise.resolve({ id: "legacy-local" }) },
+      new Request("https://dashboard.example/api/documents/supabase-article"),
+      { params: Promise.resolve({ id: "supabase-article" }) },
     );
 
     expect(response.status).toBe(200);
-    expect(mocks.getDocumentDetail).toHaveBeenCalledWith(mocks.execute, "legacy-local", {
-      allowArchiveFallback: true,
+    expect(response.headers.get("cache-control")).toBe("private, no-store");
+    await expect(response.json()).resolves.toEqual(detail);
+    expect(mocks.getCachedArticleDetail).toHaveBeenCalledWith("supabase-article");
+    expect(mocks.executeNewsSql).not.toHaveBeenCalled();
+    expect(mocks.canUseNewsArchiveFallback).not.toHaveBeenCalled();
+    expect(mocks.getDocumentDetail).not.toHaveBeenCalled();
+  });
+
+  it("returns a controlled no-store 503 when the cache adapter is unavailable", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    mocks.getCachedArticleDetail.mockRejectedValueOnce(new Error("upstream unavailable"));
+
+    const response = await GET(
+      new Request("https://dashboard.example/api/documents/article"),
+      { params: Promise.resolve({ id: "article" }) },
+    );
+
+    expect(response.status).toBe(503);
+    expect(response.headers.get("cache-control")).toBe("private, no-store");
+    await expect(response.json()).resolves.toEqual({
+      error: DATA_SERVER_UNAVAILABLE_MESSAGE,
+      code: "DOCUMENT_DETAIL_UNAVAILABLE",
     });
   });
 });

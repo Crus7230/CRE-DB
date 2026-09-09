@@ -10,7 +10,7 @@ describe("GET /api/market/pulse", () => {
     const response = await loadMarketPulseResponse(async () => ({ asOfPeriod: "2026-07", metrics: {} }));
     expect(response.status).toBe(200);
     expect(await response.json()).toMatchObject({ asOfPeriod: "2026-07" });
-    expect(response.headers.get("cache-control")).toContain("max-age=21600");
+    expect(response.headers.get("cache-control")).toBe("private, no-store");
     expect(response.headers.get("server-timing")).toMatch(/^data;dur=/u);
   });
 

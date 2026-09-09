@@ -140,7 +140,11 @@ export async function getPermitTimeseries(
     request.district,
     request.constructionAction,
   ]);
-  const payload = normalizePermitTimeseries(result.rows[0]?.payload);
+  return normalizeCanonicalPermitTimeseries(result.rows[0]?.payload);
+}
+
+export function normalizeCanonicalPermitTimeseries(value: unknown): PermitTimeseriesResponse {
+  const payload = normalizePermitTimeseries(value);
   if (payload.source.code !== SEOUL_SOURCE) throw new Error("Invalid permit source");
   return payload;
 }

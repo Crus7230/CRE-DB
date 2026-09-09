@@ -81,8 +81,10 @@ describe("DailyArticleWorkspace", () => {
     expect(within(filters).getByRole("button", { name: /거래.*1/ })).toBeInTheDocument();
     expect(within(filters).getByRole("button", { name: /개발·공급.*1/ })).toBeInTheDocument();
     expect(within(filters).getByRole("button", { name: /분류 대기.*1/ })).toBeInTheDocument();
-    expect(screen.getByText("매각")).toBeInTheDocument();
-    expect(screen.getByText("인허가")).toBeInTheDocument();
+    const saleRow = screen.getByRole("heading", { name: "가장 최신 매각 기사" }).closest("article");
+    const permitRow = screen.getByRole("heading", { name: "인허가 기사" }).closest("article");
+    expect(within(saleRow!).getByText("매각")).toBeInTheDocument();
+    expect(within(permitRow!).getByText("인허가")).toBeInTheDocument();
     expect(screen.queryByText("broken-label")).not.toBeInTheDocument();
 
     const headings = screen.getAllByRole("heading", { level: 2 }).map((item) => item.textContent);

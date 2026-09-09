@@ -13,6 +13,7 @@ import {
   Search,
   ShieldCheck,
 } from "lucide-react";
+import { ArticleEvidenceSearch } from "@/components/article-evidence-search";
 import type { DailyArticle, DailyArticleTopic, DailyArticlesResponse } from "@/lib/daily-articles-contract";
 import { normalizeDailyArticles, todayInSeoul } from "@/lib/daily-articles-contract";
 
@@ -246,6 +247,8 @@ export function DailyArticleWorkspace({
         </div>
       </div>
     </header>
+
+    <ArticleEvidenceSearch onOpenArticle={onOpenArticle}/>
 
     <div className="news-workbench">
       <aside className="topic-rail" aria-labelledby="topic-rail-title">

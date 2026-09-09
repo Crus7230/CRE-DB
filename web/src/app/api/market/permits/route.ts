@@ -37,7 +37,7 @@ export async function loadPermitTimeseriesResponse(
     const payload = await loader(parsed);
     return jsonWithServerTiming(
       payload,
-      { headers: { "Cache-Control": "private, max-age=21600" } },
+      { headers: { "Cache-Control": "private, no-store" } },
       "data",
       startedAt,
     );

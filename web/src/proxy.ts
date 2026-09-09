@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isValidSessionSecret, SESSION_COOKIE, shouldBypassAuth, verifySessionToken } from "@/lib/server/auth-session";
-import { executeAuthSql } from "@/lib/server/db";
-import { isAllowedSubjectId } from "@/lib/server/email-allowlist";
+import { authorizeDashboardSubject } from "@/lib/server/db";
 import { createSubjectAuthorizationCache } from "@/lib/server/subject-authorization-cache";
 
-const authorizeSubject = createSubjectAuthorizationCache((subjectId) => isAllowedSubjectId(executeAuthSql, subjectId));
+const authorizeSubject = createSubjectAuthorizationCache(authorizeDashboardSubject);
 
 function withAuthorizationTiming(response: NextResponse, startedAt: number) {
-  response.headers.set("Server-Timing", `authz;dur=${Math.max(0, performance.now() - startedAt).toFixed(1)}`);
+  // Do not overwrite the route's `Server-Timing: data` metric. Proxy response
+  // headers are applied after the route response on hosted Next deployments.
+  response.headers.set("X-CRE-Authz-Ms", Math.max(0, performance.now() - startedAt).toFixed(1));
   return response;
 }
 

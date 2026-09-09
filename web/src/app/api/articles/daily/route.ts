@@ -17,7 +17,7 @@ export async function GET(request: Request): Promise<Response> {
     const payload = await getCachedDailyArticles(selectedDate);
     return jsonWithServerTiming(
       payload,
-      { headers: { "Cache-Control": "private, max-age=900" } },
+      { headers: { "Cache-Control": "private, no-store" } },
       "data",
       startedAt,
     );

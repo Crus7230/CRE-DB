@@ -275,6 +275,10 @@ export async function getDocumentDetail(
   if (raw === undefined && options.allowArchiveFallback === true) {
     raw = (await execute(documentDetailSql, [id])).rows[0]?.payload;
   }
+  return normalizeDocumentDetail(raw);
+}
+
+export function normalizeDocumentDetail(raw: unknown): DocumentDetail | null {
   const detail = (typeof raw === "string" ? JSON.parse(raw) : raw) as Omit<DocumentDetail, "eventExtraction"> | undefined;
   if (!detail) return null;
 

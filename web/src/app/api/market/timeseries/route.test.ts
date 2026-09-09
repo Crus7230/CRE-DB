@@ -17,7 +17,7 @@ describe("GET /api/market/timeseries", () => {
     const response = await loadMacroTimeseriesResponse(async () => payload);
     expect(response.status).toBe(200);
     expect((await response.json()).series).toHaveLength(13);
-    expect(response.headers.get("cache-control")).toContain("max-age=3600");
+    expect(response.headers.get("cache-control")).toBe("private, no-store");
     expect(response.headers.get("server-timing")).toMatch(/^data;dur=/u);
   });
 

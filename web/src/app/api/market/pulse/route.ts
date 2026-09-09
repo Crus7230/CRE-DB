@@ -14,13 +14,17 @@ export async function loadMarketPulseResponse(loader: MarketPulseLoader) {
   try {
     return jsonWithServerTiming(
       await loader(),
-      { headers: { "cache-control": "private, max-age=21600" } },
+      { headers: { "cache-control": "private, no-store" } },
       "data",
       startedAt,
     );
   } catch (error) {
     console.error("quantitative market pulse request failed", safeErrorDescriptor(error));
-    return infrastructureUnavailableResponse("MARKET_PULSE_UNAVAILABLE", startedAt);
+    return infrastructureUnavailableResponse(
+      "MARKET_PULSE_UNAVAILABLE",
+      startedAt,
+      { "Cache-Control": "private, no-store" },
+    );
   }
 }
 
