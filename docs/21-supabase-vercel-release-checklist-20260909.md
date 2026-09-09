@@ -88,4 +88,6 @@ Promotion requires a second explicit approval after staged QA:
 6. Review recent production error logs.
 7. Record the local release commit, GitHub push status, Vercel deployment ID/URL/READY timestamp, production alias verification, final Supabase version/freshness/size evidence, and rollback deployment ID.
 
+`Promote-CreVercelRelease.ps1` implements this second gate. It refuses to run without both staged-QA and production-promotion switches, verifies that the target is a READY staged production deployment, records the currently aliased deployment, promotes without rebuilding, and confirms the production alias by API readback.
+
 If live verification fails, promote the previously recorded production deployment back immediately. Do not alter Supabase data during rollback.
