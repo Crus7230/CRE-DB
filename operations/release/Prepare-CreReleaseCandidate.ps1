@@ -10,7 +10,9 @@ param(
 
     [string]$ExpectedBaseCommit = "eef5faf4a773f3b6080e852380ba6cfcac05c5db",
 
-    [string]$ExpectedReleaseBranch = "codex/cre-supabase-release-20260909"
+    [string]$ExpectedReleaseBranch = "codex/cre-supabase-release-20260909",
+
+    [switch]$ValidateOnly
 )
 
 Set-StrictMode -Version Latest
@@ -158,6 +160,7 @@ if ($unexpectedLegacy.Count -gt 0 -or $missingLegacy.Count -gt 0) {
     throw "The complete legacy three-tab/smart-lookup delta must match the explicit legacy rows; $($parts -join '; ')"
 }
 
+$validated = @()
 $copied = @()
 foreach ($entry in $manifestEntries) {
     $sourceRoot = if ($entry.Source -eq "legacy") { $legacyRoot } else { $canonicalRoot }
@@ -166,19 +169,22 @@ foreach ($entry in $manifestEntries) {
         throw "Manifest path is missing or is not a file in $($entry.Source) source: $($entry.Path)"
     }
 
-    $destinationPath = Resolve-ContainedPath -Root $stagingRoot -RelativePath $entry.Path
-    $destinationDirectory = Split-Path -Parent $destinationPath
-    if (-not (Test-Path -LiteralPath $destinationDirectory)) {
-        New-Item -ItemType Directory -Path $destinationDirectory -Force | Out-Null
-    }
-    Copy-Item -LiteralPath $sourcePath -Destination $destinationPath -Force
-
     $sourceHash = (Get-FileHash -LiteralPath $sourcePath -Algorithm SHA256).Hash
-    $destinationHash = (Get-FileHash -LiteralPath $destinationPath -Algorithm SHA256).Hash
-    if ($sourceHash -ne $destinationHash) {
-        throw "SHA-256 mismatch after copy: $($entry.Source) -> $($entry.Path)"
+    $validated += [pscustomobject]@{ Source = $entry.Source; Path = $entry.Path; Sha256 = $sourceHash }
+    if (-not $ValidateOnly) {
+        $destinationPath = Resolve-ContainedPath -Root $stagingRoot -RelativePath $entry.Path
+        $destinationDirectory = Split-Path -Parent $destinationPath
+        if (-not (Test-Path -LiteralPath $destinationDirectory)) {
+            New-Item -ItemType Directory -Path $destinationDirectory -Force | Out-Null
+        }
+        Copy-Item -LiteralPath $sourcePath -Destination $destinationPath -Force
+
+        $destinationHash = (Get-FileHash -LiteralPath $destinationPath -Algorithm SHA256).Hash
+        if ($sourceHash -ne $destinationHash) {
+            throw "SHA-256 mismatch after copy: $($entry.Source) -> $($entry.Path)"
+        }
+        $copied += [pscustomobject]@{ Source = $entry.Source; Path = $entry.Path; Sha256 = $sourceHash }
     }
-    $copied += [pscustomobject]@{ Source = $entry.Source; Path = $entry.Path; Sha256 = $sourceHash }
 }
 
 $diffCheck = @(& git -C $stagingRoot diff --check)
@@ -192,6 +198,9 @@ if ($LASTEXITCODE -ne 0) {
     StagingRoot = $stagingRoot
     VerifiedRemoteBase = $releaseRemoteMain
     ReleaseBranch = $releaseBranch
+    Mode = if ($ValidateOnly) { "validate-only" } else { "copy" }
+    ValidatedCount = $validated.Count
+    Validated = $validated
     CopiedCount = $copied.Count
     Copied = $copied
     DiffCheck = "passed"
