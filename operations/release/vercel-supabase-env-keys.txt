@@ -1,0 +1,4 @@
+# Minimal production-only delta. Keep this synchronized with actual runtime process.env usage.
+SUPABASE_URL
+SUPABASE_SECRET_KEY
+DASHBOARD_DATA_PROVIDER

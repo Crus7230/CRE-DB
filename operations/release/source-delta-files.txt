@@ -1,0 +1,37 @@
+# Format: <source><TAB><repository-relative path>
+# legacy = complete delta from cre-online-redesign-20260908
+# canonical = exact current file from 09. CRE DB Board, overlaid after legacy
+# Update canonical rows deliberately as Supabase runtime/cache/publisher/docs work lands.
+
+legacy	web/scripts/visual-qa.mjs
+legacy	web/src/app/api/documents/[id]/route.test.ts
+legacy	web/src/app/api/documents/[id]/route.ts
+legacy	web/src/components/market-explorer.test.tsx
+legacy	web/src/components/market-explorer.tsx
+legacy	web/src/lib/server/db.test.ts
+legacy	web/src/lib/server/db.ts
+legacy	web/src/lib/server/market-data-cache.test.ts
+legacy	web/src/lib/server/market-data-cache.ts
+legacy	docs/18-local-data-split.md
+legacy	docs/19-smart-lookup-local.md
+legacy	docs/20-local-smart-search-and-split-status.md
+legacy	scripts/split_local_serving_databases.py
+legacy	tests/test_split_local_serving_databases.py
+legacy	web/scripts/smart-lookup-qa.mjs
+legacy	web/scripts/start-local-split.mjs
+legacy	web/src/app/api/lookup/route.test.ts
+legacy	web/src/app/api/lookup/route.ts
+legacy	web/src/components/smart-api-search.module.css
+legacy	web/src/components/smart-api-search.test.tsx
+legacy	web/src/components/smart-api-search.tsx
+legacy	web/src/lib/server/smart-lookup-address.test.ts
+legacy	web/src/lib/server/smart-lookup-address.ts
+legacy	web/src/lib/server/smart-lookup-company.test.ts
+legacy	web/src/lib/server/smart-lookup-company.ts
+legacy	web/src/lib/server/smart-lookup-http.test.ts
+legacy	web/src/lib/server/smart-lookup-http.ts
+legacy	web/src/lib/server/smart-lookup-types.ts
+legacy	web/src/lib/server/smart-lookup.test.ts
+legacy	web/src/lib/server/smart-lookup.ts
+legacy	web/src/lib/smart-lookup-contract.ts
+canonical	db/v2/migrations/4.0.0_supabase_compact_dashboard.sql
