@@ -180,6 +180,8 @@ canonical	web/src/lib/search-contract.ts
 canonical	web/src/lib/server/api-response.ts
 canonical	web/src/lib/server/auth-session.test.ts
 canonical	web/src/lib/server/auth-session.ts
+canonical	web/src/lib/server/auth-telemetry.test.ts
+canonical	web/src/lib/server/auth-telemetry.ts
 canonical	web/src/lib/server/bounded-data-cache.test.ts
 canonical	web/src/lib/server/bounded-data-cache.ts
 canonical	web/src/lib/server/category-index.test.ts

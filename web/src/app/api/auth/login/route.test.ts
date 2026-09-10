@@ -85,7 +85,7 @@ describe("POST /api/auth/login", () => {
   });
 
   it("fails closed when the limiter action rejects an incomplete update", async () => {
-    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const log = vi.spyOn(console, "error").mockImplementation(() => undefined);
     mocks.consumeLoginAttempts.mockRejectedValueOnce(
       new Error("Login rate-limit update was incomplete"),
     );
@@ -99,10 +99,16 @@ describe("POST /api/auth/login", () => {
     expect(response.headers.get("set-cookie")).toBeNull();
     expect(mocks.findSubject).not.toHaveBeenCalled();
     expect(mocks.clearLoginAttempts).not.toHaveBeenCalled();
+    expect(JSON.parse(String(log.mock.calls[0]?.[0]))).toMatchObject({
+      event: "DASHBOARD_AUTH_INFRASTRUCTURE_FAILURE",
+      stage: "LOGIN_LIMITER_CONSUME",
+      errorClass: "Error",
+      errorCode: "UNCLASSIFIED_ERROR",
+    });
   });
 
   it("distinguishes an allowlist infrastructure outage from an unapproved email", async () => {
-    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const log = vi.spyOn(console, "error").mockImplementation(() => undefined);
     mocks.findSubject.mockRejectedValueOnce(Object.assign(new Error("secret dsn"), { code: "BLOCKED" }));
     const response = await POST(request({ email: "person@example.com" }));
 
@@ -114,6 +120,37 @@ describe("POST /api/auth/login", () => {
     expect(AUTH_INFRASTRUCTURE_MESSAGE).not.toBe(AUTH_REJECTED_MESSAGE);
     expect(response.headers.get("set-cookie")).toBeNull();
     expect(mocks.clearLoginAttempts).not.toHaveBeenCalled();
+    expect(JSON.parse(String(log.mock.calls[0]?.[0]))).toMatchObject({
+      event: "DASHBOARD_AUTH_INFRASTRUCTURE_FAILURE",
+      stage: "ALLOWLIST_LOOKUP",
+      errorClass: "Error",
+      errorCode: "UNCLASSIFIED_ERROR",
+    });
+  });
+
+  it("logs a sanitized clear-stage failure without failing a successful login", async () => {
+    const log = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    mocks.clearLoginAttempts.mockRejectedValueOnce(Object.assign(new Error("secret reset detail"), {
+      name: "DatabaseRequestError",
+      code: "DATABASE_REQUEST_FAILED",
+      status: 503,
+      url: "https://secret.example",
+      email: "person@example.com",
+    }));
+
+    const response = await POST(request({ email: "person@example.com" }));
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("set-cookie")).toContain("cre_db_session=");
+    expect(JSON.parse(String(log.mock.calls[0]?.[0]))).toEqual({
+      event: "DASHBOARD_AUTH_INFRASTRUCTURE_FAILURE",
+      stage: "LOGIN_LIMITER_CLEAR",
+      errorClass: "DatabaseRequestError",
+      errorCode: "DATABASE_REQUEST_FAILED",
+      upstreamStatus: 503,
+    });
+    expect(String(log.mock.calls[0]?.[0])).not.toContain("secret");
+    expect(String(log.mock.calls[0]?.[0])).not.toContain("person@example.com");
   });
 
   it("fails closed when the session secret is missing", async () => {

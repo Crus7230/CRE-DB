@@ -1,17 +1,16 @@
 # CRE DB 신규 Supabase 전환 · GitHub/Vercel 릴리스 인수인계
 
-> 기준일: 2026-09-09. 이 문서는 배포 직전 상태와 남은 production gate를 기록한다. 생성형 AI/LLM은 범위 밖이며, 스마트 조회와 기사 근거 검색은 고정 API 및 사전 구축 색인을 사용하는 결정론적 조회다.
+> 기준일: 2026-09-10. 이 문서는 GitHub 연동 production 배포 결과와 남은 검증 gate를 기록한다. 생성형 AI/LLM은 범위 밖이며, 스마트 조회와 기사 근거 검색은 고정 API 및 사전 구축 색인을 사용하는 결정론적 조회다.
 
 ## 현재 결론
 
 - 신규 Supabase compact snapshot의 적재와 독립 readback, 로컬 웹 QA, 격리 release checkout 검증은 완료됐다.
-- 최종 배포 경로는 **GitHub `Crus7230/CRE-DB`의 `main` push → 기존 Vercel `cre-db` 연동 자동 배포** 하나뿐이다.
+- production 환경변수는 사용자 승인 후 검토된 8개만 암호화 저장했고, 8/8 exact-value readback과 비대상 환경 엔트리 5개 보존을 확인했다.
+- release commit `75f3660fd3567a5bcfde6253d226819296814914`를 GitHub `Crus7230/CRE-DB`의 `main`에 non-force fast-forward push했고, 기존 Vercel GitHub integration이 production deployment `dpl_7zm6YEqTsqRbhUJyigd22RF7Xe7a`를 생성했다.
+- 신규 deployment는 READY이며 alias control-plane에서 `cre-db.vercel.app`이 해당 deployment를 가리키는 것을 확인했다.
 - 로컬 checkout을 대상으로 `vercel deploy`, `vercel --prod`, `--skip-domain`을 실행하지 않는다. 별도 staged production deployment와 수동 promote 단계도 사용하지 않는다.
-- Vercel CLI `59.13.1`의 `whoami`는 `cruslee00-6855`로 확인됐고, project/team/root/GitHub branch 연결도 read-only preflight로 일치했다.
-- Windows Git Credential Manager에는 GitHub `Crus7230` 자격이 저장돼 있으며 push dry-run이 통과했다. 인증 차단은 없다.
-- 현재 production 환경과 alias는 아직 변경되지 않았다. 배포 담당 D가 env 8개 적용·readback 및 최종 push/deploy 결과를 보고하기 전에는 완료로 간주하지 않는다.
-- 현재 rollback 대상은 `dpl_5xDokCmsUozCt4K31USiDVywHv34`이며 READY, production alias `cre-db.vercel.app`에 연결돼 있다.
-- 현재 release source는 `8d6d8d3`까지 준비됐고, 최종 commit·`main` push·Vercel production 배포는 아직 남아 있다.
+- 데이터·시계열·스마트 조회의 production 확인은 통과했지만, 동시 로그인 검증에서 rate-limit consume 단계의 `503`이 1회 발생해 인증 원인은 조사 중이다. 후속 단독 UI 로그인·조회는 성공했고, 전체 production QA 완료로는 아직 표시하지 않는다.
+- rollback 대상 `dpl_5xDokCmsUozCt4K31USiDVywHv34`는 READY 상태로 보존돼 있다.
 
 ## 고정 대상
 
@@ -24,6 +23,9 @@
 | Vercel project root | `web` |
 | Vercel CLI/account | `59.13.1` / `cruslee00-6855` |
 | Production URL | `https://cre-db.vercel.app` |
+| 기능 QA 기준 commit | `75f3660fd3567a5bcfde6253d226819296814914` |
+| 기능 QA 기준 deployment | `dpl_7zm6YEqTsqRbhUJyigd22RF7Xe7a` / `cre-ly7aod9sj-grus-projects-dc1b5fb9.vercel.app` |
+| deployment READY | `2026-09-10T09:44:05.815+09:00` |
 | 현재 rollback deployment | `dpl_5xDokCmsUozCt4K31USiDVywHv34` |
 | 신규 Supabase ref | `rjalzmmiqhrdmhojbxsk` |
 | 최종 dataset version | `cre-20260909T060407Z-5c55a7cb58de` |
@@ -33,14 +35,15 @@
 
 ## 완료된 release source 검증
 
-- canonical/source parity: `211/211`, mismatch `0`.
+- canonical/source parity: `213/213`, mismatch `0`.
 - source match: `182`.
-- 최종 웹 테스트: `77 files / 312 passed / 1 skipped`.
-- 격리 release checkout에서 production build, lint, TypeScript check, secret scan, forbidden/conflict scan이 모두 통과했다.
+- 최종 웹 테스트: test files `78 passed / 1 skipped`, tests `315 passed / 1 skipped`.
+- 격리 release checkout에서 production build(`BUILD_ID=n9IqUAwm21rICcDoAymMR`), lint, TypeScript check, secret scan, forbidden/conflict scan이 모두 통과했다.
+- 후속 후보는 로그인 실패 로그를 고정 allowlist의 `stage/errorClass/errorCode/upstreamStatus/timeoutMs`로만 구조화하며 메시지·stack·body·header·URL·env·email·key·cookie는 기록하지 않는다. 인증 응답과 rate-limit/allowlist 동작은 변경하지 않는다.
 - 데이터·백업·raw·artifact/report/log·env·credential·`.vercel`·`node_modules`·`.next*`는 릴리스 source에서 제외한다.
 - source authority는 검토된 manifest와 SHA-256 대조 결과이며, dirty canonical 전체를 무차별 복사하지 않는다.
 
-이 완료 상태는 로컬·격리 checkout 검증이다. GitHub push와 Vercel production 결과를 의미하지 않는다.
+위 commit/deployment는 기능 QA 기준점이다. 후속 telemetry와 이 문서를 함께 담는 commit은 자기 SHA/deployment ID를 문서 안에 다시 적어 재배포를 반복하지 않으며, 최종 식별자는 Git `main` log와 Vercel alias readback을 기준으로 한다. production 기능 검증의 완료 여부는 아래의 별도 현황을 따른다.
 
 ## 신규 Supabase 최종 snapshot
 
@@ -105,9 +108,9 @@
 
 모바일 검증은 responsive web viewport QA다. 이번 릴리스는 web only이며 APK/native app QA 결과가 아니다.
 
-## Production 환경 gate — main push 전에 완료
+## Production 환경 적용 결과
 
-배포 담당 D가 production 환경의 이름/target을 읽고, 아래 **정확히 8개 승인 key**를 production target에 설정한 뒤 이름/target과 ref 일치를 readback해야 한다. 값은 출력·문서화하지 않는다.
+production 환경의 이름/target을 먼저 읽고, 아래 **정확히 8개 승인 key**만 production target에 설정했다. 값은 출력·문서화하지 않았으며 8개 모두 저장값과 source 값의 ordinal exact readback을 통과했다.
 
 | 승인 key | 요구사항 |
 | --- | --- |
@@ -120,21 +123,17 @@
 | `DART_API_KEY` | 회사·공시 조회 |
 | `KRX_API_KEY` | 상장종목 enrichment |
 
-현재 production에 존재하는 `TURSO_AUTH_TOKEN`, `TURSO_DATABASE_URL`, `SUPABASE_DB_URL`, `DASHBOARD_SESSION_SECRET` 4개는 삭제·교체하지 않고 보존한다. 이 4개와 기타 비대상 key를 건드리지 않는다. 승인된 변경은 위 8개 production-only key의 추가/갱신뿐이다.
+변경 전 환경 엔트리는 5개, 변경 후는 13개다. 기존 `TURSO_AUTH_TOKEN`, `TURSO_DATABASE_URL`, `SUPABASE_DB_URL`, `DASHBOARD_SESSION_SECRET` 4개 이름에 해당하는 비대상 엔트리 5개의 identity는 모두 그대로 보존됐다. 환경 적용 자체는 deployment를 만들지 않았고, 이후 별도 GitHub `main` push가 배포를 시작했다.
 
-환경 변경 범위는 root 검토를 마쳤지만, approval reviewer가 실제 secret upload를 허용하지 않아 명시적 사용자 승인을 기다리고 있다. 승인 전에는 외부 환경을 변경하지 않으며, D의 실제 apply 및 readback 보고 전에는 `main`을 push하지 않는다.
+## 실행된 production 경로
 
-## 유일한 production 실행 순서
-
-1. D가 Vercel CLI `59.13.1`, account, project/team/root, GitHub repo/branch, 현재 production alias/deployment를 다시 readback한다.
-2. D가 승인된 production env 8개만 적용한다.
-3. D가 env 이름·target `production`, 신규 Supabase ref 일치, 기존 4개 보존을 값 노출 없이 readback한다.
-4. 격리 release checkout의 최종 diff/commit SHA와 clean release 범위를 확정한다.
-5. GitHub `Crus7230/CRE-DB`의 `main`에 push한다.
-6. GitHub 연동으로 생성된 Vercel deployment를 식별하고 source commit SHA가 방금 push한 SHA와 같은지 확인한다.
-7. deployment가 READY가 되고 `cre-db.vercel.app` alias가 새 deployment를 가리키는지 확인한다.
-8. production URL에서 아래 smoke/visual QA를 수행한다.
-9. 성공 시 commit SHA, deployment ID/URL/READY 시각, alias, env readback, dataset version/freshness를 기록한다.
+1. Vercel CLI `59.13.1`, account, project/team/root, GitHub repo/branch, 기존 production deployment를 다시 readback했다.
+2. 승인된 production env 8개만 적용하고 exact readback 8/8 및 비대상 5개 보존을 확인했다.
+3. clean release commit `75f3660fd3567a5bcfde6253d226819296814914`와 원격 기준 `eef5faf4a773f3b6080e852380ba6cfcac05c5db`를 확인했다.
+4. GitHub `Crus7230/CRE-DB`의 `main`에 non-force fast-forward push하고 원격 SHA를 다시 읽었다.
+5. GitHub 연동 deployment `dpl_7zm6YEqTsqRbhUJyigd22RF7Xe7a`의 source가 `git`, branch가 `main`, commit SHA가 위 release commit과 동일함을 확인했다.
+6. deployment READY와 alias control-plane의 `cre-db.vercel.app` 연결을 확인했다.
+7. production smoke/visual QA를 수행했고, 아래의 인증 1회 오류와 미실행 항목 때문에 전체 완료 판정은 보류했다.
 
 금지 사항:
 
@@ -143,29 +142,40 @@
 - staged deployment를 수동 promote하는 절차를 정상 release 경로로 사용하지 않는다.
 - env 전체 삭제/재생성, 기존 session secret 교체, credential 출력, DB 재발행을 하지 않는다.
 
-## Production 검증과 rollback
+## Production 검증 현황과 rollback
 
-Production에서 다음을 확인한다.
+확인 완료:
 
-- 익명 protected API는 `401` 및 `Cache-Control: no-store`.
-- 허용 email login 성공, 비허용 email 거부.
-- 최신기사·시계열자료·스마트 조회 3개 tab.
-- 기사 상세 ID/title 일치, evidence 8개와 title 8개 일치, 중복 blockquote 0.
-- address/company smart API.
-- manifest와 data RPC의 dataset version이 `cre-20260909T060407Z-5c55a7cb58de`.
-- source/cache/auth timing header 및 production 로그.
-- desktop/mobile responsive web, collapsed height `44px`, horizontal overflow와 console error 없음.
+- 허용 email의 desktop 로그인과 후속 단독 UI 로그인·조회 성공.
+- 최신기사 desktop `7`, mobile `7` 표시.
+- 시계열자료 macro series `13`과 거래·인허가 chart 표시.
+- address/company smart lookup 모두 `passed=true`, error `0`.
+- mobile horizontal overflow `0`.
+- production 로그의 `5xx`는 `2026-09-10T09:44:50.458+09:00` 동시 로그인 요청 1건뿐이며, `09:47 KST` 이후 1회 추가 조회에서는 `5xx=0`이었다.
 
-실패하면 신규 Supabase를 수정하지 않는다. 현재 rollback deployment `dpl_5xDokCmsUozCt4K31USiDVywHv34`를 Vercel control plane에서 복구하고 production alias readback을 확인한다. 이는 로컬 source 직접 재배포가 아니다.
+열린 항목과 경계:
+
+- 위 `POST /api/auth/login`은 `503`과 `Dashboard login rate limit failed`를 기록했다. `dashboard_consume_login_attempts`를 호출하는 rate-limit consume 단계이며 allowlist lookup 실패나 정상적인 `429` 차단은 아니다.
+- 후속 단독 로그인은 성공했다. Supabase read-only 통계에서 PostgreSQL이 감지한 deadlock 기록은 `0`이었으나, 이것만으로 lock wait나 애플리케이션 timeout을 배제할 수 없으며 직접 원인은 아직 확정하지 않았다.
+- production 비허용 email 거부와 반복 인증 probe는 아직 실행하지 않았다.
+- 전체 visual harness는 mobile hydration 시점의 disabled click에서 중단됐으므로 전체 통과로 표시하지 않는다. 위 mobile row 수와 overflow는 실제 확인 결과다.
+- 관련 local auth test `16`개는 통과했지만 production auth 검증을 대신하지 않는다.
+- 신규 Supabase 자동 수집·자동 snapshot publish 예약은 연결하지 않았다. 현재 `2026-09-09` snapshot은 수동 게시 상태다.
+
+현재는 핵심 data와 smart lookup이 정상이고 후속 단독 로그인이 성공했으므로 자동 rollback하지 않았다. 인증 오류가 재현되거나 QA gate가 실패하면 신규 Supabase를 수정하지 않고 rollback deployment `dpl_5xDokCmsUozCt4K31USiDVywHv34`를 Vercel control plane에서 복구한 뒤 production alias를 readback한다. 이는 로컬 source 직접 재배포가 아니다.
 
 ## 아직 완료되지 않은 항목
 
-- [ ] D의 production env 8개 apply/readback
-- [ ] 최종 release commit 생성
-- [ ] GitHub `main` push
-- [ ] GitHub-triggered Vercel deployment READY
-- [ ] production alias 전환 readback
-- [ ] production API/auth/desktop/mobile QA
-- [ ] 최종 deployment·commit·rollback 증적 기록
+- [x] production env 8개 apply/exact readback 및 비대상 5개 보존
+- [x] release commit `75f3660fd3567a5bcfde6253d226819296814914`
+- [x] GitHub `main` non-force push와 원격 SHA readback
+- [x] GitHub-triggered Vercel deployment READY
+- [x] production alias control-plane readback
+- [x] deployment·commit·rollback 증적 기록
+- [ ] 동시 로그인 rate-limit consume `503` 원인 확정 및 필요한 최소 조치 검토
+- [ ] production 비허용 email/반복 인증 검증
+- [ ] 중단된 전체 production visual harness 재완료
+- [ ] manifest/data RPC의 dataset version과 freshness production readback
+- [ ] 최종 production QA 판정
 
 위 항목을 모두 확인하기 전에는 릴리스를 완료로 보고하지 않는다.
