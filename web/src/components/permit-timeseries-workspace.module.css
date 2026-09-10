@@ -1,0 +1,206 @@
+.dataGrid,
+.chartCard,
+.selectedMonthPanel,
+.selectedMonthTableWrap {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.dataGrid > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.chartViewport {
+  position: relative;
+  isolation: isolate;
+}
+
+.monthSelection {
+  pointer-events: none;
+}
+
+.monthHitTarget {
+  cursor: pointer;
+  outline: none;
+  pointer-events: all;
+  touch-action: manipulation;
+}
+
+.monthHitTarget:focus-visible {
+  stroke: var(--cre-forest-dark);
+  stroke-width: 1.6;
+  stroke-dasharray: 3 2;
+}
+
+.monthTooltip {
+  position: absolute;
+  top: 12px;
+  z-index: 3;
+  box-sizing: border-box;
+  width: 220px;
+  max-width: calc(100% - 16px);
+  padding: 8px 9px;
+  border: 1px solid rgb(35 80 69 / 24%);
+  border-radius: 4px;
+  background: rgb(255 255 255 / 97%);
+  box-shadow: 0 7px 20px rgb(21 43 37 / 15%);
+  color: var(--cre-ink);
+  display: grid;
+  gap: 3px;
+  pointer-events: none;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.monthTooltip strong {
+  margin-bottom: 2px;
+  color: var(--cre-forest-dark);
+  font-size: 12px;
+}
+
+.monthTooltip span {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.monthTooltip b {
+  color: var(--cre-muted);
+  font-weight: 650;
+}
+
+.monthTooltip small {
+  margin-top: 3px;
+  padding-top: 4px;
+  border-top: 1px solid var(--cre-line);
+  color: var(--cre-muted);
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+.selectedMonthPanel {
+  border-top: 1px solid var(--cre-line);
+  background: #fbfdfc;
+}
+
+.selectedMonthHeader {
+  min-height: 52px;
+  padding: 9px 13px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.selectedMonthHeader h3 {
+  margin: 1px 0 0;
+  color: var(--cre-ink);
+  font-size: 13px;
+}
+
+.selectedMonthHeader button {
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid var(--cre-line-strong);
+  border-radius: 3px;
+  background: #fff;
+  color: var(--cre-forest-dark);
+  cursor: pointer;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.aggregationGrain {
+  margin: 0;
+  padding: 0 13px 9px;
+  color: var(--cre-muted);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.selectedMonthTotals {
+  padding: 8px 13px;
+  border-top: 1px solid var(--cre-line);
+  border-bottom: 1px solid var(--cre-line);
+  background: #f3f8f5;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  color: var(--cre-ink);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.selectedMonthTotals b {
+  margin-right: 5px;
+  color: var(--cre-muted);
+}
+
+.selectedMonthTableWrap {
+  max-height: 220px;
+  overflow: auto;
+}
+
+.selectedMonthTableWrap table {
+  width: 100%;
+  min-width: 570px;
+  border-collapse: collapse;
+  font-size: 10px;
+}
+
+.selectedMonthTableWrap th,
+.selectedMonthTableWrap td {
+  height: 32px;
+  padding: 5px 8px;
+  border-bottom: 1px solid var(--cre-line);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.selectedMonthTableWrap th:first-child {
+  text-align: left;
+}
+
+.selectedMonthTableWrap thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #f7faf8;
+  color: var(--cre-muted);
+}
+
+.selectedMonthTableWrap tbody th,
+.selectedMonthTableWrap tfoot th {
+  color: var(--cre-ink);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.selectedMonthTableWrap tbody td,
+.selectedMonthTableWrap tfoot td {
+  color: var(--cre-ink);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.selectedMonthTableWrap tfoot {
+  background: #f7faf8;
+}
+
+@media (max-width: 680px) {
+  .monthTooltip {
+    min-width: 130px;
+    padding: 7px;
+  }
+
+  .selectedMonthHeader {
+    align-items: flex-start;
+  }
+
+  .selectedMonthTotals {
+    gap: 5px 11px;
+  }
+}

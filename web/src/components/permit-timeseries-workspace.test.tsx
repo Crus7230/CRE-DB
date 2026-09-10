@@ -125,6 +125,108 @@ describe("PermitTimeseriesWorkspace", () => {
     expect(screen.getByRole("button", { name: "진행 단계" })).toHaveAttribute("aria-pressed", "true");
   });
 
+  it("previews full month columns instantly and pins an exact monthly group aggregate", async () => {
+    const fetchMock = vi.fn(async () => new Response(JSON.stringify(payload), { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+    const user = userEvent.setup();
+    render(<PermitTimeseriesWorkspace/>);
+
+    const july = await screen.findByRole("button", { name: /2026-07, 기록 3건, 연면적 12,000㎡/ });
+    const august = screen.getByRole("button", { name: /2026-08, 기록 2건, 연면적 확인 불가, 면적 누락 1건, 면적 오류 1건/ });
+    expect(july).toHaveAttribute("tabindex", "-1");
+    expect(august).toHaveAttribute("tabindex", "0");
+    expect(july).toHaveAttribute("aria-pressed", "false");
+
+    fireEvent.pointerEnter(july);
+    expect(screen.getByRole("tooltip")).toHaveTextContent("2026-07");
+    expect(screen.getByRole("tooltip")).toHaveTextContent("연면적12,000㎡");
+    expect(screen.getByRole("tooltip")).toHaveTextContent("단계 간 중복 가능한 누적면적");
+    fireEvent.pointerLeave(july);
+    expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
+
+    await user.click(july);
+    expect(july).toHaveAttribute("aria-pressed", "true");
+    const panel = screen.getByRole("region", { name: "2026-07 선택 월 집계" });
+    expect(panel).toHaveTextContent("현재 필터(기준 단계: 전체 단계, 묶어보기: 자산 유형)");
+    expect(panel).toHaveTextContent("선택 월 × 자산 유형 집계");
+    expect(panel).toHaveTextContent("개별 건축물·사업 기록이 아닙니다.");
+    expect(panel).toHaveTextContent("전체 단계 연면적은 단계 간 중복 가능한 누적면적입니다.");
+    expect(within(panel).getByLabelText("2026-07 선택 월 품질 합계")).toHaveTextContent("기록3건연면적12,000㎡면적 유효3건누락0건오류0건");
+
+    const table = within(panel).getByRole("table", { name: "2026-07 선택 월 자산 유형별 집계" });
+    const officeRow = within(table).getByRole("row", { name: /오피스/ });
+    const logisticsRow = within(table).getByRole("row", { name: /물류센터/ });
+    expect(officeRow).toHaveTextContent("오피스266.7%10,000㎡83.3%00");
+    expect(logisticsRow).toHaveTextContent("물류센터133.3%2,000㎡16.7%00");
+    expect(within(table).queryByText("60.0%")).not.toBeInTheDocument();
+    expect(within(table).queryByText("40.0%")).not.toBeInTheDocument();
+
+    fireEvent.pointerEnter(august);
+    expect(screen.getByRole("tooltip")).toHaveTextContent("2026-08");
+    expect(screen.getByRole("tooltip")).toHaveTextContent("연면적확인 불가");
+    expect(screen.getByRole("tooltip")).toHaveTextContent("면적 누락1건");
+    expect(screen.getByRole("tooltip")).toHaveTextContent("면적 오류1건");
+    fireEvent.pointerLeave(august);
+    expect(screen.getByRole("tooltip")).toHaveTextContent("2026-07");
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    await user.click(screen.getByRole("button", { name: "2026-07 선택 해제" }));
+    expect(screen.queryByRole("region", { name: "2026-07 선택 월 집계" })).not.toBeInTheDocument();
+    expect(july).toHaveAttribute("aria-pressed", "false");
+    expect(july).toHaveFocus();
+  });
+
+  it("supports focus, Enter, Space, and Escape without another request", async () => {
+    const fetchMock = vi.fn(async () => new Response(JSON.stringify(payload), { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+    render(<PermitTimeseriesWorkspace/>);
+
+    const july = await screen.findByRole("button", { name: /2026-07, 기록 3건/ });
+    const august = screen.getByRole("button", { name: /2026-08, 기록 2건/ });
+    act(() => { august.focus(); });
+    expect(august).toHaveFocus();
+    expect(screen.getByRole("tooltip")).toHaveTextContent("2026-08");
+    fireEvent.keyDown(august, { key: "ArrowLeft" });
+    expect(july).toHaveFocus();
+    expect(screen.getByRole("tooltip")).toHaveTextContent("2026-07");
+
+    fireEvent.keyDown(july, { key: "Enter" });
+    expect(screen.getByRole("region", { name: "2026-07 선택 월 집계" })).toBeInTheDocument();
+    fireEvent.keyDown(july, { key: "Escape" });
+    expect(screen.queryByRole("region", { name: "2026-07 선택 월 집계" })).not.toBeInTheDocument();
+    expect(july).toHaveFocus();
+    expect(screen.getByRole("tooltip")).toHaveTextContent("2026-07");
+
+    fireEvent.keyDown(july, { key: " " });
+    expect(screen.getByRole("region", { name: "2026-07 선택 월 집계" })).toBeInTheDocument();
+    expect(july).toHaveAttribute("aria-pressed", "true");
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("rounds aggregated square metres to the source's two-decimal precision", async () => {
+    const fractional = {
+      ...payload,
+      series: payload.series.map((series, index) => ({
+        ...series,
+        points: [{
+          month: "2026-07",
+          permitCount: 1,
+          totalFloorAreaM2: index === 0 ? 0.1 : 0.2,
+          missingAreaCount: 0,
+          invalidAreaCount: 0,
+        }],
+      })),
+      quality: { aggregateRowCount: 2, permitCount: 2, totalFloorAreaM2: 0.3, missingAreaCount: 0, invalidAreaCount: 0 },
+    };
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify(fractional), { status: 200 })));
+    render(<PermitTimeseriesWorkspace/>);
+
+    const july = await screen.findByRole("button", { name: /2026-07, 기록 2건, 연면적 0.3㎡/ });
+    fireEvent.pointerEnter(july);
+    expect(screen.getByRole("tooltip")).toHaveTextContent("0.3㎡");
+    expect(screen.getByRole("tooltip")).not.toHaveTextContent("0.30000000000000004㎡");
+  });
+
   it("renders missing area as unavailable instead of a fabricated zero", async () => {
     const missingOnly = {
       ...payload,
@@ -146,7 +248,8 @@ describe("PermitTimeseriesWorkspace", () => {
     expect(await screen.findByText("유효 면적 기록 없음")).toBeInTheDocument();
     expect(container.querySelectorAll(".permit-area-line")).toHaveLength(0);
     expect(container.querySelectorAll(".permit-area-point")).toHaveLength(0);
-    expect(container).toHaveTextContent("연면적 확인 불가");
+    fireEvent.pointerEnter(screen.getByRole("button", { name: /2026-08, 기록 1건, 연면적 확인 불가, 면적 누락 1건/ }));
+    expect(screen.getByRole("tooltip")).toHaveTextContent("연면적확인 불가");
     expect(container).not.toHaveTextContent("0㎡");
   });
 
