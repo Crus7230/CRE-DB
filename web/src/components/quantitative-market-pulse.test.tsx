@@ -1,4 +1,5 @@
-import { render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { QuantitativeMarketPulse } from "@/components/quantitative-market-pulse";
 
@@ -34,6 +35,26 @@ const payload = {
   quality: { sourceRowCount: 13, transactionCount: 12, uniquePayloadCount: 12, exactDuplicateRows: 1 },
   scope: { geography: "서울특별시", source: "국토교통부 실거래 공개시스템", population: "비주거용 부동산 실거래", areaRule: "개별 API 행 건물면적 > 3,300㎡", exclusions: ["취소 신고", "주거용", "동일 API payload 중복"], amountBasis: "신고 거래금액 · 원 단위 환산 · 보수적 canonical payload 행 기준" },
 };
+
+const largeTransactions = (month: string, baseTransactionCount: number, totalCount = 2) => ({
+  datasetVersion: "cre-20260910T000000Z-test",
+  generatedAt: "2026-09-10T03:00:00.000Z",
+  month,
+  minAreaPyeong: 5000,
+  minAreaM2: 5000 * 400 / 121,
+  areaBasis: "TRANSACTED_BUILDING_AREA",
+  totalCount,
+  baseTransactionCount,
+  page: 1,
+  pageSize: 20,
+  totalPages: totalCount === 0 ? 0 : 1,
+  rows: totalCount === 0 ? [] : [
+    { id: `${month}-1`, dealDate: `${month}-11`, address: "서울 강남구 테헤란로 *", buildingUse: "업무", buildingType: "일반", areaM2: 20_000, areaPyeong: 6_050, amountKrw: "9007199254740993" },
+    { id: `${month}-2`, dealDate: `${month}-18`, address: "서울 영등포구 여의대로 1", buildingUse: "업무", buildingType: null, areaM2: 18_000, areaPyeong: 5_445, amountKrw: "400000000000" },
+  ],
+  coverage: { status: "COMPLETE", expectedDistrictCount: 25, completedDistrictCount: 25 },
+  source: { code: "MOLIT_REAL_TRANSACTION", label: "국토교통부 실거래 공개시스템", geography: "서울특별시", completedPartitionsOnly: true, exactPayloadDeduplicated: true, currentServingOnly: true },
+});
 
 const mockFetch = (body: unknown, ok = true) => vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok, json: async () => body }));
 afterEach(() => vi.unstubAllGlobals());
@@ -104,5 +125,89 @@ describe("QuantitativeMarketPulse", () => {
     expect(await screen.findByRole("heading", { name: "2026년 7월 신고 거래 현황" })).toBeInTheDocument();
     expect(screen.getAllByText("기준월 고유 신고행 없음").length).toBeGreaterThan(0);
     expect(document.body).not.toHaveTextContent("NaN");
+  });
+
+  it("previews monthly aggregates and fetches the fixed 5-thousand-pyeong list only when selected", async () => {
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url === "/api/market/pulse") return new Response(JSON.stringify(payload), { status: 200 });
+      return new Response(JSON.stringify(largeTransactions("2026-07", 12)), { status: 200 });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    const user = userEvent.setup();
+    render(<QuantitativeMarketPulse/>);
+
+    const july = await screen.findByRole("button", { name: /2026-07, 신고 거래금액 2\.2조 원, 고유 신고행 12건/ });
+    expect(july).toHaveAttribute("tabindex", "0");
+    fireEvent.pointerEnter(july);
+    const trendTooltip = screen.getByText("차트 모집단: 개별 API 행 건물면적 > 3,300㎡").closest('[role="tooltip"]') as HTMLElement;
+    expect(trendTooltip).toHaveTextContent("2026-07");
+    expect(trendTooltip).toHaveTextContent("거래면적250,983.21㎡");
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    fireEvent.pointerLeave(july);
+    expect(screen.queryByText("차트 모집단: 개별 API 행 건물면적 > 3,300㎡")).not.toBeInTheDocument();
+
+    await user.click(july);
+    expect(await screen.findByRole("heading", { name: "2026-07 · 거래면적 5천평 이상 (약 16,529㎡)" })).toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(String(fetchMock.mock.calls[1]?.[0])).toBe("/api/market/transactions?month=2026-07&page=1");
+    expect(july).toHaveAttribute("aria-pressed", "true");
+    expect(document.querySelector('[data-market-month-selection="2026-07"]')).toBeInTheDocument();
+    const comparison = screen.getByLabelText("2026-07 거래 목록 기준 비교");
+    expect(comparison).toHaveTextContent("전체 신고12건 (>3,300㎡)");
+    expect(comparison).toHaveTextContent("5천평 이상2건");
+    const table = screen.getByRole("table", { name: "2026-07 거래면적 5천평 이상 신고행" });
+    expect(table).toHaveTextContent("서울 강남구 테헤란로 *");
+    expect(table).toHaveTextContent("지번 일부 마스킹");
+    expect(table).toHaveTextContent("업무 · 일반");
+    expect(table).toHaveTextContent("6,050평20,000㎡");
+    expect(table).toHaveTextContent("9,007,199,254,740,993원");
+    expect(screen.getByText("거래면적은 신고행의 거래 건축물 면적이며 건물 전체 연면적과 다를 수 있습니다.")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "2026-07 선택 해제" }));
+    expect(screen.queryByRole("heading", { name: /2026-07 · 거래면적 5천평 이상/ })).not.toBeInTheDocument();
+    expect(july).toHaveFocus();
+    await user.click(july);
+    expect(await screen.findByRole("table", { name: "2026-07 거래면적 5천평 이상 신고행" })).toBeInTheDocument();
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+  });
+
+  it("uses roving month focus and treats a zero 5-thousand-pyeong result as valid", async () => {
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url === "/api/market/pulse") return new Response(JSON.stringify(payload), { status: 200 });
+      const month = new URL(url, "http://localhost").searchParams.get("month")!;
+      const base = trend.find((point) => point.period === month)?.transactionCount ?? 0;
+      return new Response(JSON.stringify(largeTransactions(month, base, 0)), { status: 200 });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    render(<QuantitativeMarketPulse/>);
+
+    const july = await screen.findByRole("button", { name: /2026-07, 신고 거래금액/ });
+    const june = screen.getByRole("button", { name: /2026-06, 신고 거래금액/ });
+    const firstMonth = screen.getByRole("button", { name: /2025-01, 신고 거래금액/ });
+    expect(june).toHaveAttribute("tabindex", "-1");
+    fireEvent.pointerEnter(july);
+    act(() => { july.focus(); });
+    fireEvent.keyDown(july, { key: "Home" });
+    expect(firstMonth).toHaveFocus();
+    expect(screen.getByText("차트 모집단: 개별 API 행 건물면적 > 3,300㎡").closest('[role="tooltip"]')).toHaveTextContent("2025-01");
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    fireEvent.keyDown(firstMonth, { key: "End" });
+    expect(july).toHaveFocus();
+    fireEvent.keyDown(july, { key: "ArrowLeft" });
+    expect(june).toHaveFocus();
+    expect(screen.getByText("차트 모집단: 개별 API 행 건물면적 > 3,300㎡").closest('[role="tooltip"]')).toHaveTextContent("2026-06");
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    fireEvent.keyDown(june, { key: "Enter" });
+    expect(await screen.findByText(/이 월의 전체 신고 14건\(>3,300㎡\)에는 5천평 미만 거래가 포함되어 있지만/)).toBeInTheDocument();
+    expect(screen.queryByRole("table", { name: /5천평 이상 신고행/ })).not.toBeInTheDocument();
+    fireEvent.keyDown(june, { key: "Escape" });
+    expect(screen.queryByRole("heading", { name: /2026-06 · 거래면적 5천평 이상/ })).not.toBeInTheDocument();
+    expect(june).toHaveFocus();
+    fireEvent.keyDown(june, { key: " " });
+    expect(await screen.findByText(/5천평 미만 거래가 포함되어 있지만/)).toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 });

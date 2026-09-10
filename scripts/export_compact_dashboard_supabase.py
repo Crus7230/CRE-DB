@@ -12,7 +12,9 @@ from __future__ import annotations
 import argparse
 from collections import defaultdict
 from contextlib import contextmanager
-from datetime import datetime, timezone
+from copy import deepcopy
+from datetime import date, datetime, timedelta, timezone
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 import gzip
 import hashlib
 import json
@@ -52,6 +54,79 @@ EXPECTED_MACRO_CODES = (
     "US_TREASURY_30Y",
     "US_TREASURY_10Y_MINUS_2Y",
 )
+EXPECTED_SEOUL_DISTRICT_CODES = (
+    "11110", "11140", "11170", "11200", "11215", "11230", "11260",
+    "11290", "11305", "11320", "11350", "11380", "11410", "11440",
+    "11470", "11500", "11530", "11545", "11560", "11590", "11620",
+    "11650", "11680", "11710", "11740",
+)
+COMPLETE_MOLIT_COVERAGE_STATUSES = frozenset(
+    {
+        "COMPLETE_FULL_SNAPSHOT",
+        "COMPLETE_EMPTY",
+        "COMPLETE_BASELINE_WITH_CHANGES",
+    }
+)
+LARGE_TRANSACTION_CONTRACT_VERSION = 1
+LARGE_TRANSACTION_MIN_AREA_PYEONG = 5_000
+LARGE_TRANSACTION_MIN_AREA_M2 = LARGE_TRANSACTION_MIN_AREA_PYEONG * 400 / 121
+LARGE_TRANSACTION_PAGE_SIZE = 20
+LARGE_TRANSACTION_MAX_MONTHS = 19
+LARGE_TRANSACTION_MAX_PAGES_PER_MONTH = 500
+LARGE_TRANSACTION_MAX_ROWS = 10_000
+LARGE_TRANSACTION_MAX_UTF8_BYTES = 1_048_576
+LARGE_TRANSACTION_AREA_RULE_NUMERATOR = 2_000_000
+LARGE_TRANSACTION_AREA_RULE_DENOMINATOR = 121
+LARGE_TRANSACTION_SOURCE = {
+    "code": "MOLIT_REAL_TRANSACTION",
+    "label": "국토교통부 실거래 공개시스템",
+    "geography": "서울특별시",
+    "completedPartitionsOnly": True,
+    "exactPayloadDeduplicated": True,
+    "currentServingOnly": True,
+}
+LARGE_TRANSACTION_QUERY = """
+SELECT api_payload_sha256,district_code,district_name,locality,building_use,
+       building_area_text,deal_amount_text,deal_year,deal_month_number,deal_day,
+       nullif(trim(CAST(json_extract(api_payload_json,'$.buildingType') AS TEXT)),'')
+         AS building_type,
+       nullif(trim(CAST(json_extract(api_payload_json,'$.jibun') AS TEXT)),'') AS jibun
+FROM serving_molit_current_transactions
+ORDER BY deal_year,CAST(deal_month_number AS INTEGER),CAST(deal_day AS INTEGER),
+         api_payload_sha256
+""".strip()
+LARGE_TRANSACTION_COVERAGE_QUERY = """
+SELECT deal_month,district_code,coverage_status
+FROM serving_molit_completed_partitions
+ORDER BY deal_month,district_code
+""".strip()
+LARGE_TRANSACTION_QUERY_IDENTITY = {
+    "contractVersion": LARGE_TRANSACTION_CONTRACT_VERSION,
+    "transactionQuery": LARGE_TRANSACTION_QUERY,
+    "coverageQuery": LARGE_TRANSACTION_COVERAGE_QUERY,
+    "minimumAreaRule": "building_area_decimal * 121 >= 2000000",
+    "baseAreaRule": "building_area_decimal > 3300",
+    "pageSize": LARGE_TRANSACTION_PAGE_SIZE,
+}
+
+# These fields record when an otherwise identical projection was rebuilt or
+# observed.  They remain in the immutable package for freshness/lineage, but
+# must not create a new logical dataset by themselves.
+CONTENT_IGNORED_COLUMNS: Mapping[str, frozenset[str]] = {
+    "article_dates": frozenset({"generated_at"}),
+    "articles": frozenset({"projection_generated_at"}),
+    "article_details": frozenset({"projection_generated_at"}),
+    "market_pulse": frozenset({"source_content_sha256", "generated_at"}),
+}
+CONTENT_IGNORED_JSON_KEYS: Mapping[str, frozenset[str]] = {
+    "market_pulse": frozenset({"generatedAt"}),
+}
+LINEAGE_IGNORED_METADATA_KEYS = frozenset(
+    {
+        "generatedAt",
+        "projectionGeneratedAt",
+    }
+)
 
 
 class CompactExportError(RuntimeError):
@@ -89,6 +164,50 @@ def canonical_json(value: Any) -> str:
 
 def sha256_json(value: Any) -> str:
     return hashlib.sha256(canonical_json(value).encode("utf-8")).hexdigest()
+
+
+LARGE_TRANSACTION_QUERY_SHA256 = sha256_json(LARGE_TRANSACTION_QUERY_IDENTITY)
+
+
+def _without_keys(value: Any, ignored: frozenset[str]) -> Any:
+    if isinstance(value, Mapping):
+        return {
+            key: _without_keys(child, ignored)
+            for key, child in value.items()
+            if key not in ignored
+        }
+    if isinstance(value, list):
+        return [_without_keys(child, ignored) for child in value]
+    return value
+
+
+def content_identity_row(table: str, row: Mapping[str, Any]) -> dict[str, Any]:
+    """Return the business-content projection used only for no-op identity."""
+
+    ignored_columns = CONTENT_IGNORED_COLUMNS.get(table, frozenset())
+    ignored_json_keys = CONTENT_IGNORED_JSON_KEYS.get(table, frozenset())
+    return {
+        key: _without_keys(value, ignored_json_keys)
+        for key, value in row.items()
+        if key not in ignored_columns
+    }
+
+
+def content_identity_lineage(row: Mapping[str, Any]) -> dict[str, Any]:
+    """Keep semantic lineage while separating operational freshness clocks."""
+
+    return {
+        "dataset_code": row["dataset_code"],
+        "source_code": row["source_code"],
+        "source_as_of_date": row["source_as_of_date"],
+        "source_status_code": row["source_status_code"],
+        "source_row_count": int(row["source_row_count"]),
+        "serving_row_count": int(row["serving_row_count"]),
+        "source_content_sha256": row["source_content_sha256"],
+        "metadata": _without_keys(
+            row.get("metadata", {}), LINEAGE_IGNORED_METADATA_KEYS
+        ),
+    }
 
 
 def parsed_json(value: Any, *, label: str) -> Any:
@@ -262,6 +381,266 @@ def permit_rows(connection: sqlite3.Connection) -> list[dict[str, Any]]:
     )
 
 
+_STRICT_DECIMAL_RE = re.compile(r"^[0-9]+(?:\.[0-9]+)?$", re.ASCII)
+_STRICT_AMOUNT_RE = re.compile(r"^(?:[0-9]+|[0-9]+(?:,[0-9]{3})+)$", re.ASCII)
+_RESIDENTIAL_USE_TOKENS = (
+    "아파트", "공동주택", "단독주택", "다가구", "다세대", "연립", "주택", "주거"
+)
+
+
+def _large_transaction_coverage(
+    connection: sqlite3.Connection,
+) -> dict[str, dict[str, str]]:
+    coverage: dict[str, dict[str, str]] = defaultdict(dict)
+    expected = set(EXPECTED_SEOUL_DISTRICT_CODES)
+    for raw in connection.execute(LARGE_TRANSACTION_COVERAGE_QUERY):
+        month = str(raw["deal_month"] or "")
+        district = str(raw["district_code"] or "")
+        status = str(raw["coverage_status"] or "")
+        if district not in expected:
+            continue
+        previous = coverage[month].get(district)
+        if previous is not None and previous != status:
+            raise CompactExportError(
+                f"Conflicting MOLIT coverage for {month}/{district}"
+            )
+        coverage[month][district] = status
+    return coverage
+
+
+def _parse_large_transaction(
+    raw: Mapping[str, Any], selected_months: frozenset[str]
+) -> tuple[str, dict[str, Any]] | None:
+    year_text = str(raw.get("deal_year") or "")
+    month_text = str(raw.get("deal_month_number") or "")
+    day_text = str(raw.get("deal_day") or "")
+    if not re.fullmatch(r"20[0-9]{2}", year_text, re.ASCII):
+        return None
+    if (
+        len(month_text) < 1
+        or len(month_text) > 2
+        or not month_text.isascii()
+        or not month_text.isdigit()
+    ):
+        return None
+    month_number = int(month_text)
+    if month_number < 1 or month_number > 12:
+        return None
+    month = f"{year_text}-{month_number:02d}"
+    if month not in selected_months:
+        return None
+    if (
+        len(day_text) < 1
+        or len(day_text) > 2
+        or not day_text.isascii()
+        or not day_text.isdigit()
+    ):
+        return None
+    day_number = int(day_text)
+    try:
+        deal_date = date(int(year_text), month_number, day_number).isoformat()
+    except ValueError:
+        return None
+
+    district_code = str(raw.get("district_code") or "")
+    building_use = str(raw.get("building_use") or "")
+    area_text = str(raw.get("building_area_text") or "")
+    amount_text = str(raw.get("deal_amount_text") or "")
+    if (
+        not district_code.startswith("11")
+        or not building_use.strip()
+        or any(token in building_use for token in _RESIDENTIAL_USE_TOKENS)
+        or not _STRICT_DECIMAL_RE.fullmatch(area_text)
+        or not _STRICT_AMOUNT_RE.fullmatch(amount_text)
+    ):
+        return None
+    try:
+        area = Decimal(area_text)
+    except InvalidOperation:
+        return None
+    if not area.is_finite() or area <= Decimal(3_300):
+        return None
+    amount_krw = int(amount_text.replace(",", "")) * 10_000
+
+    transaction_id = str(raw.get("api_payload_sha256") or "").strip()
+    if not re.fullmatch(r"[a-f0-9]{64}", transaction_id):
+        raise CompactExportError("Eligible MOLIT transaction has an invalid payload hash")
+    district = str(raw.get("district_name") or "")
+    locality = str(raw.get("locality") or "")
+    jibun = raw.get("jibun")
+    address = (
+        f"{district} {locality}"
+        + ("" if jibun is None else f" {str(jibun)}")
+    ).strip()
+    if not address:
+        raise CompactExportError("Eligible MOLIT transaction has no display address")
+    building_type = raw.get("building_type")
+    if building_type is not None:
+        building_type = str(building_type)
+    return month, {
+        "id": transaction_id,
+        "dealDate": deal_date,
+        "address": address,
+        "buildingUse": building_use,
+        "buildingType": building_type,
+        "areaM2": float(area),
+        "areaPyeong": float(
+            (area * Decimal(121) / Decimal(400)).quantize(
+                Decimal("0.01"), rounding=ROUND_HALF_UP
+            )
+        ),
+        "amountKrw": str(amount_krw),
+        "_areaDecimal": area,
+        "_amountKrw": amount_krw,
+    }
+
+
+def build_large_transactions(
+    connection: sqlite3.Connection,
+    trend: Sequence[Mapping[str, Any]],
+    *,
+    now: datetime | None = None,
+) -> dict[str, Any]:
+    """Build the bounded 5,000-pyeong detail envelope for pulse trend months."""
+
+    months = [str(point.get("period") or "") for point in trend]
+    if (
+        not months
+        or len(months) > LARGE_TRANSACTION_MAX_MONTHS
+        or months != sorted(months)
+        or len(set(months)) != len(months)
+        or any(not re.fullmatch(r"20[0-9]{2}-(?:0[1-9]|1[0-2])", month) for month in months)
+    ):
+        raise CompactExportError("Market pulse months cannot satisfy the detail contract")
+    observed_now = now or datetime.now(timezone.utc)
+    if observed_now.tzinfo is None:
+        observed_now = observed_now.replace(tzinfo=timezone.utc)
+    current_kst_month = observed_now.astimezone(
+        timezone(timedelta(hours=9))
+    ).strftime("%Y-%m")
+    if any(month >= current_kst_month for month in months):
+        raise CompactExportError("Current or future month cannot be exported as completed detail")
+
+    coverage = _large_transaction_coverage(connection)
+    expected_districts = set(EXPECTED_SEOUL_DISTRICT_CODES)
+    for month in months:
+        month_coverage = coverage.get(month, {})
+        if set(month_coverage) != expected_districts or any(
+            status not in COMPLETE_MOLIT_COVERAGE_STATUSES
+            for status in month_coverage.values()
+        ):
+            raise CompactExportError(
+                f"MOLIT detail month {month} is not a complete 25-district snapshot"
+            )
+
+    by_month: dict[str, dict[str, dict[str, Any]]] = {
+        month: {} for month in months
+    }
+    selected_months = frozenset(months)
+    for source in connection.execute(LARGE_TRANSACTION_QUERY):
+        parsed = _parse_large_transaction(dict(source), selected_months)
+        if parsed is None:
+            continue
+        month, transaction = parsed
+        previous = by_month[month].get(transaction["id"])
+        if previous is not None and previous != transaction:
+            raise CompactExportError(
+                f"Payload hash has conflicting canonical facts in {month}"
+            )
+        by_month[month][transaction["id"]] = transaction
+
+    output_months: list[dict[str, Any]] = []
+    total_detail_rows = 0
+    for point in trend:
+        month = str(point["period"])
+        canonical = list(by_month[month].values())
+        expected_count = int(point["transactionCount"])
+        if len(canonical) != expected_count:
+            raise CompactExportError(
+                f"MOLIT detail base count differs from market pulse for {month}"
+            )
+        expected_amount = Decimal(str(point["amountKrw"]))
+        expected_area = Decimal(str(point["areaM2"]))
+        base_amount = sum((Decimal(row["_amountKrw"]) for row in canonical), Decimal(0))
+        base_area = sum((row["_areaDecimal"] for row in canonical), Decimal(0))
+        area_tolerance = max(Decimal("0.000001"), abs(expected_area) * Decimal("1e-12"))
+        if base_amount != expected_amount or abs(base_area - expected_area) > area_tolerance:
+            raise CompactExportError(
+                f"MOLIT detail base totals differ from market pulse for {month}"
+            )
+
+        large = [
+            row for row in canonical
+            if row["_areaDecimal"] * LARGE_TRANSACTION_AREA_RULE_DENOMINATOR
+            >= LARGE_TRANSACTION_AREA_RULE_NUMERATOR
+        ]
+        large.sort(key=lambda row: row["id"])
+        large.sort(key=lambda row: row["dealDate"], reverse=True)
+        large.sort(key=lambda row: row["_amountKrw"], reverse=True)
+        large.sort(key=lambda row: row["_areaDecimal"], reverse=True)
+        large_amount = sum((Decimal(row["_amountKrw"]) for row in large), Decimal(0))
+        large_area = sum((row["_areaDecimal"] for row in large), Decimal(0))
+        if large_amount > expected_amount or large_area - expected_area > area_tolerance:
+            raise CompactExportError(
+                f"MOLIT large-detail subset exceeds pulse totals for {month}"
+            )
+        public_rows = [
+            {key: value for key, value in row.items() if not key.startswith("_")}
+            for row in large
+        ]
+        pages = [
+            {"page": offset // LARGE_TRANSACTION_PAGE_SIZE + 1, "rows": public_rows[offset:offset + LARGE_TRANSACTION_PAGE_SIZE]}
+            for offset in range(0, len(public_rows), LARGE_TRANSACTION_PAGE_SIZE)
+        ]
+        if len(pages) > LARGE_TRANSACTION_MAX_PAGES_PER_MONTH:
+            raise CompactExportError(f"MOLIT detail page cap exceeded for {month}")
+        total_detail_rows += len(public_rows)
+        output_months.append(
+            {
+                "month": month,
+                "baseTransactionCount": expected_count,
+                "totalCount": len(public_rows),
+                "coverage": {
+                    "status": "COMPLETE",
+                    "expectedDistrictCount": 25,
+                    "completedDistrictCount": 25,
+                },
+                "pages": pages,
+            }
+        )
+
+    if total_detail_rows > LARGE_TRANSACTION_MAX_ROWS:
+        raise CompactExportError("MOLIT detail envelope row cap exceeded")
+    envelope = {
+        "contractVersion": LARGE_TRANSACTION_CONTRACT_VERSION,
+        "minAreaPyeong": LARGE_TRANSACTION_MIN_AREA_PYEONG,
+        "minAreaM2": LARGE_TRANSACTION_MIN_AREA_M2,
+        "areaBasis": "TRANSACTED_BUILDING_AREA",
+        "pageSize": LARGE_TRANSACTION_PAGE_SIZE,
+        "months": output_months,
+    }
+    serialized_bytes = len(canonical_json(envelope).encode("utf-8"))
+    if serialized_bytes > LARGE_TRANSACTION_MAX_UTF8_BYTES:
+        raise CompactExportError("MOLIT detail envelope byte cap exceeded")
+    return envelope
+
+
+def large_transactions_stats(envelope: Mapping[str, Any]) -> dict[str, Any]:
+    months = envelope["months"]
+    return {
+        "contractVersion": int(envelope["contractVersion"]),
+        "monthCount": len(months),
+        "totalCount": sum(int(month["totalCount"]) for month in months),
+        "serializedUtf8Bytes": len(canonical_json(envelope).encode("utf-8")),
+        "maximumUtf8Bytes": LARGE_TRANSACTION_MAX_UTF8_BYTES,
+        "minimumAreaPyeong": LARGE_TRANSACTION_MIN_AREA_PYEONG,
+        "minimumAreaM2": LARGE_TRANSACTION_MIN_AREA_M2,
+        "pageSize": LARGE_TRANSACTION_PAGE_SIZE,
+        "querySha256": LARGE_TRANSACTION_QUERY_SHA256,
+        "source": dict(LARGE_TRANSACTION_SOURCE),
+    }
+
+
 def _extract_market_pulse_query() -> tuple[str, str]:
     source = PULSE_QUERY_SOURCE.read_text(encoding="utf-8")
     match = re.search(r"const QUERY = `(.*?)`;\s*\n", source, re.DOTALL)
@@ -421,7 +800,9 @@ def build_market_pulse(raw: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def market_pulse_rows(connection: sqlite3.Connection) -> tuple[list[dict[str, Any]], str]:
+def market_pulse_rows(
+    connection: sqlite3.Connection,
+) -> tuple[list[dict[str, Any]], str, str]:
     sql, query_sha256 = _extract_market_pulse_query()
     row = connection.execute(sql).fetchone()
     if row is None:
@@ -437,6 +818,9 @@ def market_pulse_rows(connection: sqlite3.Connection) -> tuple[list[dict[str, An
         raise CompactExportError("MOLIT freshness row is missing")
     raw["generatedAt"] = freshness[0]
     payload = build_market_pulse(raw)
+    large_transactions = build_large_transactions(connection, payload["trend"])
+    payload["largeTransactions"] = large_transactions
+    raw["largeTransactions"] = large_transactions
     return [
         {
             "as_of_period": f"{payload['asOfPeriod']}-01",
@@ -444,7 +828,7 @@ def market_pulse_rows(connection: sqlite3.Connection) -> tuple[list[dict[str, An
             "source_content_sha256": sha256_json(raw),
             "generated_at": payload["generatedAt"],
         }
-    ], query_sha256
+    ], query_sha256, LARGE_TRANSACTION_QUERY_SHA256
 
 
 def lineage_rows(connection: sqlite3.Connection) -> list[dict[str, Any]]:
@@ -541,6 +925,7 @@ def _facets(connection: sqlite3.Connection, pulse: dict[str, Any]) -> dict[str, 
             "asOfPeriod": pulse["asOfPeriod"],
             "scope": pulse["scope"],
             "quality": pulse["quality"],
+            "largeTransactions": large_transactions_stats(pulse["largeTransactions"]),
         },
     }
 
@@ -563,11 +948,13 @@ TABLE_BUILDERS: tuple[tuple[str, Callable[[sqlite3.Connection], list[dict[str, A
 
 
 def _table_stats(
+    table: str,
     rows: Sequence[dict[str, Any]],
     *,
     destination: Path | None,
 ) -> dict[str, Any]:
     digest = hashlib.sha256()
+    content_digest = hashlib.sha256()
     uncompressed_bytes = 0
     compressed_bytes: int | None = None
     handle = gzip.open(destination, "xt", encoding="utf-8", newline="\n", compresslevel=9) if destination else None
@@ -576,6 +963,9 @@ def _table_stats(
             line = canonical_json(row) + "\n"
             encoded = line.encode("utf-8")
             digest.update(encoded)
+            content_digest.update(
+                (canonical_json(content_identity_row(table, row)) + "\n").encode("utf-8")
+            )
             uncompressed_bytes += len(encoded)
             if handle is not None:
                 handle.write(line)
@@ -587,6 +977,7 @@ def _table_stats(
     return {
         "rowCount": len(rows),
         "contentSha256": digest.hexdigest(),
+        "stableContentSha256": content_digest.hexdigest(),
         "uncompressedBytes": uncompressed_bytes,
         "compressedBytes": compressed_bytes,
         "file": None if destination is None else destination.name,
@@ -616,6 +1007,7 @@ def serving_identity(
     row_counts: Mapping[str, int],
     facets: Mapping[str, Any],
     pulse_query_sha256: str,
+    large_transactions_query_sha256: str,
 ) -> dict[str, Any]:
     """Build the semantic identity used for no-op and version decisions.
 
@@ -625,11 +1017,13 @@ def serving_identity(
 
     return {
         "schemaVersion": SCHEMA_VERSION,
-        "lineage": list(lineages),
+        "identityVersion": 3,
+        "lineage": [content_identity_lineage(row) for row in lineages],
         "tableHashes": dict(table_hashes),
         "rowCounts": dict(row_counts),
         "facets": dict(facets),
         "marketPulseQuerySha256": pulse_query_sha256,
+        "largeTransactionsQuerySha256": large_transactions_query_sha256,
     }
 
 
@@ -642,28 +1036,49 @@ def build_manifest(source: Path, staging: Path | None = None) -> dict[str, Any]:
         for name, builder in TABLE_BUILDERS:
             rows = builder(connection)
             destination = None if staging is None else staging / f"{name}.jsonl.gz"
-            tables[name] = _table_stats(rows, destination=destination)
-        pulse_rows, pulse_query_sha256 = market_pulse_rows(connection)
+            tables[name] = _table_stats(name, rows, destination=destination)
+        (
+            pulse_rows,
+            pulse_query_sha256,
+            large_transactions_query_sha256,
+        ) = market_pulse_rows(connection)
         destination = None if staging is None else staging / "market_pulse.jsonl.gz"
-        tables["market_pulse"] = _table_stats(pulse_rows, destination=destination)
+        tables["market_pulse"] = _table_stats(
+            "market_pulse", pulse_rows, destination=destination
+        )
         pulse = pulse_rows[0]["payload"]
         facets = _facets(connection, pulse)
 
     table_hashes = {name: value["contentSha256"] for name, value in sorted(tables.items())}
+    stable_table_hashes = {
+        name: value["stableContentSha256"] for name, value in sorted(tables.items())
+    }
     row_counts = {name: value["rowCount"] for name, value in sorted(tables.items())}
     # File path, mtime, and SQLite page counts are provenance, not dataset
     # identity.  Repacking the same logical serving content must remain a no-op.
     source_manifest = serving_identity(
         lineages=lineages,
-        table_hashes=table_hashes,
+        table_hashes=stable_table_hashes,
         row_counts=row_counts,
         facets=facets,
         pulse_query_sha256=pulse_query_sha256,
+        large_transactions_query_sha256=large_transactions_query_sha256,
     )
     source_manifest_sha256 = sha256_json(source_manifest)
     source_as_of = max(str(row["generated_at"]) for row in lineages)
-    parsed_as_of = datetime.fromisoformat(source_as_of.replace("Z", "+00:00")).astimezone(timezone.utc)
-    dataset_version = f"cre-{parsed_as_of:%Y%m%dT%H%M%SZ}-{source_manifest_sha256[:12]}"
+    content_dates = [
+        str(facets["news"]["availableThrough"]),
+        f'{facets["macro"]["availableThrough"]}-01',
+        f'{facets["permits"]["availableThrough"]}-01',
+        f'{facets["marketPulse"]["asOfPeriod"]}-01',
+    ]
+    content_as_of_date = max(content_dates)
+    parsed_content_as_of = datetime.fromisoformat(content_as_of_date).replace(
+        tzinfo=timezone.utc
+    )
+    dataset_version = (
+        f"cre-{parsed_content_as_of:%Y%m%dT000000Z}-{source_manifest_sha256[:12]}"
+    )
     package_bytes = sum(
         int(value["compressedBytes"] if value["compressedBytes"] is not None else value["uncompressedBytes"])
         for value in tables.values()
@@ -675,12 +1090,16 @@ def build_manifest(source: Path, staging: Path | None = None) -> dict[str, Any]:
         "mode": "PLAN" if staging is None else "EXPORT",
         "willWrite": staging is not None,
         "sourceAsOfAt": source_as_of,
+        "contentAsOfDate": content_as_of_date,
         "sourceManifestSha256": source_manifest_sha256,
         "source": source_metadata,
         "marketPulseQuerySha256": pulse_query_sha256,
+        "largeTransactionsQuerySha256": large_transactions_query_sha256,
+        "largeTransactions": large_transactions_stats(pulse["largeTransactions"]),
         "tables": tables,
         "rowCounts": row_counts,
         "tableHashes": table_hashes,
+        "stableTableHashes": stable_table_hashes,
         "lineage": lineages,
         "facets": facets,
         "packageBytes": package_bytes,
@@ -694,6 +1113,260 @@ def build_manifest(source: Path, staging: Path | None = None) -> dict[str, Any]:
             "reason": "Current dashboard uses article serving rows, filterable monthly facts, and a precomputed governed market-pulse payload.",
         },
     }
+
+
+def _verified_base_package(package: Path) -> dict[str, Any]:
+    package = package.expanduser().resolve(strict=True)
+    manifest_path = package / "manifest.json"
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        raise CompactExportError(f"Cannot read base package manifest: {manifest_path}") from error
+    expected_tables = {name for name, _builder in TABLE_BUILDERS} | {"market_pulse"}
+    tables = manifest.get("tables")
+    if (
+        not isinstance(tables, dict)
+        or set(tables) != expected_tables
+        or manifest.get("schemaVersion") != SCHEMA_VERSION
+        or not re.fullmatch(
+            r"cre-[0-9]{8}T[0-9]{6}Z-[a-f0-9]{12}",
+            str(manifest.get("datasetVersion") or ""),
+        )
+    ):
+        raise CompactExportError("Base package manifest contract is invalid")
+
+    verified_tables: dict[str, dict[str, Any]] = {}
+    for table in sorted(expected_tables):
+        report = tables[table]
+        filename = report.get("file")
+        if not isinstance(filename, str) or Path(filename).name != filename:
+            raise CompactExportError(f"Unsafe base package filename for {table}")
+        path = package / filename
+        digest = hashlib.sha256()
+        stable_digest = hashlib.sha256()
+        row_count = 0
+        uncompressed_bytes = 0
+        try:
+            with gzip.open(path, "rt", encoding="utf-8", newline="") as handle:
+                for line_number, line in enumerate(handle, start=1):
+                    try:
+                        row = json.loads(line)
+                    except json.JSONDecodeError as error:
+                        raise CompactExportError(
+                            f"Invalid base package JSON in {filename}:{line_number}"
+                        ) from error
+                    if not isinstance(row, dict):
+                        raise CompactExportError(
+                            f"Non-object base package row in {filename}:{line_number}"
+                        )
+                    encoded = (canonical_json(row) + "\n").encode("utf-8")
+                    digest.update(encoded)
+                    stable_digest.update(
+                        (canonical_json(content_identity_row(table, row)) + "\n").encode("utf-8")
+                    )
+                    uncompressed_bytes += len(encoded)
+                    row_count += 1
+        except OSError as error:
+            raise CompactExportError(f"Cannot read base package table {filename}") from error
+        actual = {
+            "rowCount": row_count,
+            "contentSha256": digest.hexdigest(),
+            "stableContentSha256": stable_digest.hexdigest(),
+            "uncompressedBytes": uncompressed_bytes,
+            "compressedBytes": path.stat().st_size,
+            "file": filename,
+        }
+        for key in (
+            "rowCount", "contentSha256", "stableContentSha256",
+            "uncompressedBytes", "compressedBytes", "file",
+        ):
+            if report.get(key) != actual[key]:
+                raise CompactExportError(f"Base package {table} {key} mismatch")
+        verified_tables[table] = actual
+
+    row_counts = {name: value["rowCount"] for name, value in sorted(verified_tables.items())}
+    table_hashes = {name: value["contentSha256"] for name, value in sorted(verified_tables.items())}
+    stable_hashes = {
+        name: value["stableContentSha256"] for name, value in sorted(verified_tables.items())
+    }
+    if (
+        manifest.get("rowCounts") != row_counts
+        or manifest.get("tableHashes") != table_hashes
+        or manifest.get("stableTableHashes") != stable_hashes
+    ):
+        raise CompactExportError("Base package aggregate table identity mismatch")
+    legacy_identity = {
+        "schemaVersion": SCHEMA_VERSION,
+        "identityVersion": 2,
+        "lineage": [content_identity_lineage(row) for row in manifest["lineage"]],
+        "tableHashes": stable_hashes,
+        "rowCounts": row_counts,
+        "facets": manifest["facets"],
+        "marketPulseQuerySha256": manifest["marketPulseQuerySha256"],
+    }
+    if sha256_json(legacy_identity) != manifest.get("sourceManifestSha256"):
+        raise CompactExportError("Base package source identity is invalid")
+    if not str(manifest["datasetVersion"]).endswith(
+        f"-{manifest['sourceManifestSha256'][:12]}"
+    ):
+        raise CompactExportError("Base package dataset version does not match its identity")
+    return manifest
+
+
+def _base_market_pulse_row(base_package: Path, manifest: Mapping[str, Any]) -> dict[str, Any]:
+    filename = manifest["tables"]["market_pulse"]["file"]
+    with gzip.open(base_package / filename, "rt", encoding="utf-8", newline="") as handle:
+        rows = [json.loads(line) for line in handle]
+    if len(rows) != 1 or not isinstance(rows[0].get("payload"), dict):
+        raise CompactExportError("Base package must contain exactly one market pulse row")
+    if "largeTransactions" in rows[0]["payload"]:
+        raise CompactExportError("Base market pulse already contains large-transaction detail")
+    return rows[0]
+
+
+def build_large_transactions_delta_manifest(
+    source: Path,
+    base_package: Path,
+    staging: Path | None = None,
+    *,
+    now: datetime | None = None,
+) -> dict[str, Any]:
+    """Augment one verified immutable package without rebuilding its other tables."""
+
+    source = source.expanduser().resolve(strict=True)
+    base_package = base_package.expanduser().resolve(strict=True)
+    base = _verified_base_package(base_package)
+    market_row = _base_market_pulse_row(base_package, base)
+    pulse = deepcopy(market_row["payload"])
+    trend = pulse.get("trend")
+    if not isinstance(trend, list):
+        raise CompactExportError("Base market pulse has no trend")
+    with consistent_source(source) as connection:
+        large_transactions = build_large_transactions(connection, trend, now=now)
+        detail_source = _source_metadata(connection, source)
+    pulse["largeTransactions"] = large_transactions
+    market_row["payload"] = pulse
+    market_row["source_content_sha256"] = sha256_json(
+        {
+            "baseSourceContentSha256": market_row["source_content_sha256"],
+            "largeTransactions": large_transactions,
+        }
+    )
+
+    if staging is not None:
+        for table in sorted(set(base["tables"]) - {"market_pulse"}):
+            filename = base["tables"][table]["file"]
+            shutil.copy2(base_package / filename, staging / filename)
+    market_destination = None if staging is None else staging / "market_pulse.jsonl.gz"
+    market_stats = _table_stats(
+        "market_pulse", [market_row], destination=market_destination
+    )
+    if staging is None:
+        encoded = (canonical_json(market_row) + "\n").encode("utf-8")
+        market_stats["compressedBytes"] = len(gzip.compress(encoded, compresslevel=9, mtime=0))
+
+    tables = deepcopy(base["tables"])
+    tables["market_pulse"] = market_stats
+    row_counts = {name: int(value["rowCount"]) for name, value in sorted(tables.items())}
+    table_hashes = {
+        name: str(value["contentSha256"]) for name, value in sorted(tables.items())
+    }
+    stable_table_hashes = {
+        name: str(value["stableContentSha256"]) for name, value in sorted(tables.items())
+    }
+    if any(
+        table_hashes[table] != base["tableHashes"][table]
+        or stable_table_hashes[table] != base["stableTableHashes"][table]
+        or row_counts[table] != int(base["rowCounts"][table])
+        for table in tables
+        if table != "market_pulse"
+    ):
+        raise CompactExportError("A non-market table changed during delta packaging")
+    if table_hashes["market_pulse"] == base["tableHashes"]["market_pulse"]:
+        raise CompactExportError("Market pulse augmentation produced no content change")
+
+    detail_stats = large_transactions_stats(large_transactions)
+    facets = deepcopy(base["facets"])
+    facets["marketPulse"] = deepcopy(facets["marketPulse"])
+    facets["marketPulse"]["largeTransactions"] = detail_stats
+    source_manifest = serving_identity(
+        lineages=base["lineage"],
+        table_hashes=stable_table_hashes,
+        row_counts=row_counts,
+        facets=facets,
+        pulse_query_sha256=base["marketPulseQuerySha256"],
+        large_transactions_query_sha256=LARGE_TRANSACTION_QUERY_SHA256,
+    )
+    source_manifest_sha256 = sha256_json(source_manifest)
+    content_as_of_date = str(base["contentAsOfDate"])
+    parsed_content_as_of = datetime.fromisoformat(content_as_of_date).replace(
+        tzinfo=timezone.utc
+    )
+    dataset_version = (
+        f"cre-{parsed_content_as_of:%Y%m%dT000000Z}-{source_manifest_sha256[:12]}"
+    )
+    required_clones = [
+        table for table, _builder in TABLE_BUILDERS
+    ]
+    package_bytes = sum(int(value["compressedBytes"]) for value in tables.values())
+    estimated_upload_bytes = sum(int(value["uncompressedBytes"]) for value in tables.values())
+    return {
+        **deepcopy(base),
+        "datasetVersion": dataset_version,
+        "mode": "PLAN" if staging is None else "EXPORT",
+        "willWrite": staging is not None,
+        "sourceManifestSha256": source_manifest_sha256,
+        "largeTransactionsQuerySha256": LARGE_TRANSACTION_QUERY_SHA256,
+        "tables": tables,
+        "rowCounts": row_counts,
+        "tableHashes": table_hashes,
+        "stableTableHashes": stable_table_hashes,
+        "facets": facets,
+        "packageBytes": package_bytes,
+        "estimatedUploadBytes": estimated_upload_bytes,
+        "estimatedClientUploadBytes": int(market_stats["uncompressedBytes"]),
+        "largeTransactions": detail_stats,
+        "detailSource": detail_source,
+        "delta": {
+            "baseDatasetVersion": base["datasetVersion"],
+            "baseSourceManifestSha256": base["sourceManifestSha256"],
+            "changedTables": ["market_pulse"],
+            "requiredServerCloneTables": required_clones,
+        },
+    }
+
+
+def export_large_transactions_delta(
+    source: Path,
+    base_package: Path,
+    output_root: Path,
+) -> tuple[Path, dict[str, Any]]:
+    output_root = output_root.expanduser().resolve()
+    output_root.mkdir(parents=True, exist_ok=True)
+    staging = Path(tempfile.mkdtemp(prefix=".supabase-detail-", dir=output_root))
+    try:
+        manifest = build_large_transactions_delta_manifest(
+            source, base_package, staging
+        )
+        final = output_root / manifest["datasetVersion"]
+        manifest_path = staging / "manifest.json"
+        manifest_path.write_text(
+            json.dumps(manifest, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+            newline="\n",
+        )
+        if final.exists():
+            existing = json.loads((final / "manifest.json").read_text(encoding="utf-8"))
+            if existing.get("sourceManifestSha256") != manifest["sourceManifestSha256"]:
+                raise CompactExportError(f"Existing package conflicts with {final.name}")
+            shutil.rmtree(staging)
+            return final, existing
+        staging.rename(final)
+        return final, manifest
+    except Exception:
+        if staging.exists():
+            shutil.rmtree(staging)
+        raise
 
 
 def export_package(source: Path, output_root: Path) -> tuple[Path, dict[str, Any]]:
@@ -731,6 +1404,12 @@ def _parser() -> argparse.ArgumentParser:
         child.add_argument("--source", type=Path, default=DEFAULT_SOURCE)
         if command == "export":
             child.add_argument("--output-root", type=Path, default=DEFAULT_OUTPUT_ROOT)
+    for command in ("plan-large-transactions", "export-large-transactions"):
+        child = subparsers.add_parser(command)
+        child.add_argument("--source", type=Path, default=DEFAULT_SOURCE)
+        child.add_argument("--base-package", type=Path, required=True)
+        if command == "export-large-transactions":
+            child.add_argument("--output-root", type=Path, default=DEFAULT_OUTPUT_ROOT)
     return parser
 
 
@@ -739,8 +1418,17 @@ def main(argv: Sequence[str] | None = None) -> int:
     try:
         if args.command == "plan":
             manifest = build_manifest(args.source)
-        else:
+        elif args.command == "export":
             package_path, manifest = export_package(args.source, args.output_root)
+            manifest = {**manifest, "packagePath": str(package_path)}
+        elif args.command == "plan-large-transactions":
+            manifest = build_large_transactions_delta_manifest(
+                args.source, args.base_package
+            )
+        else:
+            package_path, manifest = export_large_transactions_delta(
+                args.source, args.base_package, args.output_root
+            )
             manifest = {**manifest, "packagePath": str(package_path)}
     except (OSError, sqlite3.Error, ValueError, CompactExportError) as error:
         raise SystemExit(f"compact export failed: {error}") from error

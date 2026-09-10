@@ -1,4 +1,5 @@
 import hashlib
+from contextlib import contextmanager
 from pathlib import Path
 
 from scripts import export_compact_dashboard_supabase as exporter
@@ -74,11 +75,22 @@ def test_search_export_has_one_sorted_unique_term_array_per_document(monkeypatch
 
 def test_serving_identity_uses_schema_and_content_not_source_file_metadata() -> None:
     inputs = {
-        "lineages": [{"dataset_code": "DAILY_ARTICLES", "generated_at": "2026-09-09T00:00:00Z"}],
+        "lineages": [{
+            "dataset_code": "DAILY_ARTICLES",
+            "source_code": "rss",
+            "source_as_of_date": "2026-09-09",
+            "generated_at": "2026-09-09T00:00:00Z",
+            "source_status_code": "READY",
+            "source_row_count": 1,
+            "serving_row_count": 1,
+            "source_content_sha256": "d" * 64,
+            "metadata": {"projectionGeneratedAt": "2026-09-09T00:00:00Z", "scope": "cre"},
+        }],
         "table_hashes": {"articles": "a" * 64},
         "row_counts": {"articles": 1},
         "facets": {"news": {"availableThrough": "2026-09-09"}},
         "pulse_query_sha256": "b" * 64,
+        "large_transactions_query_sha256": "e" * 64,
     }
     first = exporter.serving_identity(**inputs)
     second = exporter.serving_identity(**inputs)
@@ -89,6 +101,94 @@ def test_serving_identity_uses_schema_and_content_not_source_file_metadata() -> 
     assert exporter.sha256_json(first) == exporter.sha256_json(second)
     changed = exporter.serving_identity(**{**inputs, "table_hashes": {"articles": "c" * 64}})
     assert exporter.sha256_json(first) != exporter.sha256_json(changed)
+    changed_query = exporter.serving_identity(
+        **{**inputs, "large_transactions_query_sha256": "f" * 64}
+    )
+    assert exporter.sha256_json(first) != exporter.sha256_json(changed_query)
+
+
+def test_stable_content_identity_ignores_only_defined_projection_clocks() -> None:
+    article = {
+        "document_id": "doc-1",
+        "published_at": "2026-09-10T01:00:00Z",
+        "collected_at": "2026-09-10T01:01:00Z",
+        "summary_text": "본문에 근거한 요약",
+        "summary_generated_at": "2026-09-10T01:02:00Z",
+        "projection_generated_at": "2026-09-10T01:03:00Z",
+    }
+    baseline = exporter.sha256_json(exporter.content_identity_row("articles", article))
+
+    projection_only = {**article, "projection_generated_at": "2026-09-10T02:03:00Z"}
+    assert exporter.sha256_json(
+        exporter.content_identity_row("articles", projection_only)
+    ) == baseline
+    for field, replacement in (
+        ("published_at", "2026-09-10T02:00:00Z"),
+        ("collected_at", "2026-09-10T02:01:00Z"),
+        ("summary_text", "달라진 본문 근거 요약"),
+        ("summary_generated_at", "2026-09-10T02:02:00Z"),
+    ):
+        changed = {**article, field: replacement}
+        assert exporter.sha256_json(
+            exporter.content_identity_row("articles", changed)
+        ) != baseline
+
+    detail = {
+        "document_id": "doc-1",
+        "projection_generated_at": "2026-09-10T01:03:00Z",
+        "payload": {
+            "summary": "본문 요약",
+            "summaryGeneratedAt": "2026-09-10T01:02:00Z",
+            "collectedAt": "2026-09-10T01:01:00Z",
+        },
+    }
+    detail_baseline = exporter.sha256_json(
+        exporter.content_identity_row("article_details", detail)
+    )
+    assert exporter.sha256_json(
+        exporter.content_identity_row(
+            "article_details",
+            {**detail, "projection_generated_at": "2026-09-10T03:03:00Z"},
+        )
+    ) == detail_baseline
+    changed_payload = {**detail["payload"], "summary": "다른 본문 요약"}
+    assert exporter.sha256_json(
+        exporter.content_identity_row(
+            "article_details", {**detail, "payload": changed_payload}
+        )
+    ) != detail_baseline
+
+
+def test_lineage_identity_separates_projection_clock_but_keeps_substance() -> None:
+    lineage = {
+        "dataset_code": "DAILY_ARTICLES",
+        "source_code": "rss",
+        "source_as_of_date": "2026-09-10",
+        "generated_at": "2026-09-10T01:00:00Z",
+        "source_status_code": "READY",
+        "source_row_count": 12,
+        "serving_row_count": 12,
+        "source_content_sha256": "a" * 64,
+        "metadata": {"projectionGeneratedAt": "2026-09-10T01:00:00Z", "scope": "cre"},
+    }
+    baseline = exporter.content_identity_lineage(lineage)
+    clock_only = {
+        **lineage,
+        "generated_at": "2026-09-10T02:00:00Z",
+        "metadata": {**lineage["metadata"], "projectionGeneratedAt": "2026-09-10T02:00:00Z"},
+    }
+    assert exporter.content_identity_lineage(clock_only) == baseline
+    for field, replacement in (
+        ("source_as_of_date", "2026-09-11"),
+        ("source_status_code", "PARTIAL"),
+        ("source_row_count", 13),
+        ("serving_row_count", 13),
+        ("source_content_sha256", "b" * 64),
+    ):
+        assert exporter.content_identity_lineage({**lineage, field: replacement}) != baseline
+    assert exporter.content_identity_lineage(
+        {**lineage, "metadata": {**lineage["metadata"], "scope": "all"}}
+    ) != baseline
 
 
 def test_immutable_export_reuses_same_content_version_as_no_op(tmp_path, monkeypatch) -> None:
@@ -113,6 +213,97 @@ def test_immutable_export_reuses_same_content_version_as_no_op(tmp_path, monkeyp
     assert first_path == second_path
     assert first_manifest == second_manifest
     assert [path.name for path in output.iterdir()] == [dataset_version]
+
+
+def test_projection_regeneration_builds_the_same_logical_dataset(monkeypatch, tmp_path) -> None:
+    source = tmp_path / "source.db"
+    source.write_bytes(b"fixture")
+    clock = {"value": "2026-09-10T01:00:00Z"}
+
+    @contextmanager
+    def fake_source(_path):
+        yield object()
+
+    def fake_lineages(_connection):
+        return [{
+            "dataset_code": "DAILY_ARTICLES",
+            "source_code": "rss",
+            "source_as_of_date": "2026-09-10",
+            "generated_at": clock["value"],
+            "source_status_code": "READY",
+            "source_row_count": 1,
+            "serving_row_count": 1,
+            "source_content_sha256": "a" * 64,
+            "metadata": {"projectionGeneratedAt": clock["value"], "scope": "cre"},
+        }]
+
+    def article_dates(_connection):
+        return [{"article_date": "2026-09-10", "article_count": 1, "generated_at": clock["value"]}]
+
+    def articles(_connection):
+        return [{
+            "document_id": "doc-1",
+            "title": "기사",
+            "published_at": "2026-09-10T00:00:00Z",
+            "collected_at": "2026-09-10T00:01:00Z",
+            "summary_text": "본문 요약",
+            "summary_generated_at": "2026-09-10T00:02:00Z",
+            "projection_generated_at": clock["value"],
+        }]
+
+    def details(_connection):
+        return [{
+            "document_id": "doc-1",
+            "payload": {"summary": "본문 요약", "publishedAt": "2026-09-10T00:00:00Z"},
+            "projection_generated_at": clock["value"],
+        }]
+
+    def pulse(_connection):
+        large_transactions = {
+            "contractVersion": 1,
+            "minAreaPyeong": 5000,
+            "minAreaM2": 5000 * 400 / 121,
+            "areaBasis": "TRANSACTED_BUILDING_AREA",
+            "pageSize": 20,
+            "months": [],
+        }
+        return ([{
+            "as_of_period": "2026-09-01",
+            "payload": {
+                "asOfPeriod": "2026-09",
+                "generatedAt": clock["value"],
+                "largeTransactions": large_transactions,
+            },
+            "source_content_sha256": hashlib.sha256(clock["value"].encode()).hexdigest(),
+            "generated_at": clock["value"],
+        }], "b" * 64, "e" * 64)
+
+    facets = {
+        "news": {"availableThrough": "2026-09-10"},
+        "macro": {"availableThrough": "2026-09"},
+        "permits": {"availableThrough": "2026-09"},
+        "marketPulse": {"asOfPeriod": "2026-09"},
+    }
+    monkeypatch.setattr(exporter, "consistent_source", fake_source)
+    monkeypatch.setattr(exporter, "_source_metadata", lambda *_args: {"path": "fixture"})
+    monkeypatch.setattr(exporter, "lineage_rows", fake_lineages)
+    monkeypatch.setattr(
+        exporter,
+        "TABLE_BUILDERS",
+        (("article_dates", article_dates), ("articles", articles), ("article_details", details)),
+    )
+    monkeypatch.setattr(exporter, "market_pulse_rows", pulse)
+    monkeypatch.setattr(exporter, "_facets", lambda *_args: facets)
+
+    first = exporter.build_manifest(source)
+    clock["value"] = "2026-09-10T02:00:00Z"
+    second = exporter.build_manifest(source)
+
+    assert first["tableHashes"] != second["tableHashes"]
+    assert first["stableTableHashes"] == second["stableTableHashes"]
+    assert first["sourceManifestSha256"] == second["sourceManifestSha256"]
+    assert first["datasetVersion"] == second["datasetVersion"]
+    assert first["sourceAsOfAt"] != second["sourceAsOfAt"]
 
 
 def test_remote_semantic_normalization_is_type_stable() -> None:

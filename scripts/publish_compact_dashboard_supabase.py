@@ -23,6 +23,11 @@ from typing import Any, Iterable, Iterator, Mapping, Sequence
 from urllib.parse import unquote, urlsplit
 
 try:
+    from scripts.export_compact_dashboard_supabase import content_identity_row
+except ModuleNotFoundError:  # Direct ``python scripts/...`` execution.
+    from export_compact_dashboard_supabase import content_identity_row
+
+try:
     import psycopg
     from psycopg.conninfo import make_conninfo
     from psycopg.types.json import Jsonb
@@ -142,6 +147,16 @@ LOAD_ORDER = (
     "permit_monthly",
     "market_pulse",
 )
+DELTA_CHANGED_TABLES = ("market_pulse",)
+DELTA_SERVER_CLONE_TABLES = tuple(
+    table for table in LOAD_ORDER if table not in DELTA_CHANGED_TABLES
+)
+DELTA_MANIFEST_KEYS = {
+    "baseDatasetVersion",
+    "baseSourceManifestSha256",
+    "changedTables",
+    "requiredServerCloneTables",
+}
 MONTH_DATE_COLUMNS = {
     ("macro_series", "valid_from"),
     ("macro_series", "valid_to"),
@@ -264,7 +279,43 @@ def read_manifest(package: Path) -> dict[str, Any]:
         raise CompactPublishError("Package table set is incomplete or unexpected")
     if not SHA256_RE.fullmatch(str(manifest.get("sourceManifestSha256", ""))):
         raise CompactPublishError("Package source manifest hash is invalid")
+    stable_hashes = manifest.get("stableTableHashes")
+    if stable_hashes is not None and (
+        not isinstance(stable_hashes, dict)
+        or set(stable_hashes) != EXPECTED_TABLES
+        or any(not SHA256_RE.fullmatch(str(value)) for value in stable_hashes.values())
+    ):
+        raise CompactPublishError("Package stable table hashes are invalid")
+    _validated_delta_manifest(manifest)
     return manifest
+
+
+def _validated_delta_manifest(manifest: Mapping[str, Any]) -> dict[str, Any] | None:
+    """Validate the narrow, immutable one-table delta publication contract."""
+
+    delta = manifest.get("delta")
+    if delta is None:
+        return None
+    if not isinstance(delta, dict) or set(delta) != DELTA_MANIFEST_KEYS:
+        raise CompactPublishError("Package delta contract is incomplete or unexpected")
+    base_version = str(delta.get("baseDatasetVersion", ""))
+    if not DATASET_VERSION_RE.fullmatch(base_version):
+        raise CompactPublishError("Package delta base dataset version is invalid")
+    if base_version == str(manifest.get("datasetVersion", "")):
+        raise CompactPublishError("Package delta base and target versions must differ")
+    base_hash = str(delta.get("baseSourceManifestSha256", ""))
+    if not SHA256_RE.fullmatch(base_hash):
+        raise CompactPublishError("Package delta base manifest hash is invalid")
+    if delta.get("changedTables") != list(DELTA_CHANGED_TABLES):
+        raise CompactPublishError("Package delta changed-table set is unsupported")
+    if delta.get("requiredServerCloneTables") != list(DELTA_SERVER_CLONE_TABLES):
+        raise CompactPublishError("Package delta server-clone table set is invalid")
+    return {
+        "baseDatasetVersion": base_version,
+        "baseSourceManifestSha256": base_hash,
+        "changedTables": list(DELTA_CHANGED_TABLES),
+        "requiredServerCloneTables": list(DELTA_SERVER_CLONE_TABLES),
+    }
 
 
 def iter_package_rows(package: Path, table: str) -> Iterator[dict[str, Any]]:
@@ -291,11 +342,15 @@ def verify_package(package: Path) -> dict[str, Any]:
     verified: dict[str, Any] = {}
     for table in LOAD_ORDER:
         digest = hashlib.sha256()
+        stable_digest = hashlib.sha256()
         row_count = 0
         uncompressed_bytes = 0
         for row in iter_package_rows(package, table):
             encoded = (canonical_json(row) + "\n").encode("utf-8")
             digest.update(encoded)
+            stable_digest.update(
+                (canonical_json(content_identity_row(table, row)) + "\n").encode("utf-8")
+            )
             uncompressed_bytes += len(encoded)
             row_count += 1
         expected = manifest["tables"][table]
@@ -305,9 +360,19 @@ def verify_package(package: Path) -> dict[str, Any]:
             raise CompactPublishError(f"Package content-hash mismatch for {table}")
         if uncompressed_bytes != int(expected["uncompressedBytes"]):
             raise CompactPublishError(f"Package byte-count mismatch for {table}")
+        stable_expected = expected.get("stableContentSha256")
+        if stable_expected is not None and stable_digest.hexdigest() != stable_expected:
+            raise CompactPublishError(f"Package stable-content hash mismatch for {table}")
+        manifest_stable = manifest.get("stableTableHashes")
+        if manifest_stable is not None:
+            if not isinstance(manifest_stable, dict) or set(manifest_stable) != EXPECTED_TABLES:
+                raise CompactPublishError("Package stable table-hash set is incomplete")
+            if stable_digest.hexdigest() != manifest_stable.get(table):
+                raise CompactPublishError(f"Package stable table-hash mismatch for {table}")
         verified[table] = {
             "rowCount": row_count,
             "contentSha256": digest.hexdigest(),
+            "stableContentSha256": stable_digest.hexdigest(),
             "uncompressedBytes": uncompressed_bytes,
         }
     return {"verified": True, "tables": verified}
@@ -380,6 +445,96 @@ def inspect_target(dsn: str, identity: Mapping[str, str]) -> dict[str, Any]:
     }
 
 
+def inspect_active_publication(dsn: str) -> dict[str, Any]:
+    """Read the active immutable manifest and bounded capacity metadata."""
+
+    with _connect(dsn) as connection:
+        with connection.transaction():
+            connection.execute("SET LOCAL statement_timeout='15s'")
+            schema = connection.execute(
+                """SELECT schema_value FROM cre_system.schema_meta
+                   WHERE schema_key='compact_dashboard_schema_version'"""
+            ).fetchone()
+            if schema is None or schema[0] != EXPECTED_SCHEMA_VERSION:
+                raise CompactPublishError("Apply the compact migration before publishing")
+            active = connection.execute(
+                """SELECT version.dataset_version,version.status_code,
+                          version.source_manifest_sha256,version.row_counts,
+                          version.table_hashes,version.source_as_of_at
+                   FROM cre_system.active_manifest manifest
+                   JOIN cre_system.dataset_versions version USING(dataset_version)
+                   WHERE manifest.slot='dashboard'"""
+            ).fetchone()
+            database_bytes = int(
+                connection.execute("SELECT pg_database_size(current_database())").fetchone()[0]
+            )
+            versions = [
+                {
+                    "datasetVersion": row[0],
+                    "status": row[1],
+                    "previouslyActivated": row[2] is not None,
+                    "activeReferenced": bool(row[3]),
+                }
+                for row in connection.execute(
+                    """SELECT version.dataset_version,version.status_code,
+                              version.activated_at,
+                              EXISTS(
+                                SELECT 1 FROM cre_system.active_manifest reference
+                                WHERE reference.dataset_version=version.dataset_version
+                              )
+                       FROM cre_system.dataset_versions version
+                       ORDER BY version.created_at,version.dataset_version"""
+                )
+            ]
+    return {
+        "schemaVersion": schema[0],
+        "databaseBytes": database_bytes,
+        "active": None
+        if active is None
+        else {
+            "datasetVersion": active[0],
+            "status": active[1],
+            "sourceManifestSha256": active[2],
+            "rowCounts": active[3],
+            "tableHashes": active[4],
+            "sourceAsOfAt": active[5],
+        },
+        "versions": versions,
+    }
+
+
+def verify_active_publication(dsn: str, manifest: Mapping[str, Any]) -> dict[str, Any]:
+    """Read back the committed pointer and counts after the transactional gate."""
+
+    inspected = inspect_active_publication(dsn)
+    active = inspected["active"]
+    if active is None:
+        raise CompactPublishError("Active publication readback is missing")
+    expected_counts = {
+        table: int(value) for table, value in manifest["rowCounts"].items()
+    }
+    if (
+        active["datasetVersion"] != manifest["datasetVersion"]
+        or active["status"] != "ACTIVE"
+        or active["sourceManifestSha256"] != manifest["sourceManifestSha256"]
+        or active["tableHashes"] != manifest["tableHashes"]
+        or active["rowCounts"] != expected_counts
+    ):
+        raise CompactPublishError("Active publication manifest readback failed")
+    with _connect(dsn) as connection:
+        actual_counts = _remote_counts(connection, manifest["datasetVersion"])
+    if actual_counts != expected_counts:
+        raise CompactPublishError("Active publication row-count readback failed")
+    return {
+        "verified": True,
+        "datasetVersion": manifest["datasetVersion"],
+        "sourceManifestSha256": manifest["sourceManifestSha256"],
+        "rowCounts": actual_counts,
+        "databaseBytes": inspected["databaseBytes"],
+        "verificationMode": "post-commit-manifest-and-count-readback",
+    }
+
+
 def apply_migration(dsn: str, migration: Path, identity: Mapping[str, str]) -> dict[str, Any]:
     sql = migration.expanduser().resolve(strict=True).read_text(encoding="utf-8")
     if "compact_dashboard_schema_version" not in sql or "cre_system" not in sql:
@@ -431,6 +586,132 @@ def _copy_table(connection: Any, package: Path, dataset_version: str, table: str
                 copy.write_row(values)
                 count += 1
     return count
+
+
+def _clone_table(
+    connection: Any,
+    *,
+    table: str,
+    source_dataset_version: str,
+    target_dataset_version: str,
+) -> int:
+    target, columns, _json_columns = TABLE_SPECS[table]
+    selected = ",".join(columns)
+    result = connection.execute(
+        f"""INSERT INTO {target}(dataset_version,{selected})
+            SELECT %s,{selected} FROM {target} WHERE dataset_version=%s""",
+        (target_dataset_version, source_dataset_version),
+    )
+    return int(result.rowcount)
+
+
+def _server_table_difference_count(
+    connection: Any,
+    *,
+    table: str,
+    source_dataset_version: str,
+    target_dataset_version: str,
+) -> dict[str, int]:
+    """Prove exact typed equality in both directions without row egress."""
+
+    target, columns, _json_columns = TABLE_SPECS[table]
+    selected = ",".join(columns)
+    source_minus_target = int(
+        connection.execute(
+            f"""SELECT count(*) FROM (
+                   SELECT {selected} FROM {target} WHERE dataset_version=%s
+                   EXCEPT ALL
+                   SELECT {selected} FROM {target} WHERE dataset_version=%s
+                 ) difference""",
+            (source_dataset_version, target_dataset_version),
+        ).fetchone()[0]
+    )
+    target_minus_source = int(
+        connection.execute(
+            f"""SELECT count(*) FROM (
+                   SELECT {selected} FROM {target} WHERE dataset_version=%s
+                   EXCEPT ALL
+                   SELECT {selected} FROM {target} WHERE dataset_version=%s
+                 ) difference""",
+            (target_dataset_version, source_dataset_version),
+        ).fetchone()[0]
+    )
+    return {
+        "sourceMinusTarget": source_minus_target,
+        "targetMinusSource": target_minus_source,
+    }
+
+
+def _active_table_reuse_plan(
+    connection: Any,
+    manifest: Mapping[str, Any],
+) -> tuple[str | None, tuple[str, ...], tuple[str, ...]]:
+    """Select only tables backed by the active version's verified exact hash."""
+
+    active = connection.execute(
+        """SELECT version.dataset_version,version.table_hashes,version.row_counts
+           FROM cre_system.active_manifest active
+           JOIN cre_system.dataset_versions version USING(dataset_version)
+           WHERE active.slot='dashboard' AND version.status_code='ACTIVE'
+           FOR SHARE OF active,version"""
+    ).fetchone()
+    if active is None:
+        return None, (), tuple(LOAD_ORDER)
+    active_hashes = active[1]
+    active_counts = active[2]
+    if not isinstance(active_hashes, Mapping) or not isinstance(active_counts, Mapping):
+        return str(active[0]), (), tuple(LOAD_ORDER)
+    reusable = tuple(
+        table
+        for table in LOAD_ORDER
+        if active_hashes.get(table) == manifest["tableHashes"].get(table)
+        and int(active_counts.get(table, -1)) == int(manifest["rowCounts"].get(table, -2))
+    )
+    copied = tuple(table for table in LOAD_ORDER if table not in reusable)
+    return str(active[0]), reusable, copied
+
+
+def _enforce_delta_publish_guard(
+    connection: Any,
+    manifest: Mapping[str, Any],
+    *,
+    reuse_source: str | None,
+    reused_tables: Sequence[str],
+    copied_tables: Sequence[str],
+    target_exists: bool,
+) -> dict[str, Any] | None:
+    """Fail closed unless the locked active base and exact delta plan still match."""
+
+    delta = _validated_delta_manifest(manifest)
+    if delta is None:
+        return None
+    active = connection.execute(
+        """SELECT version.dataset_version,version.source_manifest_sha256
+           FROM cre_system.active_manifest active
+           JOIN cre_system.dataset_versions version USING(dataset_version)
+           WHERE active.slot='dashboard' AND version.status_code='ACTIVE'
+           FOR SHARE OF active,version"""
+    ).fetchone()
+    if active is None:
+        raise CompactPublishError("Delta publish requires an active base dataset")
+    if str(active[0]) != delta["baseDatasetVersion"]:
+        raise CompactPublishError("Delta publish base dataset is no longer active")
+    if str(active[1]) != delta["baseSourceManifestSha256"]:
+        raise CompactPublishError("Delta publish active base manifest hash changed")
+    if reuse_source != delta["baseDatasetVersion"]:
+        raise CompactPublishError("Delta publish clone source does not match its active base")
+    if tuple(reused_tables) != DELTA_SERVER_CLONE_TABLES:
+        raise CompactPublishError("Delta publish server-clone plan drifted")
+    if tuple(copied_tables) != DELTA_CHANGED_TABLES:
+        raise CompactPublishError("Delta publish client-copy plan drifted")
+    return {
+        "validated": True,
+        "baseDatasetVersion": delta["baseDatasetVersion"],
+        "baseSourceManifestSha256": delta["baseSourceManifestSha256"],
+        "serverCloneTables": list(reused_tables),
+        "clientCopyTables": list(copied_tables),
+        "targetAlreadyExisted": target_exists,
+    }
 
 
 def _seed_auth(connection: Any, subjects: Sequence[Mapping[str, Any]]) -> None:
@@ -525,11 +806,16 @@ def verify_remote_semantic_parity(
     connection: Any,
     package: Path,
     dataset_version: str,
+    *,
+    tables: Sequence[str] = LOAD_ORDER,
 ) -> dict[str, dict[str, Any]]:
     """Compare every stored value with its package row after target-type normalization."""
 
     parity: dict[str, dict[str, Any]] = {}
-    for table in LOAD_ORDER:
+    unknown = set(tables) - set(LOAD_ORDER)
+    if unknown:
+        raise CompactPublishError(f"Unknown semantic parity tables: {sorted(unknown)!r}")
+    for table in tables:
         target, columns, _json_columns = TABLE_SPECS[table]
         select_columns = ",".join(columns)
         sql = (
@@ -540,6 +826,7 @@ def verify_remote_semantic_parity(
         package_digest = hashlib.sha256()
         remote_digest = hashlib.sha256()
         row_count = 0
+        semantic_bytes = 0
         with connection.cursor(name=f"semantic_{table}") as cursor:
             cursor.itersize = 2_000
             cursor.execute(sql, (dataset_version,))
@@ -566,6 +853,7 @@ def verify_remote_semantic_parity(
                 remote_encoded = (canonical_json(normalized_remote) + "\n").encode("utf-8")
                 package_digest.update(package_encoded)
                 remote_digest.update(remote_encoded)
+                semantic_bytes += len(remote_encoded)
                 row_count += 1
         try:
             next(package_rows)
@@ -579,6 +867,7 @@ def verify_remote_semantic_parity(
             "rowCount": row_count,
             "semanticSha256": remote_digest.hexdigest(),
             "packageSemanticSha256": package_digest.hexdigest(),
+            "semanticReadbackBytes": semantic_bytes,
             "matched": True,
         }
     return parity
@@ -589,6 +878,9 @@ def preactivation_parity_gate(
     package: Path,
     dataset_version: str,
     expected_counts: Mapping[str, int],
+    *,
+    semantic_tables: Sequence[str] | None = None,
+    server_clone_evidence: Mapping[str, Mapping[str, Any]] | None = None,
 ) -> tuple[dict[str, int], dict[str, dict[str, Any]]]:
     """Block active-pointer mutation unless counts and every normalized value match."""
 
@@ -597,7 +889,39 @@ def preactivation_parity_gate(
         raise CompactPublishError(
             f"Remote count parity failed: expected={dict(expected_counts)!r}, actual={actual_counts!r}"
         )
-    semantic_parity = verify_remote_semantic_parity(connection, package, dataset_version)
+    if semantic_tables is None:
+        semantic_parity = verify_remote_semantic_parity(connection, package, dataset_version)
+    else:
+        semantic_parity = verify_remote_semantic_parity(
+            connection,
+            package,
+            dataset_version,
+            tables=semantic_tables,
+        )
+    for table, evidence in (server_clone_evidence or {}).items():
+        if table in semantic_parity:
+            raise CompactPublishError(f"Table has duplicate parity modes: {table}")
+        difference = evidence.get("bidirectionalExceptAll")
+        if (
+            not isinstance(difference, Mapping)
+            or int(difference.get("sourceMinusTarget", -1)) != 0
+            or int(difference.get("targetMinusSource", -1)) != 0
+            or int(evidence.get("rowCount", -1)) != int(expected_counts.get(table, -2))
+        ):
+            raise CompactPublishError(f"Server clone parity failed for {table}")
+        semantic_parity[table] = {
+            "matched": True,
+            "rowCount": int(evidence["rowCount"]),
+            "validationMode": "server-clone-bidirectional-except-all",
+            "sourceDatasetVersion": evidence["sourceDatasetVersion"],
+            "bidirectionalExceptAll": dict(difference),
+            "semanticReadbackBytes": 0,
+        }
+    for table in semantic_tables or LOAD_ORDER:
+        if table in semantic_parity:
+            semantic_parity[table].setdefault(
+                "validationMode", "client-full-semantic-readback"
+            )
     if set(semantic_parity) != set(expected_counts) or any(
         not result.get("matched")
         or int(result.get("rowCount", -1)) != int(expected_counts[table])
@@ -613,14 +937,33 @@ def publish_package(
     auth_db: Path,
     *,
     activate: bool,
+    max_database_bytes: int | None = None,
+    seed_auth: bool = True,
 ) -> dict[str, Any]:
+    started = perf_counter()
     package = package.expanduser().resolve(strict=True)
     manifest = read_manifest(package)
     package_verification = verify_package(package)
-    subjects = read_auth_subjects(auth_db)
+    delta = _validated_delta_manifest(manifest)
+    if delta is not None and seed_auth:
+        raise CompactPublishError("Delta publication requires preserved authorization")
+    subjects = read_auth_subjects(auth_db) if seed_auth else []
     dataset_version = manifest["datasetVersion"]
     expected_counts = {key: int(value) for key, value in manifest["rowCounts"].items()}
     action = "loaded"
+    table_actions: dict[str, dict[str, Any]] = {}
+    reused_tables: tuple[str, ...] = ()
+    copied_tables: tuple[str, ...] = tuple(LOAD_ORDER)
+    uploaded_tables: tuple[str, ...] = ()
+    reuse_source: str | None = None
+    database_bytes_before = 0
+    database_bytes_after_load = 0
+    auth_subject_count_before = 0
+    auth_subject_count_after = 0
+    delta_guard: dict[str, Any] | None = None
+    estimated_growth_bytes = int(manifest["estimatedUploadBytes"]) * 2
+    if max_database_bytes is not None and max_database_bytes <= 0:
+        raise CompactPublishError("Maximum database bytes must be positive")
 
     with _connect(dsn) as connection:
         with connection.transaction():
@@ -635,12 +978,45 @@ def publish_package(
             ).fetchone()
             if schema_version is None or schema_version[0] != EXPECTED_SCHEMA_VERSION:
                 raise CompactPublishError("Apply the compact migration before publishing")
+            auth_subject_count_before = int(
+                connection.execute(
+                    "SELECT count(*) FROM cre_system.authorized_subjects"
+                ).fetchone()[0]
+            )
+            database_bytes_before = int(
+                connection.execute("SELECT pg_database_size(current_database())").fetchone()[0]
+            )
+            if (
+                max_database_bytes is not None
+                and database_bytes_before + estimated_growth_bytes > max_database_bytes
+            ):
+                raise CompactPublishError(
+                    "Capacity guard rejected the publish before any dataset write"
+                )
             existing = connection.execute(
                 """SELECT source_manifest_sha256,schema_version,status_code
                    FROM cre_system.dataset_versions WHERE dataset_version=%s""",
                 (dataset_version,),
             ).fetchone()
+            if existing is None or delta is not None:
+                planned_source, planned_reused, planned_copied = _active_table_reuse_plan(
+                    connection, manifest
+                )
+                delta_guard = _enforce_delta_publish_guard(
+                    connection,
+                    manifest,
+                    reuse_source=planned_source,
+                    reused_tables=planned_reused,
+                    copied_tables=planned_copied,
+                    target_exists=existing is not None,
+                )
             if existing is None:
+                reuse_source, reused_tables, copied_tables = (
+                    planned_source,
+                    planned_reused,
+                    planned_copied,
+                )
+                uploaded_tables = copied_tables
                 connection.execute(
                     """INSERT INTO cre_system.dataset_versions(
                          dataset_version,schema_version,status_code,source_as_of_at,
@@ -679,10 +1055,49 @@ def publish_package(
                             Jsonb(lineage["metadata"]),
                         ),
                     )
-                copied = {
-                    table: _copy_table(connection, package, dataset_version, table)
-                    for table in LOAD_ORDER
-                }
+                copied: dict[str, int] = {}
+                clone_evidence: dict[str, dict[str, Any]] = {}
+                for table in LOAD_ORDER:
+                    table_started = perf_counter()
+                    if table in reused_tables:
+                        if reuse_source is None:
+                            raise CompactPublishError("Server clone has no active source version")
+                        row_count = _clone_table(
+                            connection,
+                            table=table,
+                            source_dataset_version=reuse_source,
+                            target_dataset_version=dataset_version,
+                        )
+                        difference = _server_table_difference_count(
+                            connection,
+                            table=table,
+                            source_dataset_version=reuse_source,
+                            target_dataset_version=dataset_version,
+                        )
+                        clone_evidence[table] = {
+                            "rowCount": row_count,
+                            "sourceDatasetVersion": reuse_source,
+                            "bidirectionalExceptAll": difference,
+                        }
+                        table_actions[table] = {
+                            "action": "server-clone",
+                            "rowCount": row_count,
+                            "packageUncompressedBytesSent": 0,
+                            "sourceDatasetVersion": reuse_source,
+                            "bidirectionalExceptAll": difference,
+                            "durationMs": round((perf_counter() - table_started) * 1_000, 3),
+                        }
+                    else:
+                        row_count = _copy_table(connection, package, dataset_version, table)
+                        table_actions[table] = {
+                            "action": "client-copy",
+                            "rowCount": row_count,
+                            "packageUncompressedBytesSent": int(
+                                manifest["tables"][table]["uncompressedBytes"]
+                            ),
+                            "durationMs": round((perf_counter() - table_started) * 1_000, 3),
+                        }
+                    copied[table] = row_count
                 if copied != expected_counts:
                     raise CompactPublishError(f"COPY count mismatch: {copied!r}")
                 connection.execute(
@@ -695,16 +1110,46 @@ def publish_package(
                 if existing[0] != manifest["sourceManifestSha256"] or existing[1] != manifest["schemaVersion"]:
                     raise CompactPublishError("Existing dataset version has conflicting identity")
                 action = "verified-existing"
+                clone_evidence = {}
+                copied_tables = tuple(LOAD_ORDER)
+                uploaded_tables = ()
 
-            _seed_auth(connection, subjects)
+            if seed_auth:
+                _seed_auth(connection, subjects)
+            auth_subject_count_after = int(
+                connection.execute(
+                    "SELECT count(*) FROM cre_system.authorized_subjects"
+                ).fetchone()[0]
+            )
+            if not seed_auth and auth_subject_count_after != auth_subject_count_before:
+                raise CompactPublishError(
+                    "Automatic publication unexpectedly changed authorization subjects"
+                )
             actual_counts, semantic_gate = preactivation_parity_gate(
                 connection,
                 package,
                 dataset_version,
                 expected_counts,
+                semantic_tables=copied_tables,
+                server_clone_evidence=clone_evidence,
             )
+            for table in copied_tables:
+                if table in table_actions:
+                    table_actions[table]["semanticReadbackBytes"] = int(
+                        semantic_gate[table]["semanticReadbackBytes"]
+                    )
             for table in LOAD_ORDER:
                 connection.execute(f"ANALYZE {TABLE_SPECS[table][0]}")
+            database_bytes_after_load = int(
+                connection.execute("SELECT pg_database_size(current_database())").fetchone()[0]
+            )
+            if (
+                max_database_bytes is not None
+                and database_bytes_after_load > max_database_bytes
+            ):
+                raise CompactPublishError(
+                    "Capacity guard rolled back the publish before activation"
+                )
             if activate:
                 connection.execute(
                     """UPDATE cre_system.dataset_versions SET status_code='RETIRED'
@@ -737,8 +1182,33 @@ def publish_package(
         "status": final_status,
         "rowCounts": actual_counts,
         "preactivationSemanticParity": semantic_gate,
-        "authSubjectCount": len(subjects),
+        "authSubjectCount": auth_subject_count_after,
+        "authSubjectsSeeded": bool(seed_auth),
+        "authSubjectCountBefore": auth_subject_count_before,
+        "authSubjectCountAfter": auth_subject_count_after,
+        "deltaGuard": delta_guard,
         "packageVerification": package_verification,
+        "tableActions": table_actions,
+        "clientCopiedTables": list(uploaded_tables),
+        "semanticReadbackTables": list(copied_tables),
+        "serverClonedTables": list(reused_tables),
+        "clientCopiedRows": sum(actual_counts[table] for table in uploaded_tables),
+        "serverClonedRows": sum(actual_counts[table] for table in reused_tables),
+        "packageUncompressedBytesSent": sum(
+            int(manifest["tables"][table]["uncompressedBytes"])
+            for table in uploaded_tables
+        ),
+        "semanticReadbackBytes": sum(
+            int(semantic_gate[table].get("semanticReadbackBytes", 0))
+            for table in LOAD_ORDER
+        ),
+        "capacity": {
+            "databaseBytesBefore": database_bytes_before,
+            "databaseBytesAfterLoad": database_bytes_after_load,
+            "estimatedGrowthBytesGuarded": estimated_growth_bytes,
+            "maximumDatabaseBytes": max_database_bytes,
+        },
+        "durationMs": round((perf_counter() - started) * 1_000, 3),
     }
 
 
@@ -1186,6 +1656,12 @@ def _parser() -> argparse.ArgumentParser:
     publish_parser.add_argument("--auth-db", type=Path, default=DEFAULT_AUTH_DB)
     publish_parser.add_argument("--apply", action="store_true")
     publish_parser.add_argument("--activate", action="store_true")
+    publish_parser.add_argument(
+        "--preserve-auth",
+        action="store_true",
+        help="Do not read or seed local authorization subjects during publication",
+    )
+    publish_parser.add_argument("--max-database-bytes", type=int)
     publish_parser.add_argument("--report", type=Path)
 
     verify_parser = subparsers.add_parser("verify-remote")
@@ -1226,13 +1702,20 @@ def main(argv: Sequence[str] | None = None) -> int:
                 result = apply_migration(dsn, args.migration, identity)
         elif args.command == "publish":
             if not args.apply:
+                package_manifest = read_manifest(args.package)
                 result = {
                     "mode": "PLAN",
                     "willWrite": False,
                     "target": inspect_target(dsn, identity),
-                    "package": read_manifest(args.package),
+                    "package": package_manifest,
                     "packageVerification": verify_package(args.package),
-                    "authSubjectCount": len(read_auth_subjects(args.auth_db)),
+                    "authSubjectCount": (
+                        None
+                        if args.preserve_auth
+                        else len(read_auth_subjects(args.auth_db))
+                    ),
+                    "preserveAuthRequested": bool(args.preserve_auth),
+                    "maximumDatabaseBytes": args.max_database_bytes,
                     "activateRequested": bool(args.activate),
                 }
             else:
@@ -1241,8 +1724,21 @@ def main(argv: Sequence[str] | None = None) -> int:
                     args.package,
                     args.auth_db,
                     activate=bool(args.activate),
+                    max_database_bytes=args.max_database_bytes,
+                    seed_auth=not bool(args.preserve_auth),
                 )
-                verified = verify_remote(dsn, args.package) if args.activate else None
+                if not args.activate:
+                    verified = None
+                elif args.preserve_auth:
+                    # The legacy end-to-end verifier deliberately exercises the
+                    # login-rate limiter.  A preserve-auth publication instead
+                    # performs only bounded pointer/hash/count readback; full
+                    # semantic parity already passed before activation.
+                    verified = verify_active_publication(
+                        dsn, read_manifest(args.package)
+                    )
+                else:
+                    verified = verify_remote(dsn, args.package)
                 result = {"publish": published, "verification": verified}
                 write_report(args.report, result)
         elif args.command == "verify-remote":
